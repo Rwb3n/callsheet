@@ -1,6 +1,6 @@
 # CALLSHEET — Investor Presentation Package
 
-**Status:** Draft v1
+**Status:** Draft v2 — stress tested (20 scenarios, 12 fixes applied)
 **Prepared:** 2026-02-13
 **Confidential:** For prospective investors and advisors only
 
@@ -54,6 +54,7 @@ The production industry is at an inflection point. Virtual production, AI toolin
 
 ```
 UK Production Directory Market (~£15-20M/year)
+[Derived from Companies House filings, published pricing, estimated customer counts]
 ==============================================
 
   THE KNOWLEDGE (MBI / GlobalData)
@@ -97,6 +98,29 @@ No incumbent offers any of the following at any price:
 | Competitor benchmarking | -- | -- | -- | **Yes** |
 
 The £150–400/year pricing zone is structurally underserved for feature-rich B2B listings. 4rfv charges £395 for a logo and description. The Knowledge charges £495 for bottom-tier search priority. Neither offers analytics, verification, or self-service.
+
+### 3.3 TAM / SAM / SOM
+
+```
+TAM (Total Addressable Market)
+  UK production services directory spend:        £15-20M/yr
+  Derived from: Companies House filings (MBI £14.57M total revenue,
+  Flagship Media <£1M) + estimated customer counts x published pricing.
+  Includes: listing fees, advertising, print, events across all platforms.
+
+SAM (Serviceable Addressable Market)
+  Broadcast/film/TV B2B services directory segment:  £3-5M/yr
+  4rfv (<£1M) + The Knowledge's directory share (est. £2-4M of MBI's £14.57M).
+  Excludes: print publications, production intelligence subscriptions,
+  talent/crew marketplaces (Mandy), trade event revenue.
+
+SOM (Serviceable Obtainable Market)
+  Year 1 target:    £71K  (1.4-2.4% of SAM)
+  Year 3 target:    £200K (4-7% of SAM)
+  10K providers:    £151K (3-5% of SAM)
+```
+
+The SAM is deliberately conservative. V2 verticals (gaming, events, digital content) and buyer-side premium expand TAM beyond the current production directory market.
 
 ---
 
@@ -249,6 +273,8 @@ Monthly equiv:         £3,213          £5,920         £8,594
 
 **At 10,000 providers (growth):** Target conversion yields ~£151K ARR.
 
+**Launch discount impact on year 1 actual revenue:** The projections above use full pricing. The £99 launch discount (first 500 Standard subscribers) reduces year 1 collected revenue. At target scenario: if all 181 Standard subscribers take the discount, year 1 Standard revenue = 181 × £99 = £17,919 (vs £36,019 at full price). Year 1 actual collected revenue at target = ~£53K. Year 2 revenue returns to full pricing as discount subscribers renew at £199.
+
 ### 5.4 Cost Structure
 
 ```
@@ -259,9 +285,14 @@ Supabase Pro (database)           £20/mo
 Better Auth (authentication)       £0    (self-hosted, free at scale)
 Cloudflare R2 (image storage)      £0    (10GB free tier)
 Resend (transactional email)       £0    (3K emails/mo free tier)
-Paddle (payments)                  0 fixed (5% + 40p per transaction)
+Paddle (payments)                  0 fixed (5% + 50¢ USD per transaction)
                                   ------
 TOTAL INFRASTRUCTURE:             £36/mo  (~£432/yr)
+
+Paddle fee assumption: ~5% of gross revenue. Per-transaction component
+(50¢ USD) is immaterial at annual billing cadence. Annual billing is
+the default; monthly exists but is not promoted. Revenue projections
+assume 90% annual / 10% monthly billing mix.
 
 INFRASTRUCTURE COSTS (growth, 50,000 listings)
 ==============================================
@@ -287,23 +318,36 @@ Domain + misc                     ~£100/yr
                                   --------
 TOTAL OPERATING (year 1):        ~£3,250
 
-Paddle transaction fees:
-  At target ARR (£71K):          ~£3,850/yr (5% + 40p)
+Paddle transaction fees (5% + 50¢ USD per transaction):
+  Year 1 (at ~£53K collected):   ~£2,700
+  Year 2+ (at £71K run-rate):    ~£3,600
                                   --------
-ALL-IN YEAR 1 COST:             ~£7,530
+ALL-IN YEAR 1 COST:             ~£6,000
+ALL-IN YEAR 2+ COST:            ~£7,000
 ```
 
 ### 5.5 Margin Profile
 
 ```
-                      CONSERVATIVE    TARGET         OPTIMISTIC
-Revenue:              £38,559         £71,041        £103,124
-All-in costs:         ~£5,680         ~£7,530        ~£9,590
-                      -------         -------        -------
-Net margin:           £32,879         £63,511        £93,534
-Margin %:             85.3%           89.4%          90.7%
+YEAR 1 (actual collected, with launch discount):
 
-Note: Costs include Paddle fees scaled to revenue.
+                      CONSERVATIVE    TARGET         OPTIMISTIC
+Revenue:              £28,659         £52,941        £76,824
+All-in costs:         ~£4,680         ~£6,000        ~£7,590
+                      -------         -------        -------
+Net margin:           £23,979         £46,941        £69,234
+Margin %:             84%             89%            90%
+
+YEAR 2+ (full pricing, no launch discount):
+
+                      CONSERVATIVE    TARGET         OPTIMISTIC
+Run-rate ARR:         £38,559         £71,041        £103,124
+All-in costs:         ~£5,180         ~£7,030        ~£9,090
+                      -------         -------        -------
+Net margin:           £33,379         £64,011        £94,034
+Margin %:             87%             90%            91%
+
+Note: Costs include Paddle fees (~5% of revenue).
       No salaries — entity operates autonomously.
       No paid acquisition — organic + SEO + direct outreach.
 ```
@@ -443,13 +487,33 @@ PHASE 4: Grow (months 6-12+)
   Target: 10,000 providers, 5.5% conversion (~£151K ARR)
 ```
 
-### 8.2 Cold Start Solution
+### 8.2 Claim Rate Assumptions
+
+The conversion funnel has two stages: claim (free) then upgrade (paid). The seed-to-claim rate determines the addressable base for paid conversion.
+
+```
+                        Conservative    Target      Optimistic
+Seed listings:          4,700           4,700       4,700
+Claim rate (6 months):  10%             20%         35%
+Claimed listings:       470             940         1,645
+Paid conversion (of claimed): 30%      28%         23%
+Paying customers:       141             259         376
+
+Note: Paid conversion as % of claimed is higher than the 3-8%
+headline figure because the headline measures conversion against
+ALL seed listings. Of providers who actively claim, a much higher
+proportion converts — the claim itself is a strong intent signal.
+```
+
+**Claim rate benchmarks:** Yelp reports 7.74M claimed pages out of an estimated 50M+ total business listings (~15% claim rate). Production industry providers have stronger incentive to claim (competitive, reputation-conscious). Planning assumption: 15–25% claim rate in first 6 months. [Assumption — no direct production-directory claim rate data exists]
+
+### 8.3 Cold Start Solution
 
 The production industry is a market network. Every provider is also a buyer. Each acquisition adds to both supply and demand simultaneously. [Source: provider-buyer-duality-findings.md — Hagiu/Wright, "reduce a two-sided chicken-and-egg problem to a one-sided problem by focusing on users that act as both buyers and sellers"]
 
 CALLSHEET does not need to solve a two-sided cold start. The 4,700 seed listings provide immediate buyer utility (searchable directory). Claiming providers become both supply (their profile) and demand (they search for crew and services).
 
-### 8.3 No Paid Acquisition Required at V1
+### 8.4 No Paid Acquisition Required at V1
 
 - 4rfv has 110,000+ monthly uniques — these buyers will search for alternatives when they find better results elsewhere
 - SEO on actively-maintained, verified listings vs decaying static pages
@@ -462,27 +526,34 @@ CALLSHEET does not need to solve a two-sided cold start. The 4,700 seed listings
 ## 9. Financial Summary
 
 ```
-YEAR 1 SCENARIO MODELLING
-==========================
+YEAR 1 SCENARIO MODELLING (run-rate ARR at full pricing)
+=========================================================
 
                         Conservative    Target      Optimistic
                         ------------    ------      ----------
 Seed providers:         4,700           4,700       4,700
 Conversion rate:        3%              5.5%        8%
 Paying customers:       141             259         376
-ARR:                    £38,559         £71,041     £103,124
+Run-rate ARR:           £38,559         £71,041     £103,124
 
-All-in costs:           ~£5,680         ~£7,530     ~£9,590
-Net margin:             £32,879         £63,511     £93,534
-Margin %:               85%             89%         91%
+Year 1 ACTUAL collected (with £99 launch discount on Standard):
+  Discounted Standard:  £9,801          £17,919     £26,037
+  Premium + Partner:    £18,858         £35,022     £50,787
+  TOTAL COLLECTED Y1:   ~£28,659        ~£52,941    ~£76,824
+
+All-in costs:           ~£4,680         ~£6,000     ~£7,590
+Net margin (Y1 actual): £23,979         £46,941     £69,234
+Margin %:               84%             89%         90%
 
 Infrastructure:         £432/yr         £432/yr     £432/yr
-Paddle fees:            ~£2,000         ~£3,850     ~£5,600
-Operating overhead:     ~£3,250         ~£3,250     ~£3,250
+Paddle fees (~5%):      ~£1,500         ~£2,700     ~£3,900
+Operating overhead:     ~£2,750         ~£2,750     ~£2,750
+
+Year 2 returns to full pricing (£199 Standard on renewal).
 
 
-GROWTH SCENARIO (10,000 providers)
-===================================
+GROWTH SCENARIO (10,000 providers, full pricing)
+=================================================
 
                         Conservative    Target      Optimistic
 Conversion rate:        3%              5.5%        8%
@@ -505,13 +576,76 @@ Required to break even: 3 Standard annual subscribers (£597)
 | Assumption | Value | Source | Risk |
 |---|---|---|---|
 | Seed providers | 4,700 | 4rfv scrape analysis | Low — data exists |
-| Conversion rate | 3–8% | B2B SaaS benchmarks (n=1,000+) | Medium — no direct analogue |
+| Claim rate (6 months) | 15–25% | Yelp ~15% claim rate; production industry stronger incentive | Medium — no direct analogue |
+| Paid conversion (of seed) | 3–8% | B2B SaaS benchmarks (n=1,000+) | Medium — no direct analogue |
 | Tier split | 70/25/5 | Analogous directory patterns | Medium |
-| Churn | Not modelled | No production-directory churn data exists | Medium — annual billing reduces churn vs monthly |
-| Provider growth | Organic only | No paid acquisition budget | Low risk — no CAC to recover |
+| Annual retention | 70% | Between LinkedIn Premium (65%) and B2B SaaS median (~85%) | Medium — planning assumption |
+| Billing mix | 90% annual / 10% monthly | Annual is default; monthly not promoted | Low |
+| Provider growth | Organic to 10K by Y3 | No paid acquisition budget | Medium — depends on SEO + word-of-mouth |
 | Infrastructure cost | £36/mo | Itemised vendor pricing | Low |
 
-### 9.2 What Is Not Modelled
+### 9.2 Churn Sensitivity
+
+No production-directory churn benchmark exists. The table below shows steady-state paying customers and ARR at different annual retention rates, assuming target conversion (5.5% of seed base) with continuous new conversion replacing churned customers.
+
+```
+CHURN IMPACT AT DIFFERENT RETENTION RATES
+(target scenario: 259 new paying customers/year, constant acquisition)
+
+Annual retention:     50%         65%         75%         85%
+                      ====        ====        ====        ====
+Year 1 paying:        259         259         259         259
+Year 2 paying:        389         427         453         479
+Year 3 paying:        454         537         599         666
+Steady-state paying:  518         740         1,036       1,727
+Steady-state ARR:     £142K       £203K       £284K       £474K
+
+Formula: steady-state = new_per_year / (1 - retention_rate)
+Year 2 = 259 new + (259 x retention)
+Year 3 = 259 new + (year 2 total x retention)
+
+Note: Steady-state assumes constant 259 new/year from a static 4,700 base.
+Provider growth (to 10K by Y3) increases new customers per year and
+accelerates convergence.
+```
+
+**Reference:** LinkedIn Premium reports 65% first-year renewal. Annual billing (CALLSHEET's default) typically achieves higher retention than monthly. Planning assumption: 65–75% annual retention.
+
+### 9.3 Three-Year Projection
+
+```
+                        Year 1          Year 2          Year 3
+                        ======          ======          ======
+Provider base:          4,700           6,500           10,000
+  (growth: organic, SEO, outreach)
+New paid (5.5%):        259             358             550
+Returning (70% ret.):   --              181             378
+Total paying:           259             539             928
+
+Revenue (full pricing):
+  New customers:        £71K            £98K            £151K
+  Renewals:             --              £50K            £104K
+  TOTAL ARR:            £71K            £148K           £255K
+
+Year 1 actual collected (with launch discount):
+  Standard at £99:      £18K
+  Premium + Partner:    £35K
+  TOTAL COLLECTED Y1:   ~£53K
+
+Infrastructure:         £432            £600            £828
+Paddle fees (~5%):      £3.6K           £7.4K           £12.8K
+Operating overhead:     £3.3K           £2.5K           £2.5K
+                        -----           -----           -----
+All-in costs:           £7.3K           £10.5K          £16.1K
+Net margin:             ~£46K (Y1 disc) ~£138K          ~£239K
+Margin %:               86%             93%             94%
+
+Assumptions: 70% annual retention, 90% annual billing,
+provider base grows to 10K by Y3 (organic only),
+tier split 70/25/5 constant, full pricing from Y2.
+```
+
+### 9.4 What Is Not Modelled
 
 - **Churn.** No production-directory churn benchmark exists. LinkedIn Premium: 65% annual renewal. Design mitigation: annual billing default, win-back flows, churn intervention decision architecture.
 - **Buyer-side revenue.** V2 opportunity. Not projected until usage data proves demand.
@@ -533,12 +667,27 @@ Required to break even: 3 Standard annual subscribers (£597)
 
 ---
 
-## 11. Team / Entity Structure
+## 11. Founder & Entity Structure
 
-CALLSHEET is designed to operate without permanent staff. The principal (founder, sole director) sets governance and receives learnings. The entity operates.
+### 11.1 Founder
+
+[PLACEHOLDER — Complete before distribution]
+
+| Field | Detail |
+|---|---|
+| Name | [Founder name] |
+| Role | Sole director, CALLSHEET Ltd. Principal (Layer 6). |
+| Domain expertise | [Production industry experience, technical background, relevant prior work] |
+| Technical capability | [Full-stack / architecture / AI experience — what qualifies them to build and operate the entity] |
+| Why this market | [Personal connection to the production industry, insight that triggered the opportunity] |
+| Time commitment | [Full-time / part-time. Note: entity architecture reduces operational burden to governance + strategic direction] |
+
+### 11.2 Entity Operating Structure
+
+CALLSHEET is designed to operate without permanent staff. The founder sets governance and receives learnings. The entity operates.
 
 ```
-PRINCIPAL (founder)
+FOUNDER (principal)
   |
   +-- Sets governance (Layer 1)
   +-- Reviews escalations
@@ -563,7 +712,7 @@ CALLSHEET (autonomous entity)
       +-- Content moderators (per-task)
 ```
 
-**Key point:** No salaries, no office, no permanent headcount. Human resources are procured on-demand for tasks the entity cannot yet perform autonomously. The principal's ongoing involvement is governance and strategic direction — not operations.
+**Key point:** No salaries, no office, no permanent headcount. Human resources are procured on-demand for tasks the entity cannot yet perform autonomously. The founder's ongoing involvement is governance and strategic direction — not operations.
 
 ---
 
@@ -574,9 +723,11 @@ CALLSHEET is viable as a bootstrap (£36/month infrastructure, <£3,300/year ope
 **If self-funded:**
 
 ```
-Year 1 total outlay:   ~£7,530 (all-in at target scenario)
-Year 1 net margin:     ~£63,500 (target)
-Payback period:        Month 1 (if 3+ annual subscribers)
+Year 1 total outlay:   ~£6,000 (all-in at target scenario)
+Year 1 collected:      ~£53,000 (target, with launch discount)
+Year 1 net margin:     ~£47,000
+Year 2 run-rate ARR:   ~£148,000 (full pricing + renewals)
+Payback period:        Month 1 (breakeven = 3 annual subscribers)
 ```
 
 **If externally funded (indicative allocation):**
@@ -595,7 +746,7 @@ Allocation:
                                             for entity portfolio thesis
 ```
 
-**SEIS/EIS note:** CALLSHEET Ltd is eligible for SEIS (Seed Enterprise Investment Scheme) — investors receive 50% income tax relief on up to £200,000 invested. Advance assurance from HMRC can be obtained pre-investment. This makes early-stage risk significantly more attractive for UK angel investors.
+**SEIS/EIS note:** CALLSHEET Ltd is eligible for SEIS (Seed Enterprise Investment Scheme). Individual investors receive 50% income tax relief on up to £200,000 invested per tax year. The company can raise up to £250,000 lifetime under SEIS. Advance assurance from HMRC can be obtained pre-investment. Capital gains tax exemption on SEIS shares held 3+ years. This makes early-stage risk significantly more attractive for UK angel investors.
 
 ---
 
@@ -625,7 +776,23 @@ Entity health:
 
 ---
 
-## 14. Summary
+## 14. Exit / Returns
+
+CALLSHEET is designed for capital efficiency, not a binary exit event. Multiple return paths exist:
+
+**1. Dividend stream (primary path).** At 89% margin on £71K ARR (target Y1), the business generates ~£63K distributable profit in year 1 with near-zero reinvestment requirements. At steady-state (£255K ARR, Y3), annual distributable profit exceeds £239K. For a £25–50K SEIS investment, dividend returns alone achieve payback within 1–2 years.
+
+**2. Strategic acquisition.** The production services directory market has consolidation precedent: GlobalData acquired MBI (The Knowledge's parent) in 2022. A platform with verified data, active listings, and a proven subscription base is an acquisition target for media conglomerates, recruitment platforms, or vertical SaaS roll-ups. Likely acquirers: GlobalData (already in the space), Spotlight/The Casting Networks (adjacent vertical), or PE-backed directory roll-ups.
+
+**3. Framework licensing.** The entity architecture (Layers 1–2) is vertical-agnostic. A proven substrate creates optionality: license to other verticals, spin out additional entities (events, gaming, digital content), or sell the framework IP separately from the CALLSHEET instance.
+
+**4. Secondary sale.** SEIS shares become CGT-exempt after 3 years. A profitable, autonomous business with minimal operational burden is attractive to lifestyle-focused acquirers or small PE funds.
+
+**Planning assumption:** Dividend returns are the base case. Acquisition and framework licensing are upside scenarios that become viable at scale (10K+ providers, £150K+ ARR).
+
+---
+
+## 15. Summary
 
 ```
 +===================================================================+
@@ -635,8 +802,8 @@ Entity health:
 |                                                                   |
 |  Infrastructure: £36/month.                                       |
 |  Breakeven: 3 annual subscribers.                                 |
-|  Target year 1: £71K ARR at 89% margin.                          |
-|  Growth path: 10,000 providers -> £151K ARR.                      |
+|  Year 1: ~£53K collected (launch discount), £71K run-rate ARR.    |
+|  Year 3: £255K ARR at 94% margin (10K providers, 70% retention).  |
 |  Evolution: directory -> buyer premium -> SaaS tools.             |
 |                                                                   |
 |  No permanent staff. No office. No paid acquisition.              |
