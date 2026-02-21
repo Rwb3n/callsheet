@@ -1,6 +1,6 @@
 # CALLSHEET — Investor Presentation Package
 
-**Status:** Draft v2 — stress tested (20 scenarios, 12 fixes applied)
+**Status:** Draft v3 — AI compute costs added, all figures recalculated
 **Prepared:** 2026-02-13
 **Confidential:** For prospective investors and advisors only
 
@@ -8,7 +8,7 @@
 
 ## 1. One-Liner
 
-CALLSHEET is an autonomous B2B discovery platform for UK production services — broadcast, film, and TV — replacing a legacy incumbent with actively-maintained data, intelligent matching, and a £36/month operating cost.
+CALLSHEET is an autonomous B2B discovery platform for UK production services — broadcast, film, and TV — replacing a legacy incumbent with actively-maintained data, intelligent matching, and a £416/month operating cost (platform infrastructure + AI compute).
 
 ---
 
@@ -286,8 +286,18 @@ Better Auth (authentication)       £0    (self-hosted, free at scale)
 Cloudflare R2 (image storage)      £0    (10GB free tier)
 Resend (transactional email)       £0    (3K emails/mo free tier)
 Paddle (payments)                  0 fixed (5% + 50¢ USD per transaction)
+AI compute (Claude subscription)  £380/mo
                                   ------
-TOTAL INFRASTRUCTURE:             £36/mo  (~£432/yr)
+PLATFORM INFRASTRUCTURE:          £36/mo   (~£432/yr)
+AI COMPUTE:                       £380/mo  (~£4,560/yr)
+TOTAL INFRASTRUCTURE:             £416/mo  (~£4,992/yr)
+
+The AI compute cost covers the autonomous decision layer: claim
+evaluation, quality scoring, churn detection, support triage, decay
+monitoring. At V1 scale, a fixed subscription covers this workload.
+At growth scale, API-based billing (~£200/mo based on projected
+decision volume) may reduce this cost. Projections use the higher
+£380 figure as the conservative assumption.
 
 Paddle fee assumption: ~5% of gross revenue. Per-transaction component
 (50¢ USD) is immaterial at annual billing cadence. Annual billing is
@@ -300,8 +310,9 @@ Vercel Pro                        £16/mo
 Supabase Pro (upgraded)           £36/mo
 Cloudflare R2                      £1/mo
 Resend (paid plan)                £16/mo
+AI compute (Claude subscription)  £380/mo  (or ~£200/mo on API billing)
                                   ------
-TOTAL INFRASTRUCTURE:             £69/mo  (~£828/yr)
+TOTAL INFRASTRUCTURE:             £449/mo  (~£5,388/yr)
 ```
 
 ```
@@ -322,8 +333,10 @@ Paddle transaction fees (5% + 50¢ USD per transaction):
   Year 1 (at ~£53K collected):   ~£2,700
   Year 2+ (at £71K run-rate):    ~£3,600
                                   --------
-ALL-IN YEAR 1 COST:             ~£6,000
-ALL-IN YEAR 2+ COST:            ~£7,000
+ALL-IN YEAR 1 COST:             ~£11,000
+  (infrastructure £4,992 + operating £3,250 + Paddle £2,700)
+ALL-IN YEAR 2+ COST:            ~£11,000
+  (infrastructure £4,992 + operating £2,250 + Paddle £3,600)
 ```
 
 ### 5.5 Margin Profile
@@ -333,23 +346,25 @@ YEAR 1 (actual collected, with launch discount):
 
                       CONSERVATIVE    TARGET         OPTIMISTIC
 Revenue:              £28,659         £52,941        £76,824
-All-in costs:         ~£4,680         ~£6,000        ~£7,590
+All-in costs:         ~£9,680         ~£11,000       ~£12,590
                       -------         -------        -------
-Net margin:           £23,979         £46,941        £69,234
-Margin %:             84%             89%            90%
+Net margin:           £18,979         £41,941        £64,234
+Margin %:             66%             79%            84%
 
 YEAR 2+ (full pricing, no launch discount):
 
                       CONSERVATIVE    TARGET         OPTIMISTIC
 Run-rate ARR:         £38,559         £71,041        £103,124
-All-in costs:         ~£5,180         ~£7,030        ~£9,090
+All-in costs:         ~£10,180        ~£12,030       ~£14,090
                       -------         -------        -------
-Net margin:           £33,379         £64,011        £94,034
-Margin %:             87%             90%            91%
+Net margin:           £28,379         £59,011        £89,034
+Margin %:             74%             83%            86%
 
-Note: Costs include Paddle fees (~5% of revenue).
+Note: Costs include AI compute (£4,560/yr), platform infrastructure
+      (£432/yr), Paddle fees (~5% of revenue), and operating overhead.
       No salaries — entity operates autonomously.
       No paid acquisition — organic + SEO + direct outreach.
+      AI compute cost is fixed — margin % improves as revenue scales.
 ```
 
 ---
@@ -358,11 +373,11 @@ Note: Costs include Paddle fees (~5% of revenue).
 
 ### 6.1 Structural Moats
 
-**1. Active data enrichment vs passive directory.** Incumbents wait for providers to update listings. CALLSHEET enriches continuously: Companies House API, domain verification, social signal, decay detection. Data quality is perception, not a feature.
+**1. Active data enrichment vs passive directory.** Business listing data decays at 22–30% per year. Incumbents wait for providers to update their own listings. CALLSHEET enriches continuously: Companies House API, domain verification, social signal, decay detection. Data quality is perception, not a feature.
 
 **2. Market network architecture.** Every user is simultaneously provider and buyer. Each acquisition adds to both supply and demand. Effective CAC is halved. [Source: provider-buyer-duality-findings.md — Hagiu/Wright framework]
 
-**3. Capital efficiency.** £36/month infrastructure. No human operator for routine operations. The entity operates autonomously within its decision authority and procures human resources on-demand when needed.
+**3. Capital efficiency.** £416/month total infrastructure (£36 platform + £380 AI compute). No human operator for routine operations. The entity operates autonomously within its decision authority and procures human resources on-demand when needed. AI compute is a fixed cost — margin improves as revenue scales against it.
 
 **4. Incumbent vulnerability.** 4rfv: 94% debt ratio, contracting assets, family-run, dated technology (ASP.NET), manual sales process. The Knowledge: £495 minimum paid tier on a WordPress template, owned by GlobalData (corporate parent with different priorities). Neither can respond with technology because they lack the engineering capacity.
 
@@ -541,13 +556,14 @@ Year 1 ACTUAL collected (with £99 launch discount on Standard):
   Premium + Partner:    £18,858         £35,022     £50,787
   TOTAL COLLECTED Y1:   ~£28,659        ~£52,941    ~£76,824
 
-All-in costs:           ~£4,680         ~£6,000     ~£7,590
-Net margin (Y1 actual): £23,979         £46,941     £69,234
-Margin %:               84%             89%         90%
+All-in costs:           ~£9,680         ~£11,000    ~£12,590
+Net margin (Y1 actual): £18,979         £41,941     £64,234
+Margin %:               66%             79%         84%
 
-Infrastructure:         £432/yr         £432/yr     £432/yr
+Infrastructure:         £4,992/yr       £4,992/yr   £4,992/yr
+  (platform £432 + AI compute £4,560)
 Paddle fees (~5%):      ~£1,500         ~£2,700     ~£3,900
-Operating overhead:     ~£2,750         ~£2,750     ~£2,750
+Operating overhead:     ~£3,250         ~£3,250     ~£3,250
 
 Year 2 returns to full pricing (£199 Standard on renewal).
 
@@ -560,15 +576,15 @@ Conversion rate:        3%              5.5%        8%
 Paying customers:       300             550         800
 ARR:                    £82,000         £151,000    £219,000
 
-Infrastructure:         ~£828/yr        ~£828/yr    ~£828/yr
-Net margin %:           ~84%            ~89%        ~91%
+Infrastructure:         ~£5,388/yr      ~£5,388/yr  ~£5,388/yr
+Net margin %:           ~86%            ~90%        ~92%
 
 
 BREAKEVEN
 =========
-Monthly infrastructure: £36
-Required to break even: 3 Standard annual subscribers (£597)
-                        or 2 Standard monthly subs (£38/mo)
+Monthly infrastructure: £416 (platform £36 + AI compute £380)
+Annual infrastructure:  £4,992
+Required to break even: 25 Standard annual subscribers (£4,975)
 ```
 
 ### 9.1 Key Assumptions
@@ -582,7 +598,7 @@ Required to break even: 3 Standard annual subscribers (£597)
 | Annual retention | 70% | Between LinkedIn Premium (65%) and B2B SaaS median (~85%) | Medium — planning assumption |
 | Billing mix | 90% annual / 10% monthly | Annual is default; monthly not promoted | Low |
 | Provider growth | Organic to 10K by Y3 | No paid acquisition budget | Medium — depends on SEO + word-of-mouth |
-| Infrastructure cost | £36/mo | Itemised vendor pricing | Low |
+| Infrastructure cost | £416/mo (platform £36 + AI £380) | Itemised vendor pricing + current subscription | Low — AI pricing trending downward |
 
 ### 9.2 Churn Sensitivity
 
@@ -632,17 +648,20 @@ Year 1 actual collected (with launch discount):
   Premium + Partner:    £35K
   TOTAL COLLECTED Y1:   ~£53K
 
-Infrastructure:         £432            £600            £828
-Paddle fees (~5%):      £3.6K           £7.4K           £12.8K
-Operating overhead:     £3.3K           £2.5K           £2.5K
+Platform infra:         £432            £600            £828
+AI compute:             £4,560          £4,560          £4,560
+Paddle fees (~5%):      £2.7K           £7.4K           £12.8K
+Operating overhead:     £3.3K           £2.3K           £2.3K
                         -----           -----           -----
-All-in costs:           £7.3K           £10.5K          £16.1K
-Net margin:             ~£46K (Y1 disc) ~£138K          ~£239K
-Margin %:               86%             93%             94%
+All-in costs:           £11.0K          £14.9K          £20.5K
+Net margin:             ~£42K (Y1 disc) ~£133K          ~£235K
+Margin %:               79%             90%             92%
 
 Assumptions: 70% annual retention, 90% annual billing,
 provider base grows to 10K by Y3 (organic only),
 tier split 70/25/5 constant, full pricing from Y2.
+AI compute at £380/mo throughout (conservative — may reduce
+to ~£200/mo on API billing at growth scale).
 ```
 
 ### 9.4 What Is Not Modelled
@@ -659,10 +678,11 @@ tier split 70/25/5 constant, full pricing from Y2.
 | Risk | Severity | Mitigation |
 |---|---|---|
 | 4rfv data source restricted (licence required) | HIGH | Document public-data basis. Budget for licence if needed. Entire launch strategy depends on seed data. |
-| Conversion below 3% | MEDIUM | £36/mo infrastructure means near-zero burn. Iterate on conversion levers. Breakeven = 3 annual subs. |
+| Conversion below 3% | MEDIUM | £416/mo infrastructure is low burn. Breakeven = 25 annual Standard subs. There is time and margin to iterate on conversion levers. |
 | Incumbent response | LOW | 4rfv lacks engineering capacity (ASP.NET, 94% debt). The Knowledge owned by corporate parent. Neither can pivot technology quickly. |
 | GDPR compliance failure | HIGH | Compliance advisor engaged pre-launch. Article 14 process specified. DSAR decision architecture designed. ICO registration before any data processing. |
 | Production industry too small | MEDIUM | £15–20M existing market. V2 verticals (gaming, events, digital content) expand TAM. Architecture is vertical-agnostic from day one. |
+| AI compute costs increase | LOW | Current cost is a fixed £380/mo subscription. At scale, API billing (~£200/mo budget) is likely cheaper. AI pricing is trending downward across all providers. |
 | Entity cannot operate autonomously at V1 | LOW | V1 autonomy is scoped and conservative: scoring, routing, scheduling. Human escalation is designed in. Graduation is earned, not assumed. |
 
 ---
@@ -718,16 +738,16 @@ CALLSHEET (autonomous entity)
 
 ## 12. Use of Funds (If Applicable)
 
-CALLSHEET is viable as a bootstrap (£36/month infrastructure, <£3,300/year operating costs, breakeven at 3 annual subscribers). External funding accelerates but is not required.
+CALLSHEET is viable as a bootstrap. £416/month infrastructure (platform + AI compute), ~£3,250/year operating costs, breakeven at 25 annual Standard subscribers. External funding accelerates but is not required.
 
 **If self-funded:**
 
 ```
-Year 1 total outlay:   ~£6,000 (all-in at target scenario)
+Year 1 total outlay:   ~£11,000 (all-in at target scenario)
 Year 1 collected:      ~£53,000 (target, with launch discount)
-Year 1 net margin:     ~£47,000
+Year 1 net margin:     ~£42,000
 Year 2 run-rate ARR:   ~£148,000 (full pricing + renewals)
-Payback period:        Month 1 (breakeven = 3 annual subscribers)
+Payback period:        Month 3-4 (breakeven = 25 annual Standard subscribers)
 ```
 
 **If externally funded (indicative allocation):**
@@ -780,7 +800,7 @@ Entity health:
 
 CALLSHEET is designed for capital efficiency, not a binary exit event. Multiple return paths exist:
 
-**1. Dividend stream (primary path).** At 89% margin on £71K ARR (target Y1), the business generates ~£63K distributable profit in year 1 with near-zero reinvestment requirements. At steady-state (£255K ARR, Y3), annual distributable profit exceeds £239K. For a £25–50K SEIS investment, dividend returns alone achieve payback within 1–2 years.
+**1. Dividend stream (primary path).** At 79% margin on £53K collected revenue (target Y1 with launch discount), the business generates ~£42K in distributable profit. At steady-state (£255K ARR, Y3), annual distributable profit exceeds £235K. For a £25–50K SEIS investment, dividend returns alone achieve payback within 1–2 years.
 
 **2. Strategic acquisition.** The production services directory market has consolidation precedent: GlobalData acquired MBI (The Knowledge's parent) in 2022. A platform with verified data, active listings, and a proven subscription base is an acquisition target for media conglomerates, recruitment platforms, or vertical SaaS roll-ups. Likely acquirers: GlobalData (already in the space), Spotlight/The Casting Networks (adjacent vertical), or PE-backed directory roll-ups.
 
@@ -800,10 +820,10 @@ CALLSHEET is designed for capital efficiency, not a binary exit event. Multiple 
 |  CALLSHEET replaces a decaying incumbent in a £15-20M market      |
 |  with a capital-efficient autonomous platform.                    |
 |                                                                   |
-|  Infrastructure: £36/month.                                       |
-|  Breakeven: 3 annual subscribers.                                 |
-|  Year 1: ~£53K collected (launch discount), £71K run-rate ARR.    |
-|  Year 3: £255K ARR at 94% margin (10K providers, 70% retention).  |
+|  Infrastructure: £416/month (platform + AI compute).              |
+|  Breakeven: 25 annual Standard subscribers.                       |
+|  Year 1: ~£53K collected (launch discount), 79% margin.           |
+|  Year 3: £255K ARR at 92% margin (10K providers, 70% retention).  |
 |  Evolution: directory -> buyer premium -> SaaS tools.             |
 |                                                                   |
 |  No permanent staff. No office. No paid acquisition.              |
