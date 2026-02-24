@@ -210,7 +210,7 @@ export async function seedTaxonomy(db: Db) {
 
 // --- DB adapters (re-exported from production module) ---
 
-export { createSchedulerDb, createDecisionLogDb } from "@/db/adapters"
+export { createSchedulerDb, createDecisionLogDb, createNotificationDb } from "@/db/adapters"
 
 // --- In-memory NotificationDb for tests ---
 

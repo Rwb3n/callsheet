@@ -1,6 +1,6 @@
-// Shared infrastructure schema — S0 §1.2, SI §1.5, SI §2.1
+// Shared infrastructure schema — S0 §1.2, SI §1.5, SI §2.1, SI §8
 
-import { pgTable, pgEnum, uuid, text, jsonb, timestamp, integer, index } from "drizzle-orm/pg-core"
+import { pgTable, pgEnum, uuid, text, jsonb, timestamp, integer, boolean, index } from "drizzle-orm/pg-core"
 
 // Deferred action enums [SI §2.1, S0 §3]
 export const deferredActionStatusEnum = pgEnum("deferred_action_status", [
@@ -83,6 +83,27 @@ export const decisionLogs = pgTable(
   (table) => [
     index("decision_logs_domain_type_idx").on(table.domain, table.decisionType),
     index("decision_logs_created_idx").on(table.createdAt),
+  ],
+)
+
+// Notifications [SI §8, S5 §6]
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    accountId: text("account_id").notNull(),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    link: text("link"),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    dismissed: boolean("dismissed").notNull().default(false),
+    dismissedAt: timestamp("dismissed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("notifications_account_dismissed_idx").on(table.accountId, table.dismissed),
+    index("notifications_account_unread_idx").on(table.accountId, table.readAt, table.dismissed),
   ],
 )
 

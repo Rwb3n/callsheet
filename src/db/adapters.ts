@@ -6,6 +6,8 @@ import { deferredActions, decisionLogs } from "@/db/schema/shared"
 import type { Db } from "@/db/types"
 import type { SchedulerDb } from "@/lib/scheduler/api"
 import type { DecisionLogDb } from "@/lib/decisions/logger"
+import type { NotificationDb } from "@/lib/notifications"
+import { DrizzleNotificationDb } from "@/lib/notifications/drizzle-notification-db"
 
 export function createSchedulerDb(db: Db): SchedulerDb {
   return {
@@ -64,4 +66,8 @@ export function createDecisionLogDb(db: Db): DecisionLogDb {
         .where(eq(decisionLogs.domain, domain))
     },
   }
+}
+
+export function createNotificationDb(db: Db): NotificationDb {
+  return new DrizzleNotificationDb(db)
 }

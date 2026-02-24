@@ -25,6 +25,7 @@ import { createOnboardingRouter } from "@/server/routers/onboarding"
 import { createProfileRouter } from "@/server/routers/profile"
 import { createEngagementRouter } from "@/server/routers/engagement"
 import { createDashboardRouter } from "@/server/routers/dashboard"
+import { createNotificationRouter } from "@/server/routers/notification"
 
 // --- Shared services injected at app startup ---
 
@@ -94,6 +95,9 @@ export function createAppRouter(services: AppServices) {
     dashboard: createDashboardRouter({
       db: services.db,
       notificationDb: services.notificationDb,
+    }),
+    notification: createNotificationRouter({
+      db: services.db,
     }),
   })
 }

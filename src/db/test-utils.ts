@@ -30,6 +30,7 @@ export function getTestDb() {
 /** Truncate SQL shared between test resetDb() and /api/test/reset endpoint. */
 export const TRUNCATE_ALL_TABLES_SQL = sql`
   TRUNCATE TABLE
+    notifications,
     grace_periods,
     pending_cancellations,
     processed_paddle_events,
