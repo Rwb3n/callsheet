@@ -1,0 +1,1 @@
+ALTER TABLE "listings" ADD COLUMN "article_14_notice_displayed" boolean DEFAULT false NOT NULL;

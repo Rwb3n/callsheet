@@ -1,0 +1,1 @@
+ALTER TABLE "account_profiles" ADD COLUMN "departments" text[] DEFAULT '{}';

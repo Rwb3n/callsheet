@@ -1,0 +1,768 @@
+[
+  {
+    "name": "Production",
+    "slug": "production",
+    "sortOrder": 0,
+    "serviceAreas": [
+      {
+        "name": "Film Production",
+        "slug": "film-production",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Feature Film", "slug": "feature-film", "sortOrder": 0 },
+          { "name": "Short Film", "slug": "short-film", "sortOrder": 1 },
+          { "name": "Documentary", "slug": "documentary", "sortOrder": 2 },
+          { "name": "Factual", "slug": "factual", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "TV Production",
+        "slug": "tv-production",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Drama", "slug": "drama", "sortOrder": 0 },
+          { "name": "Entertainment", "slug": "entertainment", "sortOrder": 1 },
+          { "name": "Factual", "slug": "factual", "sortOrder": 2 },
+          { "name": "News", "slug": "news", "sortOrder": 3 },
+          { "name": "Sport", "slug": "sport", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Commercial Production",
+        "slug": "commercial-production",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "TV Commercials", "slug": "tv-commercials", "sortOrder": 0 },
+          { "name": "Online/Digital Ads", "slug": "online-digital-ads", "sortOrder": 1 },
+          { "name": "Branded Content", "slug": "branded-content", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Corporate Production",
+        "slug": "corporate-production",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "Corporate Film", "slug": "corporate-film", "sortOrder": 0 },
+          { "name": "Internal Comms", "slug": "internal-comms", "sortOrder": 1 },
+          { "name": "Training Video", "slug": "training-video", "sortOrder": 2 },
+          { "name": "Investor/Stakeholder", "slug": "investor-stakeholder", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Event Production",
+        "slug": "event-production",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Live Event", "slug": "live-event", "sortOrder": 0 },
+          { "name": "Conference", "slug": "conference", "sortOrder": 1 },
+          { "name": "Exhibition", "slug": "exhibition", "sortOrder": 2 },
+          { "name": "Hybrid/Virtual Event", "slug": "hybrid-virtual-event", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Content Production",
+        "slug": "content-production",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "Social Media Content", "slug": "social-media-content", "sortOrder": 0 },
+          { "name": "Web Series", "slug": "web-series", "sortOrder": 1 },
+          { "name": "Podcast (Video)", "slug": "podcast-video", "sortOrder": 2 },
+          { "name": "Livestream", "slug": "livestream", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Animation Production",
+        "slug": "animation-production",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "2D", "slug": "2d", "sortOrder": 0 },
+          { "name": "3D", "slug": "3d", "sortOrder": 1 },
+          { "name": "Stop-Motion", "slug": "stop-motion", "sortOrder": 2 },
+          { "name": "Motion Graphics", "slug": "motion-graphics", "sortOrder": 3 },
+          { "name": "Character Animation", "slug": "character-animation", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Immersive Production",
+        "slug": "immersive-production",
+        "sortOrder": 7,
+        "specialisations": [
+          { "name": "VR/AR/XR Content", "slug": "vr-ar-xr-content", "sortOrder": 0 },
+          { "name": "360° Video", "slug": "360-video", "sortOrder": 1 },
+          { "name": "Interactive Experience", "slug": "interactive-experience", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Virtual Production",
+        "slug": "virtual-production",
+        "sortOrder": 8,
+        "specialisations": [
+          { "name": "LED Volume", "slug": "led-volume", "sortOrder": 0 },
+          { "name": "Real-Time (Unreal/Unity)", "slug": "real-time-unreal-unity", "sortOrder": 1 },
+          { "name": "Motion Capture", "slug": "motion-capture", "sortOrder": 2 },
+          { "name": "Previz", "slug": "previz", "sortOrder": 3 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Post-Production",
+    "slug": "post-production",
+    "sortOrder": 1,
+    "serviceAreas": [
+      {
+        "name": "Editing",
+        "slug": "editing",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Offline Edit", "slug": "offline-edit", "sortOrder": 0 },
+          { "name": "Online Edit", "slug": "online-edit", "sortOrder": 1 },
+          { "name": "Assembly", "slug": "assembly", "sortOrder": 2 },
+          { "name": "Conform", "slug": "conform", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Colour & Grading",
+        "slug": "colour-and-grading",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Colour Grading", "slug": "colour-grading", "sortOrder": 0 },
+          { "name": "Colour Correction", "slug": "colour-correction", "sortOrder": 1 },
+          { "name": "HDR Mastering", "slug": "hdr-mastering", "sortOrder": 2 },
+          { "name": "Film Scan", "slug": "film-scan", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Visual Effects (VFX)",
+        "slug": "visual-effects-vfx",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "Compositing", "slug": "compositing", "sortOrder": 0 },
+          { "name": "CGI", "slug": "cgi", "sortOrder": 1 },
+          { "name": "Matte Painting", "slug": "matte-painting", "sortOrder": 2 },
+          { "name": "Rotoscoping", "slug": "rotoscoping", "sortOrder": 3 },
+          { "name": "Cleanup", "slug": "cleanup", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Audio Post",
+        "slug": "audio-post",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "Sound Design", "slug": "sound-design", "sortOrder": 0 },
+          { "name": "Dubbing/Mixing", "slug": "dubbing-mixing", "sortOrder": 1 },
+          { "name": "Foley", "slug": "foley", "sortOrder": 2 },
+          { "name": "ADR", "slug": "adr", "sortOrder": 3 },
+          { "name": "Audio Restoration", "slug": "audio-restoration", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Music",
+        "slug": "music",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Composition", "slug": "composition", "sortOrder": 0 },
+          { "name": "Production Music/Library", "slug": "production-music-library", "sortOrder": 1 },
+          { "name": "Scoring", "slug": "scoring", "sortOrder": 2 },
+          { "name": "Music Supervision", "slug": "music-supervision", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Graphics & Titles",
+        "slug": "graphics-and-titles",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "Title Design", "slug": "title-design", "sortOrder": 0 },
+          { "name": "Lower Thirds", "slug": "lower-thirds", "sortOrder": 1 },
+          { "name": "Infographics", "slug": "infographics", "sortOrder": 2 },
+          { "name": "End Credits", "slug": "end-credits", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Finishing & Delivery",
+        "slug": "finishing-and-delivery",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "QC", "slug": "qc", "sortOrder": 0 },
+          { "name": "Format Conversion", "slug": "format-conversion", "sortOrder": 1 },
+          { "name": "Mastering", "slug": "mastering", "sortOrder": 2 },
+          { "name": "Deliverables", "slug": "deliverables", "sortOrder": 3 },
+          { "name": "Closed Captioning", "slug": "closed-captioning", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "AI-Assisted Post",
+        "slug": "ai-assisted-post",
+        "sortOrder": 7,
+        "specialisations": [
+          { "name": "AI Upscaling", "slug": "ai-upscaling", "sortOrder": 0 },
+          { "name": "Automated Editing", "slug": "automated-editing", "sortOrder": 1 },
+          { "name": "Speech-to-Text", "slug": "speech-to-text", "sortOrder": 2 },
+          { "name": "AI Colour", "slug": "ai-colour", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Localisation",
+        "slug": "localisation",
+        "sortOrder": 8,
+        "specialisations": [
+          { "name": "Subtitling", "slug": "subtitling", "sortOrder": 0 },
+          { "name": "Dubbing", "slug": "dubbing", "sortOrder": 1 },
+          { "name": "Translation", "slug": "translation", "sortOrder": 2 },
+          { "name": "Access Services (AD, HOH)", "slug": "access-services-ad-hoh", "sortOrder": 3 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Crew & Talent",
+    "slug": "crew-and-talent",
+    "sortOrder": 2,
+    "serviceAreas": [
+      {
+        "name": "Camera",
+        "slug": "camera",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Director of Photography", "slug": "director-of-photography", "sortOrder": 0 },
+          { "name": "Camera Operator", "slug": "camera-operator", "sortOrder": 1 },
+          { "name": "Focus Puller", "slug": "focus-puller", "sortOrder": 2 },
+          { "name": "Steadicam", "slug": "steadicam", "sortOrder": 3 },
+          { "name": "Drone Operator", "slug": "drone-operator", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Lighting",
+        "slug": "lighting",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Gaffer", "slug": "gaffer", "sortOrder": 0 },
+          { "name": "Lighting Director", "slug": "lighting-director", "sortOrder": 1 },
+          { "name": "Best Boy", "slug": "best-boy", "sortOrder": 2 },
+          { "name": "Lighting Designer", "slug": "lighting-designer", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Sound",
+        "slug": "sound",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "Sound Recordist", "slug": "sound-recordist", "sortOrder": 0 },
+          { "name": "Boom Operator", "slug": "boom-operator", "sortOrder": 1 },
+          { "name": "Sound Mixer", "slug": "sound-mixer", "sortOrder": 2 },
+          { "name": "Sound Designer", "slug": "sound-designer", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Production Crew",
+        "slug": "production-crew",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "Producer", "slug": "producer", "sortOrder": 0 },
+          { "name": "Line Producer", "slug": "line-producer", "sortOrder": 1 },
+          { "name": "Production Manager", "slug": "production-manager", "sortOrder": 2 },
+          { "name": "Production Coordinator", "slug": "production-coordinator", "sortOrder": 3 },
+          { "name": "Runner", "slug": "runner", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Direction",
+        "slug": "direction",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Director", "slug": "director", "sortOrder": 0 },
+          { "name": "Assistant Director (1st, 2nd, 3rd)", "slug": "assistant-director", "sortOrder": 1 },
+          { "name": "Script Supervisor", "slug": "script-supervisor", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Art Department",
+        "slug": "art-department",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "Production Designer", "slug": "production-designer", "sortOrder": 0 },
+          { "name": "Art Director", "slug": "art-director", "sortOrder": 1 },
+          { "name": "Set Decorator", "slug": "set-decorator", "sortOrder": 2 },
+          { "name": "Props Master", "slug": "props-master", "sortOrder": 3 },
+          { "name": "Scenic Artist", "slug": "scenic-artist", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Hair, Makeup & Costume",
+        "slug": "hair-makeup-and-costume",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "Makeup Artist", "slug": "makeup-artist", "sortOrder": 0 },
+          { "name": "Hair Stylist", "slug": "hair-stylist", "sortOrder": 1 },
+          { "name": "Costume Designer", "slug": "costume-designer", "sortOrder": 2 },
+          { "name": "Wardrobe Supervisor", "slug": "wardrobe-supervisor", "sortOrder": 3 },
+          { "name": "Prosthetics", "slug": "prosthetics", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Stunts & Action",
+        "slug": "stunts-and-action",
+        "sortOrder": 7,
+        "specialisations": [
+          { "name": "Stunt Coordinator", "slug": "stunt-coordinator", "sortOrder": 0 },
+          { "name": "Stunt Performer", "slug": "stunt-performer", "sortOrder": 1 },
+          { "name": "Fight Choreographer", "slug": "fight-choreographer", "sortOrder": 2 },
+          { "name": "Armourer", "slug": "armourer", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Post Crew",
+        "slug": "post-crew",
+        "sortOrder": 8,
+        "specialisations": [
+          { "name": "Editor", "slug": "editor", "sortOrder": 0 },
+          { "name": "Colourist", "slug": "colourist", "sortOrder": 1 },
+          { "name": "VFX Artist", "slug": "vfx-artist", "sortOrder": 2 },
+          { "name": "Sound Editor", "slug": "sound-editor", "sortOrder": 3 },
+          { "name": "Graphic Designer", "slug": "graphic-designer", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Specialist",
+        "slug": "specialist",
+        "sortOrder": 9,
+        "specialisations": [
+          { "name": "Drone Pilot", "slug": "drone-pilot", "sortOrder": 0 },
+          { "name": "Underwater Camera", "slug": "underwater-camera", "sortOrder": 1 },
+          { "name": "Aerial Coordinator", "slug": "aerial-coordinator", "sortOrder": 2 },
+          { "name": "Technical Director", "slug": "technical-director", "sortOrder": 3 },
+          { "name": "Intimacy Coordinator", "slug": "intimacy-coordinator", "sortOrder": 4 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Equipment & Technology",
+    "slug": "equipment-and-technology",
+    "sortOrder": 3,
+    "serviceAreas": [
+      {
+        "name": "Camera Systems",
+        "slug": "camera-systems",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Cinema Cameras", "slug": "cinema-cameras", "sortOrder": 0 },
+          { "name": "Broadcast Cameras", "slug": "broadcast-cameras", "sortOrder": 1 },
+          { "name": "Specialty (High-Speed, Underwater, Miniature)", "slug": "specialty-cameras", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Lenses & Accessories",
+        "slug": "lenses-and-accessories",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Prime", "slug": "prime", "sortOrder": 0 },
+          { "name": "Zoom", "slug": "zoom", "sortOrder": 1 },
+          { "name": "Anamorphic", "slug": "anamorphic", "sortOrder": 2 },
+          { "name": "Filters", "slug": "filters", "sortOrder": 3 },
+          { "name": "Matte Boxes", "slug": "matte-boxes", "sortOrder": 4 },
+          { "name": "Follow Focus", "slug": "follow-focus", "sortOrder": 5 }
+        ]
+      },
+      {
+        "name": "Lighting",
+        "slug": "lighting-equipment",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "Tungsten", "slug": "tungsten", "sortOrder": 0 },
+          { "name": "HMI", "slug": "hmi", "sortOrder": 1 },
+          { "name": "LED", "slug": "led", "sortOrder": 2 },
+          { "name": "Practicals", "slug": "practicals", "sortOrder": 3 },
+          { "name": "Grip/Rigging", "slug": "grip-rigging", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Sound Equipment",
+        "slug": "sound-equipment",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "Microphones", "slug": "microphones", "sortOrder": 0 },
+          { "name": "Wireless", "slug": "wireless", "sortOrder": 1 },
+          { "name": "Mixers/Recorders", "slug": "mixers-recorders", "sortOrder": 2 },
+          { "name": "Comms", "slug": "comms", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Grip & Rigging",
+        "slug": "grip-and-rigging",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Dollies", "slug": "dollies", "sortOrder": 0 },
+          { "name": "Cranes", "slug": "cranes", "sortOrder": 1 },
+          { "name": "Jibs", "slug": "jibs", "sortOrder": 2 },
+          { "name": "Sliders", "slug": "sliders", "sortOrder": 3 },
+          { "name": "Tracking", "slug": "tracking", "sortOrder": 4 },
+          { "name": "Scaffolding", "slug": "scaffolding", "sortOrder": 5 }
+        ]
+      },
+      {
+        "name": "Monitors & Playback",
+        "slug": "monitors-and-playback",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "On-Set Monitors", "slug": "on-set-monitors", "sortOrder": 0 },
+          { "name": "Video Village", "slug": "video-village", "sortOrder": 1 },
+          { "name": "Playback Systems", "slug": "playback-systems", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Drones & Aerial",
+        "slug": "drones-and-aerial",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "Drone Systems", "slug": "drone-systems", "sortOrder": 0 },
+          { "name": "Stabilised Heads", "slug": "stabilised-heads", "sortOrder": 1 },
+          { "name": "Aerial Rigging", "slug": "aerial-rigging", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Power & Cabling",
+        "slug": "power-and-cabling",
+        "sortOrder": 7,
+        "specialisations": [
+          { "name": "Generators", "slug": "generators", "sortOrder": 0 },
+          { "name": "Distribution", "slug": "distribution", "sortOrder": 1 },
+          { "name": "Cabling/Connectors", "slug": "cabling-connectors", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Broadcast Systems",
+        "slug": "broadcast-systems",
+        "sortOrder": 8,
+        "specialisations": [
+          { "name": "Routers", "slug": "routers", "sortOrder": 0 },
+          { "name": "Switchers", "slug": "switchers", "sortOrder": 1 },
+          { "name": "Servers", "slug": "servers", "sortOrder": 2 },
+          { "name": "Playout", "slug": "playout", "sortOrder": 3 },
+          { "name": "Encoding", "slug": "encoding", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Software & Cloud",
+        "slug": "software-and-cloud",
+        "sortOrder": 9,
+        "specialisations": [
+          { "name": "NLEs", "slug": "nles", "sortOrder": 0 },
+          { "name": "DAWs", "slug": "daws", "sortOrder": 1 },
+          { "name": "VFX Software", "slug": "vfx-software", "sortOrder": 2 },
+          { "name": "MAM/DAM", "slug": "mam-dam", "sortOrder": 3 },
+          { "name": "Cloud Render", "slug": "cloud-render", "sortOrder": 4 },
+          { "name": "Collaboration Tools", "slug": "collaboration-tools", "sortOrder": 5 }
+        ]
+      },
+      {
+        "name": "Virtual Production Tech",
+        "slug": "virtual-production-tech",
+        "sortOrder": 10,
+        "specialisations": [
+          { "name": "LED Walls/Volumes", "slug": "led-walls-volumes", "sortOrder": 0 },
+          { "name": "Tracking Systems", "slug": "tracking-systems", "sortOrder": 1 },
+          { "name": "Real-Time Engines", "slug": "real-time-engines", "sortOrder": 2 },
+          { "name": "Disguise/Pixotope", "slug": "disguise-pixotope", "sortOrder": 3 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Facilities & Locations",
+    "slug": "facilities-and-locations",
+    "sortOrder": 4,
+    "serviceAreas": [
+      {
+        "name": "Studios",
+        "slug": "studios",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Sound Stage", "slug": "sound-stage", "sortOrder": 0 },
+          { "name": "TV Studio", "slug": "tv-studio", "sortOrder": 1 },
+          { "name": "Film Studio", "slug": "film-studio", "sortOrder": 2 },
+          { "name": "Green/Blue Screen", "slug": "green-blue-screen", "sortOrder": 3 },
+          { "name": "Insert Stage", "slug": "insert-stage", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Recording Studios",
+        "slug": "recording-studios",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Music Recording", "slug": "music-recording", "sortOrder": 0 },
+          { "name": "Voice/ADR", "slug": "voice-adr", "sortOrder": 1 },
+          { "name": "Foley Stage", "slug": "foley-stage", "sortOrder": 2 },
+          { "name": "Podcast Studio", "slug": "podcast-studio", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Edit & Post Facilities",
+        "slug": "edit-and-post-facilities",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "Edit Suite", "slug": "edit-suite", "sortOrder": 0 },
+          { "name": "Grading Suite", "slug": "grading-suite", "sortOrder": 1 },
+          { "name": "Dubbing Theatre", "slug": "dubbing-theatre", "sortOrder": 2 },
+          { "name": "Review/Screening Room", "slug": "review-screening-room", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Virtual Production Stages",
+        "slug": "virtual-production-stages",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "LED Volume", "slug": "led-volume", "sortOrder": 0 },
+          { "name": "Motion Capture Stage", "slug": "motion-capture-stage", "sortOrder": 1 },
+          { "name": "Previz Suite", "slug": "previz-suite", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Office & Production Space",
+        "slug": "office-and-production-space",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Production Office", "slug": "production-office", "sortOrder": 0 },
+          { "name": "Writers Room", "slug": "writers-room", "sortOrder": 1 },
+          { "name": "Casting Suite", "slug": "casting-suite", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Locations",
+        "slug": "locations",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "Location Library", "slug": "location-library", "sortOrder": 0 },
+          { "name": "Location Management", "slug": "location-management", "sortOrder": 1 },
+          { "name": "Location Scouting", "slug": "location-scouting", "sortOrder": 2 },
+          { "name": "Permits", "slug": "permits", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Backlots & Standing Sets",
+        "slug": "backlots-and-standing-sets",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "Exterior Sets", "slug": "exterior-sets", "sortOrder": 0 },
+          { "name": "Period Sets", "slug": "period-sets", "sortOrder": 1 },
+          { "name": "Speciality Environments", "slug": "speciality-environments", "sortOrder": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Production Support",
+    "slug": "production-support",
+    "sortOrder": 5,
+    "serviceAreas": [
+      {
+        "name": "Catering",
+        "slug": "catering",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Location Catering", "slug": "location-catering", "sortOrder": 0 },
+          { "name": "Craft Services", "slug": "craft-services", "sortOrder": 1 },
+          { "name": "Event Catering", "slug": "event-catering", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Transport & Logistics",
+        "slug": "transport-and-logistics",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Unit Vehicles", "slug": "unit-vehicles", "sortOrder": 0 },
+          { "name": "Artiste Transport", "slug": "artiste-transport", "sortOrder": 1 },
+          { "name": "Freight/Shipping", "slug": "freight-shipping", "sortOrder": 2 },
+          { "name": "Parking/Basecamp", "slug": "parking-basecamp", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Props & Set Dressing",
+        "slug": "props-and-set-dressing",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "Prop Hire", "slug": "prop-hire", "sortOrder": 0 },
+          { "name": "Prop Making", "slug": "prop-making", "sortOrder": 1 },
+          { "name": "Set Dressing", "slug": "set-dressing", "sortOrder": 2 },
+          { "name": "Action Vehicles", "slug": "action-vehicles", "sortOrder": 3 },
+          { "name": "Greens/Plants", "slug": "greens-plants", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Costume & Wardrobe",
+        "slug": "costume-and-wardrobe",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "Costume Hire", "slug": "costume-hire", "sortOrder": 0 },
+          { "name": "Costume Making", "slug": "costume-making", "sortOrder": 1 },
+          { "name": "Costume Breakdown", "slug": "costume-breakdown", "sortOrder": 2 },
+          { "name": "Millinery", "slug": "millinery", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Construction",
+        "slug": "construction",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Set Construction", "slug": "set-construction", "sortOrder": 0 },
+          { "name": "Scenic Painting", "slug": "scenic-painting", "sortOrder": 1 },
+          { "name": "Metalwork", "slug": "metalwork", "sortOrder": 2 },
+          { "name": "Carpentry", "slug": "carpentry", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "SFX (Physical)",
+        "slug": "sfx-physical",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "Pyrotechnics", "slug": "pyrotechnics", "sortOrder": 0 },
+          { "name": "Mechanical Effects", "slug": "mechanical-effects", "sortOrder": 1 },
+          { "name": "Weather Effects", "slug": "weather-effects", "sortOrder": 2 },
+          { "name": "Atmospherics", "slug": "atmospherics", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Health & Safety",
+        "slug": "health-and-safety",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "H&S Supervision", "slug": "hs-supervision", "sortOrder": 0 },
+          { "name": "Risk Assessment", "slug": "risk-assessment", "sortOrder": 1 },
+          { "name": "First Aid", "slug": "first-aid", "sortOrder": 2 },
+          { "name": "Intimacy Coordination", "slug": "intimacy-coordination", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Security",
+        "slug": "security",
+        "sortOrder": 7,
+        "specialisations": [
+          { "name": "Location Security", "slug": "location-security", "sortOrder": 0 },
+          { "name": "Asset Protection", "slug": "asset-protection", "sortOrder": 1 },
+          { "name": "Crowd Management", "slug": "crowd-management", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Accommodation",
+        "slug": "accommodation",
+        "sortOrder": 8,
+        "specialisations": [
+          { "name": "Crew Accommodation", "slug": "crew-accommodation", "sortOrder": 0 },
+          { "name": "Artists Accommodation", "slug": "artists-accommodation", "sortOrder": 1 },
+          { "name": "Hotels", "slug": "hotels", "sortOrder": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Business Services",
+    "slug": "business-services",
+    "sortOrder": 6,
+    "serviceAreas": [
+      {
+        "name": "Finance",
+        "slug": "finance",
+        "sortOrder": 0,
+        "specialisations": [
+          { "name": "Production Accounting", "slug": "production-accounting", "sortOrder": 0 },
+          { "name": "Tax Credits/Relief", "slug": "tax-credits-relief", "sortOrder": 1 },
+          { "name": "Completion Bonds", "slug": "completion-bonds", "sortOrder": 2 },
+          { "name": "Cashflow", "slug": "cashflow", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Insurance",
+        "slug": "insurance",
+        "sortOrder": 1,
+        "specialisations": [
+          { "name": "Production Insurance", "slug": "production-insurance", "sortOrder": 0 },
+          { "name": "E&O", "slug": "e-and-o", "sortOrder": 1 },
+          { "name": "Equipment Insurance", "slug": "equipment-insurance", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Legal",
+        "slug": "legal",
+        "sortOrder": 2,
+        "specialisations": [
+          { "name": "Entertainment Law", "slug": "entertainment-law", "sortOrder": 0 },
+          { "name": "Rights Clearance", "slug": "rights-clearance", "sortOrder": 1 },
+          { "name": "Contracts", "slug": "contracts", "sortOrder": 2 },
+          { "name": "IP", "slug": "ip", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Training & Education",
+        "slug": "training-and-education",
+        "sortOrder": 3,
+        "specialisations": [
+          { "name": "Short Courses", "slug": "short-courses", "sortOrder": 0 },
+          { "name": "Degrees", "slug": "degrees", "sortOrder": 1 },
+          { "name": "Apprenticeships", "slug": "apprenticeships", "sortOrder": 2 },
+          { "name": "Mentoring", "slug": "mentoring", "sortOrder": 3 },
+          { "name": "CPD", "slug": "cpd", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Recruitment",
+        "slug": "recruitment",
+        "sortOrder": 4,
+        "specialisations": [
+          { "name": "Permanent", "slug": "permanent", "sortOrder": 0 },
+          { "name": "Freelance", "slug": "freelance", "sortOrder": 1 },
+          { "name": "Crew Agencies", "slug": "crew-agencies", "sortOrder": 2 }
+        ]
+      },
+      {
+        "name": "Talent Services",
+        "slug": "talent-services",
+        "sortOrder": 5,
+        "specialisations": [
+          { "name": "Casting Directors", "slug": "casting-directors", "sortOrder": 0 },
+          { "name": "Talent Agents", "slug": "talent-agents", "sortOrder": 1 },
+          { "name": "Voice-Over Agencies", "slug": "voice-over-agencies", "sortOrder": 2 },
+          { "name": "Presenter/Speaker Agencies", "slug": "presenter-speaker-agencies", "sortOrder": 3 },
+          { "name": "Extras/Supporting Artist Agencies", "slug": "extras-supporting-artist-agencies", "sortOrder": 4 },
+          { "name": "Child Performer Agencies", "slug": "child-performer-agencies", "sortOrder": 5 },
+          { "name": "Model Agencies", "slug": "model-agencies", "sortOrder": 6 },
+          { "name": "Stunt Coordination", "slug": "stunt-coordination", "sortOrder": 7 },
+          { "name": "Voice-Over Production", "slug": "voice-over-production", "sortOrder": 8 }
+        ]
+      },
+      {
+        "name": "Industry Bodies",
+        "slug": "industry-bodies",
+        "sortOrder": 6,
+        "specialisations": [
+          { "name": "Unions", "slug": "unions", "sortOrder": 0 },
+          { "name": "Guilds", "slug": "guilds", "sortOrder": 1 },
+          { "name": "Trade Associations", "slug": "trade-associations", "sortOrder": 2 },
+          { "name": "Certification Bodies", "slug": "certification-bodies", "sortOrder": 3 }
+        ]
+      },
+      {
+        "name": "Marketing & PR",
+        "slug": "marketing-and-pr",
+        "sortOrder": 7,
+        "specialisations": [
+          { "name": "EPK", "slug": "epk", "sortOrder": 0 },
+          { "name": "Unit Publicity", "slug": "unit-publicity", "sortOrder": 1 },
+          { "name": "Digital Marketing", "slug": "digital-marketing", "sortOrder": 2 },
+          { "name": "Social Media", "slug": "social-media", "sortOrder": 3 },
+          { "name": "Festival Strategy", "slug": "festival-strategy", "sortOrder": 4 }
+        ]
+      },
+      {
+        "name": "Distribution",
+        "slug": "distribution",
+        "sortOrder": 8,
+        "specialisations": [
+          { "name": "Sales Agents", "slug": "sales-agents", "sortOrder": 0 },
+          { "name": "Aggregators", "slug": "aggregators", "sortOrder": 1 },
+          { "name": "Platform Delivery", "slug": "platform-delivery", "sortOrder": 2 },
+          { "name": "Theatrical", "slug": "theatrical", "sortOrder": 3 }
+        ]
+      }
+    ]
+  }
+]
