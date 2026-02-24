@@ -504,7 +504,7 @@ export const subscriptionRouter = router({
       const listing = await getListing(input.listingId)
 
       // Guard: caller must own this listing
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "you do not own this listing" })
       }
 
@@ -521,11 +521,11 @@ export const subscriptionRouter = router({
       // Resolve Paddle customer ID (reuse existing or let Paddle create)
       const accountProfile = await db.select()
         .from(accountProfiles)
-        .where(eq(accountProfiles.accountId, ctx.session.userId))
+        .where(eq(accountProfiles.accountId, ctx.session.accountId))
         .limit(1)
 
       const checkoutResult = await ctx.services.payment.createCheckoutSession({
-        accountId: ctx.session.userId,
+        accountId: ctx.session.accountId,
         listingId: input.listingId,
         tier: input.tier,
         billingCadence: input.billingCadence,
@@ -547,7 +547,7 @@ export const subscriptionRouter = router({
       const listing = await getListing(input.listingId)
 
       // Guard: caller must own this listing
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -565,7 +565,7 @@ export const subscriptionRouter = router({
       // Paddle handles proration via subscription update API
       // Redirect to Paddle checkout with subscription update context
       const checkoutResult = await ctx.services.payment.createCheckoutSession({
-        accountId: ctx.session.userId,
+        accountId: ctx.session.accountId,
         listingId: input.listingId,
         tier: input.newTier,
         existingSubscriptionId: listing.paddleSubscriptionId,
@@ -580,7 +580,7 @@ export const subscriptionRouter = router({
     .input(z.object({ listingId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const listing = await getListing(input.listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 

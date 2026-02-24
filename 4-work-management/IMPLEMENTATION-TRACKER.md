@@ -10,11 +10,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Work items complete | **7 / 7 (S0)**, **6 / 6 (S1)**, **2 / 2 (S1 Seed)**, **4 / 4 (Comms P1)**, **10 / 10 (S2)**, **4 / 4 (S3)**, **8 / 8 (S4)** |
-| AC verified (unit/integration/e2e) | **52 / 51 (S0)**, **42 / 42 (S1)**, **9 / 9 (S1 Seed)**, **17 / 17 (Comms P1)**, **41 / 41 (S2)**, **48 / 48 (S3)**, **47 / 50 + 3 e2e (S4)**, 256 / 693 (total) |
+| Work items complete | **7 / 7 (S0)**, **6 / 6 (S1)**, **2 / 2 (S1 Seed)**, **4 / 4 (Comms P1)**, **10 / 10 (S2)**, **4 / 4 (S3)**, **8 / 8 (S4)**, **1 / 7 (S5)** |
+| AC verified (unit/integration/e2e) | **52 / 51 (S0)**, **42 / 42 (S1)**, **9 / 9 (S1 Seed)**, **17 / 17 (Comms P1)**, **41 / 41 (S2)**, **48 / 48 (S3)**, **47 / 50 + 3 e2e (S4)**, **5 / 46 (S5)**, 261 / 693 (total) |
 | AC deferred to E2E | 6 (see E2E Debt below) |
-| Slices with code | **S0 complete**, **S1 complete**, **S1 Seed complete**, **Comms Phase 1 complete**, **S2 complete**, **S3 complete**, **S4 complete** |
-| Tests passing | 620 (247 unit + 371 integration + 2 E2E) |
+| Slices with code | **S0 complete**, **S1 complete**, **S1 Seed complete**, **Comms Phase 1 complete**, **S2 complete**, **S3 complete**, **S4 complete**, S5 in progress |
+| Tests passing | 632 (250 unit + 382 integration + 2 E2E) |
 | Type errors | 0 |
 
 ---
@@ -218,6 +218,34 @@ CS-WORK-036 (Feature Gating, 5 AC) ✅
 
 ---
 
+## S5: Provider Experience — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-043 | Dashboard overview and listing context | 5/5 | **done** | — | 044, 045, 046, 047, 048, 049 | `src/server/routers/dashboard.ts`, `src/server/root.ts`, `src/app/dashboard/layout.tsx`, `src/app/dashboard/page.tsx`, `src/app/dashboard/listings/[listingId]/layout.tsx` |
+| CS-WORK-044 | Analytics display and quality score panel | 0/10 | pending | ~~043~~ | — | — |
+| CS-WORK-045 | Enquiry inbox and response tracking | 0/7 | pending | ~~043~~ | — | — |
+| CS-WORK-046 | Notification centre and schema | 0/4 | pending | ~~043~~ | — | — |
+| CS-WORK-047 | Subscription management panel | 0/4 | pending | ~~043~~ | — | — |
+| CS-WORK-048 | Profile editor enhancements and 90-day reminder | 0/8 | pending | ~~043~~ | — | — |
+| CS-WORK-049 | Account settings and feature gating UI | 0/8 | pending | ~~043~~ | — | — |
+
+**S5 progress:** 5/46 AC verified (unit/integration). **1/7 work items done.**
+
+### Dependency Graph
+
+```
+CS-WORK-043 (Dashboard Shell, 5 AC) ✅
+  ├──▶ CS-WORK-044 (Analytics, 10 AC) pending
+  ├──▶ CS-WORK-045 (Enquiry Inbox, 7 AC) pending
+  ├──▶ CS-WORK-046 (Notifications, 4 AC) pending
+  ├──▶ CS-WORK-047 (Subscription Panel, 4 AC) pending
+  ├──▶ CS-WORK-048 (Profile Editor, 8 AC) pending
+  └──▶ CS-WORK-049 (Settings, 8 AC) pending
+```
+
+---
+
 ## E2E Debt
 
 ACs deferred to E2E verification, classified by verification category. See `1-investigation/e2e-verification-workflow.md` for full analysis, tooling recommendation, and phased build plan.
@@ -367,6 +395,7 @@ Created 2026-02-19 as part of CS-WORK-001.
 | 2026-02-23 | CS-WORK-041 | 6 | Archival path and event consumers. S4 §7 archive route amendment: `listing.archive` emits `pending_cancellation_created` for paid listings (AC-31), does NOT emit `subscription_ended` directly (AC-32), free listings emit no subscription events (AC-33). D&L `subscription_tier_changed` consumer extended with `restoreHiddenItems` on upgrade (AC-41). Ops `pending_cancellation_created` consumer: `storePendingCancellation` + `PaymentService.cancelSubscription`. PP `subscription_ended` consumers: feature access (placeholder) + re-subscribe CTA with closure skip (AC-42). CR `subscription_ended` consumer: churn decision log + `win_back_evaluation` scheduling for paddle-origin only (AC-43). `EVENT_CONSUMER_MATRIX` populated: +3 `subscription_tier_changed` (PP×2, CR), +3 `subscription_ended` (PP×2, CR), +1 `pending_cancellation_created` (Ops). `PendingCancellationCreatedEvent` +`timestamp` field. 4 integration test files, 13 tests. 0 type errors. |
 | 2026-02-23 | CS-WORK-037 | 6 | Downgrade and re-upgrade data handling. `applyDowngrade()`: hides excess media/credits beyond new tier limit (visibility="hidden", never deletes), sends notification with hidden item counts. `suppressNotification` param for `finaliseSubscriptionEnd` [S4-ST-8]. `restoreHiddenItems()`: restores oldest hidden items first up to new tier limit; unlimited = restore all. Media upload route amended: counts only `visibility="visible"` items against tier limit [AC-24]. Shared `hideExcess()` helper for both media_items and credits tables. 10 integration tests. 0 type errors. **Unblocks CS-WORK-039 (037 dependency satisfied).** |
 | 2026-02-24 | CS-WORK-034 | 7 | E2E verification harness Phase 1. `@playwright/test` + `dotenv` devDeps. `playwright.config.ts` (API-only, `webServer` build+start, `Origin` header for CSRF). `src/app/api/auth/[...all]/route.ts` via `toNextJsHandler(getAuthInstance())`. `src/lib/auth-instance.ts`: singleton auth + InMemoryEmailService capture + `email_verification`/`password_reset` template registration. `src/app/api/test/reset/route.ts` (POST, `E2E_TEST_MODE` guard, `TRUNCATE_ALL_TABLES_SQL`). `src/app/api/test/emails/route.ts` (GET/DELETE, captured email access). `e2e/auth-flow.spec.ts`: 2 tests — signup→email→verify→login→session (AC-04) + emailVerified=true (AC-05). `src/lib/services/__tests__/production-services.test.ts`: Vitest smoke test (AC-06). `createProductionServices()` refactored from throw to fallback-to-mocks. `.github/workflows/ci.yml` +test-e2e job. `src/lib/auth.ts` +`sendOnSignUp: true`. `vitest.config.ts` excludes `e2e/**`. `.env.local` +BETTER_AUTH_SECRET, +BETTER_AUTH_URL, +E2E_TEST_MODE. Closes S0 AC-21, AC-22, S2-AC-02, AC-42. E2E debt reduced from 10→6. 247 unit + 371 integration + 2 E2E = 620 tests. 0 type errors. |
+| 2026-02-24 | CS-WORK-043 | 5 | Dashboard overview and listing context. `createDashboardRouter({ db, notificationDb })` with `getOverview` (4-way LEFT JOIN: listings + verifications + engagements + qualityScores, profile strength via `computeFallbackProfileStrength`, unread notification count) and `getListingContext` (ownership check, `computeFeatureAccess` for tier-gated child routes). `src/server/root.ts` created: `createAppRouter(services)` wires all 12 domain routers, exports `AppRouter` type for tRPC client. Auth guard layout at `src/app/dashboard/layout.tsx` via `getAuthInstance().api.getSession()`. Spec `session.userId` corrected to `session.accountId` across 8 slice spec files (68 occurrences). `makeUUID()` fixed: version=4, variant=8 for Zod `.uuid()` compatibility. 3 unit + 11 integration tests. 0 type errors. **S5 first work item — unblocks CS-WORK-044 through CS-WORK-049.** |
 | 2026-02-23 | CS-WORK-020 | 4 | Image processing pipeline. `processListingImage()`: downloads original from R2, generates 3 WebP variants via `sharp` (thumbnail 150px, card 400px, full 1200px) with `withoutEnlargement`, uploads to R2 with deterministic naming (`{imageId}_{variant}.webp`). Returns `ImageVariants` or `null` on failure (AC-50). `variantKey()` + `parseOriginalKey()` pure functions. `ImageProcessor` type injected into `MediaRouterDeps` — upload route updates `media_items.url` to card variant on success, preserves original on failure. `ObjectStorageService` +`download()` method. 14 unit + 11 integration tests. 0 type errors. **S2 code complete (10/10 work items, 40/41 AC + 1 E2E).** |
 
 ---
@@ -420,3 +449,4 @@ Items discovered that need resolution but aren't blocking current work.
 | WORK.md deliverable path convention | [Retro: CS-WORK-017 #1](../retros/cs-work-017-retro-2026-02-22.md) | Decomposer skill outputs `src/domains/platform/` but actual code lands in `src/lib/onboarding/`. Align convention. |
 | Phase 3 import pipeline real export | [Retro: CS-WORK-021 #2](../retros/cs-work-021-retro-2026-02-22.md) | Replace `console.log` stub with real export mechanism for flagged records. Blocked on S7 (Operations). |
 | Replace `NoOpNotificationDb` with DB implementation | Tech debt session 2026-02-23 | `NoOpNotificationDb` used in webhook route. Replace when notifications table created (S7). Bounce threshold notifications silently dropped until then. |
+| Typed `SubscriptionTier` helper for Drizzle join results | [Retro: CS-WORK-043 #4](../retros/cs-work-043-retro-2026-02-24.md) | `asSubscriptionTier(value)` narrowing function or Drizzle select helper. Eliminates `as` casts in routers reading `subscriptionTier` from joins. Trigger: 3+ routers need the cast. |

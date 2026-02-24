@@ -27,7 +27,8 @@ import type { Notification } from "@/lib/notifications"
 
 export function makeUUID(suffix: string): string {
   const hex = suffix.replace(/[^0-9a-f]/gi, "").padStart(12, "0").slice(0, 12)
-  return `00000000-0000-0000-0000-${hex}`
+  // version=4, variant=8 so Zod .uuid() accepts the result
+  return `00000000-0000-4000-8000-${hex}`
 }
 
 // --- Session factories ---

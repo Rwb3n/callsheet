@@ -67,7 +67,7 @@ export default async function DashboardLayout({ children }) {
 
 ### 1.3 Listing Context Provider
 
-Dashboard listing pages require ownership verification. The `[listingId]` layout loads the listing, verifies `listing.accountId === session.userId`, and provides listing + feature access context to child routes.
+Dashboard listing pages require ownership verification. The `[listingId]` layout loads the listing, verifies `listing.accountId === session.accountId`, and provides listing + feature access context to child routes.
 
 ```typescript
 // src/app/dashboard/listings/[listingId]/layout.tsx
@@ -75,7 +75,7 @@ export default async function ListingLayout({ params, children }) {
   const session = await auth()
   const listing = await getListing(params.listingId)
 
-  if (!listing || listing.accountId !== session.userId) {
+  if (!listing || listing.accountId !== session.accountId) {
     notFound()
   }
 
@@ -141,7 +141,7 @@ export const dashboardRouter = router({
         .from(listingsTable)
         .leftJoin(engagements, eq(engagements.listingId, listingsTable.id))
         .leftJoin(qualityScores, eq(qualityScores.listingId, listingsTable.id))
-        .where(eq(listingsTable.accountId, ctx.session.userId))
+        .where(eq(listingsTable.accountId, ctx.session.accountId))
 
       const cards: ListingCardData[] = rows.map(row => ({
         ...row,
@@ -150,7 +150,7 @@ export const dashboardRouter = router({
         profileStrength: computeProfileStrengthFromRow(row), // derived from joined columns
       }))
 
-      const unreadCount = await getUnreadNotificationCount(ctx.session.userId)
+      const unreadCount = await getUnreadNotificationCount(ctx.session.accountId)
 
       return { cards, unreadCount }
     }),
@@ -239,7 +239,7 @@ function mapAnalyticsToUI(
     }))
     .query(async ({ ctx, input }) => {
       const listing = await getListing(input.listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -317,7 +317,7 @@ Panel contents:
     .input(z.object({ listingId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const listing = await getListing(input.listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -374,7 +374,7 @@ export const enquiryRouter = router({
     }))
     .query(async ({ ctx, input }) => {
       const listing = await getListing(input.listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -416,7 +416,7 @@ Provider responds to an enquiry. Emits `enquiry_responded` event (PP-owned, alre
     }))
     .mutation(async ({ ctx, input }) => {
       const listing = await getListing(input.listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -544,7 +544,7 @@ export const notificationRouter = router({
       const notifications = await db.select()
         .from(notificationsTable)
         .where(and(
-          eq(notificationsTable.accountId, ctx.session.userId),
+          eq(notificationsTable.accountId, ctx.session.accountId),
           eq(notificationsTable.dismissed, false),
         ))
         .orderBy(desc(notificationsTable.createdAt))
@@ -567,7 +567,7 @@ export const notificationRouter = router({
         dismissedAt: new Date(),
       }).where(and(
         eq(notificationsTable.id, input.notificationId),
-        eq(notificationsTable.accountId, ctx.session.userId),
+        eq(notificationsTable.accountId, ctx.session.accountId),
       ))
       return { success: true }
     }),
@@ -579,7 +579,7 @@ export const notificationRouter = router({
         readAt: new Date(),
       }).where(and(
         eq(notificationsTable.id, input.notificationId),
-        eq(notificationsTable.accountId, ctx.session.userId),
+        eq(notificationsTable.accountId, ctx.session.accountId),
       ))
       return { success: true }
     }),
@@ -589,7 +589,7 @@ export const notificationRouter = router({
       const result = await db.select({ count: sql<number>`count(*)` })
         .from(notificationsTable)
         .where(and(
-          eq(notificationsTable.accountId, ctx.session.userId),
+          eq(notificationsTable.accountId, ctx.session.accountId),
           isNull(notificationsTable.readAt),
           eq(notificationsTable.dismissed, false),
         ))
@@ -630,7 +630,7 @@ Subscription billing management routes to Paddle's customer portal. No custom bi
     .input(z.object({ listingId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const listing = await getListing(input.listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -682,7 +682,7 @@ Optimistic concurrency control prevents conflicting edits (e.g., provider edits 
     .mutation(async ({ ctx, input }) => {
       const { listingId, version, ...updates } = input
       const listing = await getListing(listingId)
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
@@ -717,7 +717,7 @@ Optimistic concurrency control prevents conflicting edits (e.g., provider edits 
         {
           type: "profile_edited",
           listingId,
-          accountId: ctx.session.userId,
+          accountId: ctx.session.accountId,
           changedFields,
           timestamp: new Date().toISOString(),
         },
@@ -830,7 +830,7 @@ export const settingsRouter = router({
     .query(async ({ ctx }) => {
       const prefs = await db.select()
         .from(emailPreferences)
-        .where(eq(emailPreferences.accountId, ctx.session.userId))
+        .where(eq(emailPreferences.accountId, ctx.session.accountId))
       return prefs
     }),
 
@@ -844,7 +844,7 @@ export const settingsRouter = router({
         enabled: input.enabled,
         updatedAt: new Date(),
       }).where(and(
-        eq(emailPreferences.accountId, ctx.session.userId),
+        eq(emailPreferences.accountId, ctx.session.accountId),
         eq(emailPreferences.category, input.category),
       ))
       return { success: true }
@@ -867,8 +867,8 @@ The settings page exposes an "Close Account" action. Closure initiates the PP-or
       // Delegate to PP's account closure orchestrator (S0 orchestrated flow engine)
       await startOrchestratedFlow({
         flowType: "closure",
-        triggeredBy: ctx.session.userId,
-        context: { accountId: ctx.session.userId },
+        triggeredBy: ctx.session.accountId,
+        context: { accountId: ctx.session.accountId },
       })
 
       return { success: true }

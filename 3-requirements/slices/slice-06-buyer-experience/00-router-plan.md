@@ -51,7 +51,7 @@ S6 introduces a dedicated search router. S1's `listing.search` route remains for
 | `search.suggest` | `publicProcedure` | `{ prefix: string }` | `string[]` | CSR | Autocomplete from taxonomy terms + synonym table. Debounced client-side. |
 | `search.saveSearch` | `protectedProcedure` | `{ name: string, query?: string, filters?: SearchFilters }` | `SavedSearch` | CSR | Persist search to `saved_searches` table (S1 §2.2). |
 | `search.getSavedSearches` | `protectedProcedure` | `{ limit?: number }` | `SavedSearch[]` | CSR | List saved searches for current account. Default limit 10. |
-| `search.deleteSavedSearch` | `protectedProcedure` | `{ savedSearchId: uuid }` | `void` | CSR | Delete a saved search. Ownership check: `savedSearch.accountId === session.userId`. |
+| `search.deleteSavedSearch` | `protectedProcedure` | `{ savedSearchId: uuid }` | `void` | CSR | Delete a saved search. Ownership check: `savedSearch.accountId === session.accountId`. |
 
 **Input/output types:**
 
@@ -140,7 +140,7 @@ search.query(input):
 
   // 10. Record in search_history if authenticated [S1-6 flag resolution]
   if ctx.session:
-    insertSearchHistory(ctx.session.userId, input.query, input.filters, totalCount)
+    insertSearchHistory(ctx.session.accountId, input.query, input.filters, totalCount)
 
   return { results, sponsoredResults, totalCount, facets, nextCursor, suggestedFilters, zeroResultSuggestions }
 ```
@@ -204,7 +204,7 @@ type ShortlistItemWithListing = {
 
 ```
 shortlist.getItems({ shortlistId, cursor }):
-  // Ownership check: shortlist.accountId === session.userId
+  // Ownership check: shortlist.accountId === session.accountId
   // Single query: JOIN shortlist_items → listings
   // WHERE shortlist_items.shortlistId = :shortlistId AND shortlist_items.status != 'removed' [S6-ST-1]
   // ORDER BY shortlist_items.addedAt DESC
@@ -216,14 +216,14 @@ shortlist.getItems({ shortlistId, cursor }):
 
 ```
 shortlist.addItem({ shortlistId, listingId }):
-  // Ownership check: shortlist.accountId === session.userId
+  // Ownership check: shortlist.accountId === session.accountId
   // Capacity check: count(active items) < 50
   // Duplicate check: unique(shortlist_id, listing_id) constraint
   // Insert with status = "active"
   emit({
     type: "shortlist_added",
     listingId: listingId,
-    accountId: ctx.session.userId,
+    accountId: ctx.session.accountId,
     timestamp: new Date().toISOString(),
   })
 ```
@@ -238,7 +238,7 @@ Enquiry submission is open to anonymous users (email required in form). Buyer-si
 |-------|--------|-------|--------|-----------|-------------|
 | `enquiry.submit` | `publicProcedure` | `EnquirySubmitInput` | `{ enquiryId: uuid }` | CSR | Submit enquiry. Routes by claim status (claimed → deliver, unclaimed+email → forward, unclaimed+no email → reject with contact fallback, disputed → silent queue). Emits `enquiry_submitted`. |
 | `enquiry.listSent` | `protectedProcedure` | `{ cursor?: string, limit?: number }` | `{ enquiries: EnquirySentView[], nextCursor? }` | CSR | Buyer's sent enquiries with response status. Reads `enquiry_records` filtered by `senderAccountId`. |
-| `enquiry.getSent` | `protectedProcedure` | `{ enquiryId: uuid }` | `EnquirySentDetail` | CSR | Single enquiry detail with response status. Ownership check: `enquiry.senderAccountId === session.userId`. |
+| `enquiry.getSent` | `protectedProcedure` | `{ enquiryId: uuid }` | `EnquirySentDetail` | CSR | Single enquiry detail with response status. Ownership check: `enquiry.senderAccountId === session.accountId`. |
 
 **Input/output types:**
 
@@ -340,7 +340,7 @@ enquiry.submit(input):
 ```
 enquiry.listSent({ cursor, limit }):
   // Single query: JOIN enquiry_records → listings (for display name + slug)
-  // WHERE sender_account_id = session.userId
+  // WHERE sender_account_id = session.accountId
   // ORDER BY submitted_at DESC
   // Cursor pagination on submitted_at
   // Index: (sender_account_id) — defined in S1 §2.2

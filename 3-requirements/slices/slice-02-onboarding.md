@@ -156,7 +156,7 @@ export const listingCreationRouter = router({
       // 2. Run integrity checks: checkDuplicate, checkCHUniqueness (Rule 3 n/a for freelancers without CH)
       //    [Source: S1 §6.2 runIntegrityChecks]
       // 3. Create listing (entityType = "freelancer", claimStatus = "claimed",
-      //    subscriptionTier = "free", lifecycleStatus = "active", accountId = ctx.session.userId)
+      //    subscriptionTier = "free", lifecycleStatus = "active", accountId = ctx.session.accountId)
       // 4. Create one-to-one rows: verification (tier = "claimed"), quality_scores (zeros),
       //    quality_score_explanations, engagements (zeros) — two-phase pattern [S1 §10]
       // 5. Create taxonomy tags

@@ -28,22 +28,22 @@ Seven routes on the `shortlist` router. All require authentication (`protectedPr
 
 ```
 shortlist.create({ name }):
-  // Ownership: implicit — uses session.userId as accountId
-  count = SELECT COUNT(*) FROM shortlists WHERE account_id = session.userId
+  // Ownership: implicit — uses session.accountId as accountId
+  count = SELECT COUNT(*) FROM shortlists WHERE account_id = session.accountId
   if count >= 10: throw BAD_REQUEST("Maximum 10 shortlists per account")
 
-  INSERT INTO shortlists (account_id, name) VALUES (session.userId, name)
+  INSERT INTO shortlists (account_id, name) VALUES (session.accountId, name)
   return shortlist
 
 shortlist.rename({ shortlistId, name }):
   shortlist = SELECT * FROM shortlists WHERE id = shortlistId
-  if !shortlist || shortlist.accountId !== session.userId: throw NOT_FOUND
+  if !shortlist || shortlist.accountId !== session.accountId: throw NOT_FOUND
 
   UPDATE shortlists SET name = name WHERE id = shortlistId
 
 shortlist.delete({ shortlistId }):
   shortlist = SELECT * FROM shortlists WHERE id = shortlistId
-  if !shortlist || shortlist.accountId !== session.userId: throw NOT_FOUND
+  if !shortlist || shortlist.accountId !== session.accountId: throw NOT_FOUND
 
   DELETE FROM shortlists WHERE id = shortlistId
   // shortlist_items cascade-deleted via FK (onDelete: "cascade")
@@ -54,7 +54,7 @@ shortlist.list():
          COUNT(si.id) FILTER (WHERE si.status = 'active') AS item_count
   FROM shortlists s
   LEFT JOIN shortlist_items si ON si.shortlist_id = s.id
-  WHERE s.account_id = session.userId
+  WHERE s.account_id = session.accountId
   GROUP BY s.id
   ORDER BY s.created_at DESC
 ```
@@ -65,7 +65,7 @@ shortlist.list():
 shortlist.addItem({ shortlistId, listingId }):
   // 1. Ownership check
   shortlist = SELECT * FROM shortlists WHERE id = shortlistId
-  if !shortlist || shortlist.accountId !== session.userId: throw NOT_FOUND
+  if !shortlist || shortlist.accountId !== session.accountId: throw NOT_FOUND
 
   // 2. Capacity check
   activeCount = SELECT COUNT(*) FROM shortlist_items
@@ -81,14 +81,14 @@ shortlist.addItem({ shortlistId, listingId }):
   emit({
     type: "shortlist_added",
     listingId: listingId,
-    accountId: session.userId,
+    accountId: session.accountId,
     timestamp: new Date().toISOString(),
   })
 
 shortlist.removeItem({ shortlistId, listingId }):
   // Ownership check via shortlist
   shortlist = SELECT * FROM shortlists WHERE id = shortlistId
-  if !shortlist || shortlist.accountId !== session.userId: throw NOT_FOUND
+  if !shortlist || shortlist.accountId !== session.accountId: throw NOT_FOUND
 
   // Soft delete — preserves the record for potential analytics
   UPDATE shortlist_items
@@ -105,7 +105,7 @@ shortlist.removeItem({ shortlistId, listingId }):
 shortlist.getItems({ shortlistId, cursor }):
   // Ownership check
   shortlist = SELECT * FROM shortlists WHERE id = shortlistId
-  if !shortlist || shortlist.accountId !== session.userId: throw NOT_FOUND
+  if !shortlist || shortlist.accountId !== session.accountId: throw NOT_FOUND
 
   // Single JOIN query — listing state derived at read time (Decision D2)
   items = SELECT
@@ -257,7 +257,7 @@ enquiry.listSent({ cursor, limit = 20 }):
     l.name           AS listing_name
   FROM enquiry_records er
   INNER JOIN listings l ON l.id = er.listing_id
-  WHERE er.sender_account_id = session.userId
+  WHERE er.sender_account_id = session.accountId
   ORDER BY er.sent_at DESC
   LIMIT limit
   -- Cursor: AND er.sent_at < :cursor
@@ -322,7 +322,7 @@ shortlist.list():
     MAX(si.added_at) FILTER (WHERE si.status = 'active')   AS last_added_at
   FROM shortlists s
   LEFT JOIN shortlist_items si ON si.shortlist_id = s.id
-  WHERE s.account_id = session.userId
+  WHERE s.account_id = session.accountId
   GROUP BY s.id
   ORDER BY s.created_at DESC
 ```

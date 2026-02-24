@@ -222,7 +222,7 @@ S6 adds one new table and no column amendments to existing tables. Full Drizzle 
 | # | Criterion | Test |
 |---|-----------|------|
 | AC-33 | `search.saveSearch` creates `saved_searches` row; rejects at 20 saved searches per account | Integration |
-| AC-34 | `search.deleteSavedSearch` deletes only if `savedSearch.accountId === session.userId`; returns NOT_FOUND otherwise | Integration |
+| AC-34 | `search.deleteSavedSearch` deletes only if `savedSearch.accountId === session.accountId`; returns NOT_FOUND otherwise | Integration |
 | AC-35 | `searchHistory.list` returns at most `limit` entries (default 10, max 50), ordered by createdAt DESC, for authenticated user only | Integration |
 | AC-36 | `searchHistory.clear` deletes all `search_history` rows for the authenticated user and no other accounts | Integration |
 | AC-37 | `search_history_cleanup` deferred action deletes rows older than 365 days, self-schedules next execution, and is registered in `DeferredActionParamsMap` (SI §2.1) | Integration |

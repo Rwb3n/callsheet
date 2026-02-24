@@ -302,7 +302,7 @@ For authenticated users, every search execution writes to the `search_history` t
 // Inside search.query handler, after event emission
 if (ctx.session) {
   await db.insert(searchHistory).values({
-    accountId: ctx.session.userId,
+    accountId: ctx.session.accountId,
     query: input.query ?? null,
     filters: input.filters ?? null,
     resultCount: totalCount,
@@ -386,16 +386,16 @@ Saved searches allow buyers to name, store, and re-execute search queries. Maxim
 
 ```
 search.saveSearch({ name, query, filters }):
-  // Ownership: protectedProcedure — session.userId
+  // Ownership: protectedProcedure — session.accountId
   // Capacity check
   const count = await db.select({ count: count() })
     .from(savedSearches)
-    .where(eq(savedSearches.accountId, ctx.session.userId))
+    .where(eq(savedSearches.accountId, ctx.session.accountId))
 
   if (count >= 20) throw TRPCError("FORBIDDEN", "Maximum 20 saved searches")
 
   return await db.insert(savedSearches).values({
-    accountId: ctx.session.userId,
+    accountId: ctx.session.accountId,
     name: name.trim(),
     query: query ?? null,
     filters: filters ?? null,
@@ -409,7 +409,7 @@ search.getSavedSearches({ limit }):
   // protectedProcedure
   return await db.select()
     .from(savedSearches)
-    .where(eq(savedSearches.accountId, ctx.session.userId))
+    .where(eq(savedSearches.accountId, ctx.session.accountId))
     .orderBy(desc(savedSearches.createdAt))
     .limit(limit ?? 10)
 ```
@@ -424,7 +424,7 @@ search.deleteSavedSearch({ savedSearchId }):
     .where(eq(savedSearches.id, savedSearchId))
     .limit(1)
 
-  if (!saved || saved.accountId !== ctx.session.userId)
+  if (!saved || saved.accountId !== ctx.session.accountId)
     throw TRPCError("NOT_FOUND")
 
   await db.delete(savedSearches)
@@ -455,7 +455,7 @@ searchHistory.list({ limit }):
     createdAt: searchHistory.createdAt,
   })
     .from(searchHistory)
-    .where(eq(searchHistory.accountId, ctx.session.userId))
+    .where(eq(searchHistory.accountId, ctx.session.accountId))
     .orderBy(desc(searchHistory.createdAt))
     .limit(effectiveLimit)
 ```
@@ -466,7 +466,7 @@ searchHistory.list({ limit }):
 searchHistory.clear():
   // protectedProcedure
   await db.delete(searchHistory)
-    .where(eq(searchHistory.accountId, ctx.session.userId))
+    .where(eq(searchHistory.accountId, ctx.session.accountId))
 ```
 
 **Table:** `search_history` — new in S6. [Source: s6-drafting/01-schema.md — §1.1, §4.1]
@@ -559,7 +559,7 @@ Re-running from search history uses the same `buildSearchUrl` function, substitu
 | AC-19 | `search.saveSearch` creates a `saved_searches` row with name, query, filters for the authenticated user | Integration |
 | AC-20 | `search.saveSearch` rejects with error when account has 20 saved searches | Integration |
 | AC-21 | `search.getSavedSearches` returns only searches belonging to the authenticated user, ordered by createdAt DESC | Integration |
-| AC-22 | `search.deleteSavedSearch` deletes the search only if `savedSearch.accountId === session.userId`; returns NOT_FOUND otherwise | Integration |
+| AC-22 | `search.deleteSavedSearch` deletes the search only if `savedSearch.accountId === session.accountId`; returns NOT_FOUND otherwise | Integration |
 | AC-23 | `searchHistory.list` returns at most `limit` entries (default 10, max 50), ordered by createdAt DESC, for the authenticated user only | Integration |
 | AC-24 | `searchHistory.clear` deletes all `search_history` rows for the authenticated user and no other accounts | Integration |
 | AC-25 | `/dashboard/searches` renders "Recent Searches" (last 5 from history) and "Saved Searches" list for authenticated users | E2E |

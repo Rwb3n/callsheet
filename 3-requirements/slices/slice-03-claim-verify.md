@@ -191,7 +191,7 @@ Lock lifecycle: held only during synchronous evaluation phase (milliseconds). Wh
 
 ## 2. tRPC Route — Claim Submission
 
-S3 replaces S2's claim stub in the `submitClaim` mutation. S2's snapshot creation and integrity checks remain. S3 amends S2's step 2/3 to include `claimantAccountId: ctx.session.userId` in the snapshot JSONB alongside `pendingEdits` [S3-ST-5]. S3 also cancels S2's 90-day `pre_claim_snapshot_cleanup` when the claim enters `pending_review` or `disputed` state [S3-ST-20]. S3 inserts the `evaluateClaim` call after S2's steps 1–4.
+S3 replaces S2's claim stub in the `submitClaim` mutation. S2's snapshot creation and integrity checks remain. S3 amends S2's step 2/3 to include `claimantAccountId: ctx.session.accountId` in the snapshot JSONB alongside `pendingEdits` [S3-ST-5]. S3 also cancels S2's 90-day `pre_claim_snapshot_cleanup` when the claim enters `pending_review` or `disputed` state [S3-ST-20]. S3 inserts the `evaluateClaim` call after S2's steps 1–4.
 
 ```typescript
 // src/server/routers/claim.ts (S3 replaces S2 stub logic)
@@ -201,7 +201,7 @@ export const claimRouter = router({
     .mutation(async ({ ctx, input }) => {
       // Steps 1–4: S2's existing logic (snapshot, edits, integrity)
       // S3 AMENDS S2 step 2/3: snapshot JSONB now includes claimantAccountId [S3-ST-5]:
-      //   snapshot = { claimantAccountId: ctx.session.userId, pendingEdits: edits }
+      //   snapshot = { claimantAccountId: ctx.session.accountId, pendingEdits: edits }
       // S3 AMENDS S2 step 6: cancel pre_claim_snapshot_cleanup before evaluation [S3-ST-20]:
       //   await cancelDeferredAction<"pre_claim_snapshot_cleanup">({
       //     action: "pre_claim_snapshot_cleanup", params: { listingId: input.listingId }
@@ -212,7 +212,7 @@ export const claimRouter = router({
       const decision = await evaluateClaim(
         {
           listingId: input.listingId,
-          accountId: ctx.session.userId,
+          accountId: ctx.session.accountId,
           companiesHouseNumber: input.companiesHouseNumber,
           claimEmail: input.claimEmail ?? ctx.session.user.email,
           evidenceUrls: input.evidenceUrls ?? [],
@@ -228,33 +228,33 @@ export const claimRouter = router({
         inputs: { listingId: input.listingId, entityType: listing.entityType, hasChNumber: !!input.companiesHouseNumber },
         output: { action: decision.action, confidence: "confidence" in decision ? decision.confidence : null },
         confidence: "confidence" in decision ? decision.confidence : undefined,
-        entityContext: { listingId: input.listingId, accountId: ctx.session.userId },
+        entityContext: { listingId: input.listingId, accountId: ctx.session.accountId },
       })
 
       // Step 7: Execute decision
       switch (decision.action) {
         case "auto_approve":
-          await onClaimApproved(listing, ctx.session.userId, "auto")
+          await onClaimApproved(listing, ctx.session.accountId, "auto")
           // Platform emits claim_approved (S1 pattern: tRPC = PP surface)
-          await emit({ type: "claim_approved", listingId: input.listingId, accountId: ctx.session.userId, method: "auto", timestamp: new Date().toISOString() })
+          await emit({ type: "claim_approved", listingId: input.listingId, accountId: ctx.session.accountId, method: "auto", timestamp: new Date().toISOString() })
           return { status: "approved" as const }
 
         case "auto_reject":
-          await onClaimRejected(listing, ctx.session.userId, decision.reasons)
+          await onClaimRejected(listing, ctx.session.accountId, decision.reasons)
           // Platform emits claim_rejected
-          await emit({ type: "claim_rejected", listingId: input.listingId, claimantAccountId: ctx.session.userId, reason: decision.reasons.join("; "), timestamp: new Date().toISOString() })
+          await emit({ type: "claim_rejected", listingId: input.listingId, claimantAccountId: ctx.session.accountId, reason: decision.reasons.join("; "), timestamp: new Date().toISOString() })
           return { status: "rejected" as const, reasons: decision.reasons }
 
         case "queue_manual_review":
           // claimStatus already set to "pending_review" by acquireClaimLock
           await createTaskSpec(decision.taskSpec)
           await createNotification({
-            accountId: ctx.session.userId,
+            accountId: ctx.session.accountId,
             type: "claim_pending_review",
             title: "Claim under review",
             body: "We're verifying your claim. You'll hear back within 48 hours.",
           })
-          await sendEmail("claim_pending_review", ctx.session.userId, { listingName: listing.name })
+          await sendEmail("claim_pending_review", ctx.session.accountId, { listingName: listing.name })
           // Schedule 90-day snapshot cleanup (S2's deferred action — already scheduled by S2 step 6)
           return { status: "pending_review" as const }
 
@@ -288,7 +288,7 @@ export const claimRouter = router({
       reviewNotes: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      await onManualReviewComplete(input.listingId, input.decision, input.reviewNotes, ctx.session.userId)
+      await onManualReviewComplete(input.listingId, input.decision, input.reviewNotes, ctx.session.accountId)
     }),
 })
 ```
@@ -850,7 +850,7 @@ export const verificationRouter = router({
       const listing = await getListing(input.listingId)
 
       // Guard: caller must own this listing
-      if (listing.accountId !== ctx.session.userId) {
+      if (listing.accountId !== ctx.session.accountId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "you do not own this listing" })
       }
 
@@ -1136,7 +1136,7 @@ This also covers the case where a listing is suspended due to an unresolved disp
 | S3-ST-2 | `onClaimApproved` steps 2 and 4 both UPDATE the same listings row separately (ownership + Article 14 banner). | Low | Fixed. Combined into single UPDATE in step 2. Steps renumbered 1–8 (was 1–10). |
 | S3-ST-3 | `deliverPendingEnquiries` calls `getListing(listingId)` 3 times per batch iteration — N+1 query. | Medium | Fixed. Listing fetched once before the loop. All 3 references now use the local variable. |
 | S3-ST-4 | `deliverPendingEnquiries` uses `inArray(enquiryRecords.id, batch)` where batch contains `pending_enquiries.enquiryId` values. S1-ST-3 says "enquiryId is PP's ID, not D&L's enquiry_records.id" — confusing documentation. | **High** → Low | Reclassified to Low after analysis: `enquiry_records` IS PP's table (S1 §2.2), so `.id` is correct. Added clarifying comment. |
-| S3-ST-5 | `onManualReviewComplete` reads `snapshot.claimantAccountId` but S2's `submitClaim` never stores it. S3 §6.3 documents the extension but S2's code doesn't populate it. | **High** | Fixed. S3 documents amendment to S2's `submitClaim` step 2/3: snapshot JSONB now includes `claimantAccountId: ctx.session.userId`. AC-46 added. |
+| S3-ST-5 | `onManualReviewComplete` reads `snapshot.claimantAccountId` but S2's `submitClaim` never stores it. S3 §6.3 documents the extension but S2's code doesn't populate it. | **High** | Fixed. S3 documents amendment to S2's `submitClaim` step 2/3: snapshot JSONB now includes `claimantAccountId: ctx.session.accountId`. AC-46 added. |
 | S3-ST-6 | `delete_claim_snapshot` deferred action (§10) is never scheduled by S3 code — direct `db.delete()` used in `onClaimApproved` and `onClaimRejected`. Redundant with direct delete. | Medium | Fixed. `delete_claim_snapshot` removed from §10 and SI §2.1/§2.2. S2's `pre_claim_snapshot_cleanup` (90-day) handles the fallback case. 2→1 deferred action handler. AC-44 updated. |
 | S3-ST-7 | SI §2.1 `delete_claim_snapshot` params use `claimId` but schema uses `listingId` (pre_claim_snapshots PK). | Medium | Resolved by S3-ST-6: `delete_claim_snapshot` removed entirely from SI. |
 | S3-ST-8 | `evaluateClaim` Step 2 inner `emailDomainMatches` re-checks `listing.websiteUrl` — already failed in Step 1. Redundant. Concept design checks CH registered domain instead. | Medium | Resolved by S3-ST-1 restructure. CH paths now precede email domain match. When CH number is provided, email domain match only runs with active CH confirmation (different confidence). When no CH, email domain match runs as Step 3. No redundant check. |

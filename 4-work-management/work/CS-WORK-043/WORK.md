@@ -3,7 +3,7 @@ template: work_item
 id: CS-WORK-043
 title: "Implement dashboard overview and listing context"
 type: feature
-status: active
+status: done
 owner: null
 created: 2026-02-24
 spawned_by: null
@@ -11,7 +11,7 @@ spawned_children: []
 chapter: CH-CS-007
 arc: provider-experience
 epoch: CS-E1
-closed: null
+closed: 2026-02-24
 priority: critical
 effort: medium
 traces_to:
@@ -56,12 +56,13 @@ Dashboard shell and listing context provider — the foundational layout that al
 
 ## Deliverables
 
-- [ ] `src/app/dashboard/layout.tsx` — Auth guard + dashboard shell (session check, redirect)
-- [ ] `src/app/dashboard/page.tsx` — Overview page: listing cards grid
-- [ ] `src/app/dashboard/listings/[listingId]/layout.tsx` — Listing context provider (ownership check, feature access)
-- [ ] `src/server/routers/dashboard.ts` — `createDashboardRouter(deps)` with `getOverview` query (join query)
-- [ ] `src/server/routers/__tests__/dashboard.test.ts` — Unit tests for overview query
-- [ ] `src/server/routers/__tests__/dashboard.integration.test.ts` — Integration tests for AC-4, AC-5
+- [x] `src/app/dashboard/layout.tsx` — Auth guard + dashboard shell (session check, redirect)
+- [x] `src/app/dashboard/page.tsx` — Overview page: listing cards grid
+- [x] `src/app/dashboard/listings/[listingId]/layout.tsx` — Listing context provider (ownership check, feature access)
+- [x] `src/server/routers/dashboard.ts` — `createDashboardRouter(deps)` with `getOverview` + `getListingContext` queries
+- [x] `src/server/routers/__tests__/dashboard.test.ts` — 3 unit tests (auth rejection, UUID validation)
+- [x] `src/server/routers/__tests__/dashboard.integration.test.ts` — 11 integration tests (AC-2 through AC-5)
+- [x] `src/server/root.ts` — Root router wiring all 12 domain routers + `AppRouter` type export
 
 ## References
 
