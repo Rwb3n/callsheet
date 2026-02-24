@@ -634,10 +634,12 @@ Subscription billing management routes to Paddle's customer portal. No custom bi
         throw new TRPCError({ code: "FORBIDDEN" })
       }
 
-      if (!listing.paddleCustomerId) return { portalUrl: null }
+      // paddleCustomerId lives on accountProfiles, not listing [S5-retro-1]
+      const profile = await getAccountProfile(ctx.session.accountId)
+      if (!profile?.paddleCustomerId) return { portalUrl: null }
 
-      const portalUrl = await ctx.services.payment.getCustomerPortalUrl({
-        paddleCustomerId: listing.paddleCustomerId,
+      const portalUrl = await deps.payment.getCustomerPortalUrl({
+        paddleCustomerId: profile.paddleCustomerId,
       })
 
       return { portalUrl }

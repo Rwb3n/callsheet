@@ -27,7 +27,7 @@ export function getTestDb() {
   return _db
 }
 
-/** Truncate SQL shared between test resetDb() and /api/test/reset endpoint. */
+/** TRUNCATE for E2E reset endpoint (runs once per suite, not per test). */
 export const TRUNCATE_ALL_TABLES_SQL = sql`
   TRUNCATE TABLE
     notifications,
@@ -71,10 +71,53 @@ export const TRUNCATE_ALL_TABLES_SQL = sql`
   CASCADE
 `
 
-/** Truncate all application tables. Call in beforeEach/afterEach. */
+// DELETE in reverse-FK order — no ACCESS EXCLUSIVE locks, ~2ms on empty tables
+// vs ~9.5s for TRUNCATE CASCADE. Same correctness for beforeEach.
+const DELETE_ALL_TABLES_SQL = sql`
+  DELETE FROM notifications;
+  DELETE FROM grace_periods;
+  DELETE FROM pending_cancellations;
+  DELETE FROM processed_paddle_events;
+  DELETE FROM suppressed_emails;
+  DELETE FROM correspondence_log;
+  DELETE FROM shortlist_items;
+  DELETE FROM shortlists;
+  DELETE FROM enquiry_records;
+  DELETE FROM saved_searches;
+  DELETE FROM account_profiles;
+  DELETE FROM listing_taxonomy_tags;
+  DELETE FROM credits;
+  DELETE FROM media_items;
+  DELETE FROM social_profiles;
+  DELETE FROM accreditations;
+  DELETE FROM pending_enquiries;
+  DELETE FROM pre_claim_snapshots;
+  DELETE FROM additional_locations;
+  DELETE FROM quality_score_explanations;
+  DELETE FROM quality_scores;
+  DELETE FROM engagements;
+  DELETE FROM verifications;
+  DELETE FROM zero_result_queries;
+  DELETE FROM controlled_vocabulary;
+  DELETE FROM search_synonyms;
+  DELETE FROM listings;
+  DELETE FROM taxonomy_specialisations;
+  DELETE FROM taxonomy_service_areas;
+  DELETE FROM taxonomy_sectors;
+  DELETE FROM deferred_actions;
+  DELETE FROM orchestrated_flows;
+  DELETE FROM decision_logs;
+  DELETE FROM event_consumer_errors;
+  DELETE FROM verification;
+  DELETE FROM session;
+  DELETE FROM account;
+  DELETE FROM "user"
+`
+
+/** Delete all rows from application tables. Call in beforeEach/afterEach. */
 export async function resetDb() {
   const db = getTestDb()
-  await db.execute(TRUNCATE_ALL_TABLES_SQL)
+  await db.execute(DELETE_ALL_TABLES_SQL)
 }
 
 /** Close the pool. Call in afterAll. */

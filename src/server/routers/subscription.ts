@@ -1,7 +1,8 @@
-// Subscription checkout + status routes — S4 §3, AC-11 through AC-15
+// Subscription checkout + status routes — S4 §3 AC-11–AC-15, S5 §7 AC-30
 // createCheckout: initiate Paddle checkout for claimed listing at free tier
 // upgrade: Paddle subscription update to higher tier
 // getSubscriptionStatus: current tier, billing cadence, grace period, feature access
+// getPortalUrl: Paddle customer portal URL for billing management
 
 import { z } from "zod"
 import { TRPCError } from "@trpc/server"
@@ -147,6 +148,42 @@ export function createSubscriptionRouter(deps: SubscriptionRouterDeps) {
             ? { expiresAt: grace.expiresAt, previousTier: grace.previousTier }
             : null,
         }
+      }),
+
+    // AC-30: Paddle portal link for customer billing management [S5 §7.2, SI §10.1]
+    getPortalUrl: protectedProcedure
+      .input(z.object({ listingId: z.string().uuid() }))
+      .query(async ({ ctx, input }) => {
+        const [listing] = await deps.db
+          .select({ accountId: listings.accountId })
+          .from(listings)
+          .where(eq(listings.id, input.listingId))
+          .limit(1)
+
+        if (!listing) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Listing not found" })
+        }
+
+        if (listing.accountId !== ctx.session.accountId) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "you do not own this listing" })
+        }
+
+        // Paddle customer ID lives on account profile, not listing
+        const [profile] = await deps.db
+          .select({ paddleCustomerId: accountProfiles.paddleCustomerId })
+          .from(accountProfiles)
+          .where(eq(accountProfiles.accountId, ctx.session.accountId))
+          .limit(1)
+
+        if (!profile?.paddleCustomerId) {
+          return { portalUrl: null }
+        }
+
+        const portalUrl = await deps.payment.getCustomerPortalUrl({
+          paddleCustomerId: profile.paddleCustomerId,
+        })
+
+        return { portalUrl }
       }),
   })
 }

@@ -35,6 +35,7 @@ If the slice is not at v2, stop and tell the user.
 5. **Work item template.** Read `references/work-item-template.md` for the WORK.md format.
 6. **Dependency context.** Read the arc file to understand cross-chapter dependencies. Read prior chapters' work items if the current slice depends on infrastructure from earlier slices.
 7. **Type alignment check.** Grep the codebase for type definitions that the new slice will consume or extend (e.g., `PaymentService`, `SubscriptionTier`, `EventPayloadMap`, `DeferredActionParamsMap`). Compare the existing type's shape/values against the slice's expectations. If there is a misalignment (placeholder values, missing fields, wrong union members), note it in the relevant work item's Context section so the implementer resolves it deliberately rather than discovering it mid-coding.
+8. **Router ownership check.** Glob `src/server/routers/*.ts` and note which procedures each router already owns. When a work item extends an existing procedure namespace (e.g., adding `getPortalUrl` alongside `getSubscriptionStatus`), the deliverable must target the router that already owns that namespace — not a different router that happens to consume the data. Domain co-location takes priority over consumer proximity.
 
 ### What NOT to read
 

@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     include: ["src/**/*.integration.test.ts"],
-    // Sequential — tests share a single DB and truncate between runs
+    // Sequential — tests share a single DB and DELETE between runs
     pool: "forks",
     maxWorkers: 1,
     testTimeout: 15_000,

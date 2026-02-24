@@ -10,11 +10,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Work items complete | **7 / 7 (S0)**, **6 / 6 (S1)**, **2 / 2 (S1 Seed)**, **4 / 4 (Comms P1)**, **10 / 10 (S2)**, **4 / 4 (S3)**, **8 / 8 (S4)**, **1 / 7 (S5)** |
-| AC verified (unit/integration/e2e) | **52 / 51 (S0)**, **42 / 42 (S1)**, **9 / 9 (S1 Seed)**, **17 / 17 (Comms P1)**, **41 / 41 (S2)**, **48 / 48 (S3)**, **47 / 50 + 3 e2e (S4)**, **5 / 46 (S5)**, 261 / 693 (total) |
+| Work items complete | **7 / 7 (S0)**, **6 / 6 (S1)**, **2 / 2 (S1 Seed)**, **4 / 4 (Comms P1)**, **10 / 10 (S2)**, **4 / 4 (S3)**, **8 / 8 (S4)**, **3 / 7 (S5)** |
+| AC verified (unit/integration/e2e) | **52 / 51 (S0)**, **42 / 42 (S1)**, **9 / 9 (S1 Seed)**, **17 / 17 (Comms P1)**, **41 / 41 (S2)**, **48 / 48 (S3)**, **47 / 50 + 3 e2e (S4)**, **13 / 46 (S5)**, 269 / 693 (total) |
 | AC deferred to E2E | 6 (see E2E Debt below) |
 | Slices with code | **S0 complete**, **S1 complete**, **S1 Seed complete**, **Comms Phase 1 complete**, **S2 complete**, **S3 complete**, **S4 complete**, S5 in progress |
-| Tests passing | 632 (250 unit + 382 integration + 2 E2E) |
+| Tests passing | 654 (250 unit + 402 integration + 2 E2E) |
 | Type errors | 0 |
 
 ---
@@ -225,12 +225,12 @@ CS-WORK-036 (Feature Gating, 5 AC) ✅
 | CS-WORK-043 | Dashboard overview and listing context | 5/5 | **done** | — | 044, 045, 046, 047, 048, 049 | `src/server/routers/dashboard.ts`, `src/server/root.ts`, `src/app/dashboard/layout.tsx`, `src/app/dashboard/page.tsx`, `src/app/dashboard/listings/[listingId]/layout.tsx` |
 | CS-WORK-044 | Analytics display and quality score panel | 0/10 | pending | ~~043~~ | — | — |
 | CS-WORK-045 | Enquiry inbox and response tracking | 0/7 | pending | ~~043~~ | — | — |
-| CS-WORK-046 | Notification centre and schema | 0/4 | pending | ~~043~~ | — | — |
-| CS-WORK-047 | Subscription management panel | 0/4 | pending | ~~043~~ | — | — |
+| CS-WORK-046 | Notification centre and schema | 4/4 | **done** | ~~043~~ | — | `src/db/schema/shared.ts` (+notifications), `drizzle/0007_*.sql`, `src/lib/notifications/drizzle-notification-db.ts`, `src/server/routers/notification.ts`, `src/app/dashboard/notifications/page.tsx` |
+| CS-WORK-047 | Subscription management panel | 4/4 | **done** | ~~043~~ | — | `src/server/routers/subscription.ts` (+getPortalUrl), `src/app/dashboard/listings/[listingId]/subscription/page.tsx` |
 | CS-WORK-048 | Profile editor enhancements and 90-day reminder | 0/8 | pending | ~~043~~ | — | — |
 | CS-WORK-049 | Account settings and feature gating UI | 0/8 | pending | ~~043~~ | — | — |
 
-**S5 progress:** 5/46 AC verified (unit/integration). **1/7 work items done.**
+**S5 progress:** 13/46 AC verified (unit/integration). **3/7 work items done.**
 
 ### Dependency Graph
 
@@ -238,8 +238,8 @@ CS-WORK-036 (Feature Gating, 5 AC) ✅
 CS-WORK-043 (Dashboard Shell, 5 AC) ✅
   ├──▶ CS-WORK-044 (Analytics, 10 AC) pending
   ├──▶ CS-WORK-045 (Enquiry Inbox, 7 AC) pending
-  ├──▶ CS-WORK-046 (Notifications, 4 AC) pending
-  ├──▶ CS-WORK-047 (Subscription Panel, 4 AC) pending
+  ├──▶ CS-WORK-046 (Notifications, 4 AC) ✅
+  ├──▶ CS-WORK-047 (Subscription Panel, 4 AC) ✅
   ├──▶ CS-WORK-048 (Profile Editor, 8 AC) pending
   └──▶ CS-WORK-049 (Settings, 8 AC) pending
 ```
