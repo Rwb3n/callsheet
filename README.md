@@ -41,7 +41,126 @@ The platform (directory, search, matching, subscriptions) is what the entity *do
 
 ---
 
-## Architecture
+## How It Works — The Simple Version
+
+### What users see
+
+```mermaid
+flowchart LR
+    classDef person fill:#e8daef,stroke:#6c3483,color:#1a1a1a
+    classDef action fill:#d4efdf,stroke:#1e8449,color:#1a1a1a
+    classDef result fill:#d4e6f1,stroke:#2471a3,color:#1a1a1a
+
+    BUYER(["🎬 Production Company<br/><i>needs a camera crew</i>"]):::person
+
+    SEARCH["Search<br/><i>'camera operator London'</i>"]:::action
+    RESULTS["See ranked results<br/><i>quality + relevance</i>"]:::action
+    PROFILE["View provider profile<br/><i>credits, reviews, trust badge</i>"]:::action
+    ENQUIRY["Send enquiry"]:::action
+    RESPONSE(["Provider responds<br/><i>connection made ✓</i>"]):::result
+
+    BUYER --> SEARCH --> RESULTS --> PROFILE --> ENQUIRY --> RESPONSE
+```
+
+```mermaid
+flowchart LR
+    classDef person fill:#fef9e7,stroke:#b7950b,color:#1a1a1a
+    classDef action fill:#d4efdf,stroke:#1e8449,color:#1a1a1a
+    classDef result fill:#d4e6f1,stroke:#2471a3,color:#1a1a1a
+
+    PROVIDER(["🎥 Camera Operator<br/><i>wants to be found</i>"]):::person
+
+    CLAIM["Claim or create<br/>their listing"]:::action
+    FILL["Add profile, credits,<br/>photos, services"]:::action
+    VERIFY["Get verified<br/><i>Companies House check</i>"]:::action
+    UPGRADE["Optionally upgrade<br/><i>more photos, priority, analytics</i>"]:::action
+    FOUND(["Found by buyers<br/><i>enquiries arrive ✓</i>"]):::result
+
+    PROVIDER --> CLAIM --> FILL --> VERIFY --> UPGRADE --> FOUND
+```
+
+### How the business works
+
+```mermaid
+flowchart TD
+    classDef money fill:#d5f5e3,stroke:#1e8449,color:#1a1a1a
+    classDef free fill:#d4e6f1,stroke:#2471a3,color:#1a1a1a
+    classDef value fill:#fef9e7,stroke:#b7950b,color:#1a1a1a
+
+    subgraph FREE ["Free Tier — Everyone gets this"]
+        F1["Listed in directory"]
+        F2["Appear in search results"]
+        F3["Receive enquiries"]
+        F4["Basic profile"]
+    end
+    class FREE free
+
+    subgraph PAID ["Paid Tiers — £199 / £399 / £699 per year"]
+        P1["More photos & media"]
+        P2["Visibility boost in search"]
+        P3["Analytics dashboard"]
+        P4["Priority placement"]
+        P5["Competitor benchmarking"]
+    end
+    class PAID money
+
+    subgraph ENGINE ["What the system does automatically"]
+        E1["Scores quality (0-100) based on<br/>completeness, freshness, accuracy"]:::value
+        E2["Detects stale data and<br/>nudges providers to update"]:::value
+        E3["Spots churn risk and<br/>intervenes before cancellation"]:::value
+        E4["Monitors its own health<br/>and generates reports"]:::value
+    end
+
+    FREE -- "conversion nudges<br/>(you got 12 views!)" --> PAID
+    PAID -- "revenue funds<br/>the platform" --> ENGINE
+    ENGINE -- "better data = better<br/>search = more buyers" --> FREE
+```
+
+### What makes it different from a normal directory
+
+Most directories are databases with a search box. CALLSHEET is designed to **run itself**.
+
+```mermaid
+flowchart LR
+    classDef normal fill:#fadbd8,stroke:#922b21,color:#1a1a1a
+    classDef cs fill:#d4efdf,stroke:#1e8449,color:#1a1a1a
+
+    subgraph NORMAL ["Typical Directory"]
+        N1["Human updates listings"]:::normal
+        N2["Human monitors quality"]:::normal
+        N3["Human chases renewals"]:::normal
+        N4["Human handles support"]:::normal
+    end
+
+    subgraph CALLSHEET ["CALLSHEET"]
+        C1["System detects stale data<br/>and triggers updates"]:::cs
+        C2["System scores quality<br/>across 5 dimensions"]:::cs
+        C3["System detects churn risk<br/>and sends win-back offers"]:::cs
+        C4["System triages support<br/>and escalates when stuck"]:::cs
+    end
+
+    NORMAL -- "replace manual<br/>work with" --> CALLSHEET
+```
+
+> **TL;DR:** It's a production services directory that watches its own data quality, nudges providers to keep profiles fresh, automatically handles billing/compliance/churn, and only calls a human when it encounters something it can't resolve on its own.
+
+---
+
+## Architecture — Under the Hood
+
+<details>
+<summary><b>The four departments, explained simply</b></summary>
+
+Think of CALLSHEET as a company with four departments. Each department does its own job and talks to the others through a shared noticeboard. Nobody reaches into another department's filing cabinet.
+
+| Department | Job | Example |
+|---|---|---|
+| **Data & Listings** | Owns all the directory records. Scores quality, checks freshness, verifies identities. | "This listing hasn't been updated in 6 months — flag it." |
+| **Operations** | Processes payments, handles compliance, creates support tickets. | "Paddle says this card failed — start the grace period." |
+| **Platform & Product** | The website. Search, profiles, dashboards, onboarding, emails. | "Someone searched 'camera operator London' — show the best matches." |
+| **Commercial & Revenue** | Grows the business. Conversion nudges, churn prevention, pricing. | "This free user got 12 enquiries — suggest upgrading." |
+
+</details>
 
 Four autonomous sub-entities coordinate through typed events and query interfaces. No shared mutable state. Each sub-entity is a black box with defined contracts.
 
