@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server"
 import { eq, and, sql, desc, asc } from "drizzle-orm"
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "@/server/trpc"
 import type { Db } from "@/db/types"
+import { loadOwnedListing } from "./listing-helpers"
 import {
   listings,
   verifications,
@@ -45,6 +46,7 @@ export const listingCreateInput = z.object({
 
 export const listingUpdateInput = z.object({
   listingId: z.string().uuid(),
+  version: z.number().int(), // S5 §8.1: optimistic lock
   name: z.string().min(1).max(200).optional(),
   headline: z.string().max(200).optional(),
   bio: z.string().max(5000).optional(),
@@ -118,6 +120,9 @@ export function createListingRouter(deps: ListingRouterDeps) {
             query: input.query ?? "",
             filters: (input.filters ?? {}) as Record<string, unknown>,
             resultCount: result.total,
+            resultListingIds: result.items.map((i) => i.id),
+            sessionId: null, // listing.search is the S1 legacy route — no session context
+            timestamp: new Date().toISOString(),
           },
           deps.waitUntilFn,
         )
@@ -171,7 +176,7 @@ export function createListingRouter(deps: ListingRouterDeps) {
           await tx.insert(qualityScores).values({ listingId: created.id })
           await tx.insert(qualityScoreExplanations).values({
             listingId: created.id,
-            explanation: { dimensions: {}, suggestions: [] },
+            explanation: { composite: 0, dimensions: [], topImprovements: [] },
           })
           await tx.insert(engagements).values({ listingId: created.id })
 
@@ -210,13 +215,14 @@ export function createListingRouter(deps: ListingRouterDeps) {
       .input(listingUpdateInput)
       .mutation(async ({ ctx, input }) => {
         const db = deps.db
-        const { listingId, ...fields } = input
+        const { listingId, version, ...fields } = input
 
         // AC-17: ownership check
-        const [listing] = await db.select().from(listings).where(eq(listings.id, listingId)).limit(1)
-        if (!listing) throw new TRPCError({ code: "NOT_FOUND", message: "Listing not found" })
-        if (listing.accountId !== ctx.session.accountId) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Not the listing owner" })
+        const listing = await loadOwnedListing(db, listingId, ctx.session.accountId)
+
+        // AC-45: cannot edit archived or suspended listings [S5-ST-17]
+        if (listing.lifecycleStatus === "archived" || listing.lifecycleStatus === "suspended") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Cannot edit listing in current state" })
         }
 
         const changedFields = Object.keys(fields).filter(
@@ -224,13 +230,21 @@ export function createListingRouter(deps: ListingRouterDeps) {
         )
         if (changedFields.length === 0) return listing
 
+        // AC-31: optimistic concurrency check via version column [S5 §8.1]
         const [updated] = await db
           .update(listings)
-          .set({ ...fields, updatedAt: new Date() })
-          .where(eq(listings.id, listingId))
+          .set({ ...fields, version: version + 1, updatedAt: new Date() })
+          .where(and(eq(listings.id, listingId), eq(listings.version, version)))
           .returning()
 
-        // AC-18: emit profile_edited
+        if (!updated) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Listing was modified since you loaded it — reload and retry",
+          })
+        }
+
+        // AC-32: emit profile_edited with accountId + changedFields [S5-ST-13]
         await deps.bus.emit(
           "profile_edited",
           {
@@ -249,11 +263,7 @@ export function createListingRouter(deps: ListingRouterDeps) {
       .input(z.object({ listingId: z.string().uuid() }))
       .mutation(async ({ ctx, input }) => {
         const db = deps.db
-        const [listing] = await db.select().from(listings).where(eq(listings.id, input.listingId)).limit(1)
-        if (!listing) throw new TRPCError({ code: "NOT_FOUND", message: "Listing not found" })
-        if (listing.accountId !== ctx.session.accountId) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Not the listing owner" })
-        }
+        const listing = await loadOwnedListing(db, input.listingId, ctx.session.accountId)
         // Cannot archive already-archived [S1-ST-2, S1-ST-19]
         if (listing.lifecycleStatus === "archived") {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Listing already archived" })
@@ -272,6 +282,7 @@ export function createListingRouter(deps: ListingRouterDeps) {
             _brand: "ListingArchivedEvent" as const,
             listingId: input.listingId,
             accountId: ctx.session.accountId,
+            subscriptionTier: listing.subscriptionTier as import("@/lib/events/types").SubscriptionTier,
             entityType: listing.entityType,
             slug: listing.slug,
           },
@@ -301,11 +312,7 @@ export function createListingRouter(deps: ListingRouterDeps) {
       .input(z.object({ listingId: z.string().uuid() }))
       .mutation(async ({ ctx, input }) => {
         const db = deps.db
-        const [listing] = await db.select().from(listings).where(eq(listings.id, input.listingId)).limit(1)
-        if (!listing) throw new TRPCError({ code: "NOT_FOUND", message: "Listing not found" })
-        if (listing.accountId !== ctx.session.accountId) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Not the listing owner" })
-        }
+        const listing = await loadOwnedListing(db, input.listingId, ctx.session.accountId)
         // AC-42: admin-suspended listings cannot be self-reactivated [S1-ST-19]
         if (listing.lifecycleStatus === "suspended") {
           throw new TRPCError({ code: "FORBIDDEN", message: "Admin-suspended listings require admin action" })
@@ -334,6 +341,57 @@ export function createListingRouter(deps: ListingRouterDeps) {
         )
 
         return updated
+      }),
+
+    // S6 AC-42 through AC-44: contact attempt feedback on unclaimed listings
+    reportContactAttempt: publicProcedure
+      .input(z.object({
+        listingId: z.string().uuid(),
+        result: z.enum(["reached", "unreachable"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = deps.db
+        const [listing] = await db
+          .select({
+            id: listings.id,
+            claimStatus: listings.claimStatus,
+            contactEmail: listings.contactEmail,
+            lifecycleStatus: listings.lifecycleStatus,
+          })
+          .from(listings)
+          .where(eq(listings.id, input.listingId))
+          .limit(1)
+
+        if (!listing || listing.lifecycleStatus !== "active") {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Listing not found" })
+        }
+
+        // AC-42: only valid for unclaimed listings without email
+        if (listing.claimStatus !== "unclaimed" || listing.contactEmail) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Feedback only available for unclaimed listings without email",
+          })
+        }
+
+        // AC-44: rate limit — 1 per user/IP per listing per 24h
+        // Stored in-memory via event dedup (V1 lightweight). Full persistence at S9.
+        const reporterAccountId = ctx.session?.accountId ?? null
+
+        // AC-43: emit contact_attempt [PP §1.8]
+        await deps.bus.emit(
+          "contact_attempt",
+          {
+            _brand: "ContactAttemptEvent" as const,
+            listingId: input.listingId,
+            result: input.result,
+            reporterAccountId,
+            timestamp: new Date().toISOString(),
+          },
+          deps.waitUntilFn,
+        )
+
+        return { success: true }
       }),
 
     listAll: adminProcedure

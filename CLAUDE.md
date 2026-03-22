@@ -2,16 +2,19 @@
 
 ## Mandatory Session Init
 
-**Before producing any output**, read these files in full:
-1. `0-strategic-frame/entity-architecture-frame.md` — governing design frame (v2: sub-entity hierarchy)
-2. `0-strategic-frame/output-style.md` — architect output style (planning docs, specs, proposals)
-3. `0-strategic-frame/output-style-engineer.md` — engineer output style (TypeScript source, tests, commits)
+Run `/session-init` at the start of every conversation. It reads governing documents, loads handoff context, verifies test health, and produces a status briefing. Do not produce substantive output before init completes.
 
-Do not summarise, paraphrase, or skip them. Planning output complies with #2. Code output complies with #3.
+If the skill is unavailable, execute the ceremony manually:
+1. Read `0-strategic-frame/entity-architecture-frame.md`, `0-strategic-frame/output-style.md`, `0-strategic-frame/output-style-engineer.md` in full.
+2. Read `MEMORY.md` handoff section + `4-work-management/IMPLEMENTATION-TRACKER.md` + active chapter file.
+3. Run `npx tsc --noEmit`, `npm run test`, `npm run test:integration` in parallel.
+4. Output a status briefing.
+
+Planning output complies with `output-style.md`. Code output complies with `output-style-engineer.md`.
 
 ## What This Repository Is
 
-Planning and documentation repository for CALLSHEET — an autonomous commercial entity (not a human-operated product) operating as a B2B discovery and matching platform for UK broadcast/film/TV production services. No application code yet.
+Planning, documentation, and implementation repository for CALLSHEET — an autonomous commercial entity (not a human-operated product) operating as a B2B discovery and matching platform for UK broadcast/film/TV production services.
 
 Read `entity-architecture-frame.md` before making any design decisions — it takes precedence over all other documents.
 
@@ -21,11 +24,11 @@ Read `entity-architecture-frame.md` before making any design decisions — it ta
 0-strategic-frame/    ← ACTIVE. entity-architecture-frame.md v2, output-style.md, strategic-positioning.md (LOCKED).
 1-investigation/      ← COMPLETE (LOCKED). 14 deliverables across 4 domains.
 2-concept-design/     ← COMPLETE. 5 domains, 341 stress-test scenarios. See DESIGN-TRACKER.md.
-3-requirements/       ← COMPLETE. 11 slices at v2 (693 AC). 5 interface specs (SI v10, D&L v6, Ops v5, PP v8, CR v3).
-4-work-management/    ← ACTIVE. CS-E1 scaffolding created. S0 decomposed (6 work items). S1–S10 skeleton chapters.
+3-requirements/       ← COMPLETE. 11 slices at v2 (693 AC). 5 interface specs. Versions in REQUIREMENTS-TRACKER.md.
+4-work-management/    ← ACTIVE. See IMPLEMENTATION-TRACKER.md for current progress.
 ```
 
-Requirements tracked in `3-requirements/REQUIREMENTS-TRACKER.md`. Work management in `4-work-management/`.
+Authoritative trackers: `3-requirements/REQUIREMENTS-TRACKER.md`, `4-work-management/IMPLEMENTATION-TRACKER.md`.
 
 ## Entity Architecture (Summary)
 
@@ -67,7 +70,7 @@ Comply with `output-style.md`. Dense prose, conclusion first, Mermaid diagrams, 
 ```
 3-requirements/
 ├── decisions/          ← Resolved trade-off evaluations (interface-questions, sq-1, sq-2)
-├── interfaces/         ← Sub-entity boundary specs (5 specs: SI v10, D&L v6, Ops v5, PP v8, CR v3)
+├── interfaces/         ← Sub-entity boundary specs (5 specs). Versions in REQUIREMENTS-TRACKER.md.
 ├── slices/             ← Vertical build sequence S0–S10 (all at v2, stress tested)
 ├── stress-tests/       ← Stress test results, pre-draft checklists, drafting intermediates
 │   └── s{N}-drafting/  ← Multi-agent drafting pipeline intermediates (Phase 1–2 outputs)
@@ -91,20 +94,12 @@ Flat directories. Relationships in YAML frontmatter (`epoch`, `arc`, `chapter`),
 
 ## Skills (Agent Pipelines)
 
-Six skills in `.claude/skills/` compose into the requirements-to-implementation workflow:
+12 skills in `.claude/skills/`. Each skill file (`skill.md`) is authoritative for its own behaviour — read it, don't rely on summaries elsewhere.
 
-| Skill | Trigger | What It Does |
-|-------|---------|-------------|
-| `slice-pre-draft-checklist` | "checklist for S6" | Scans interface specs + concept design. Produces registry pre-population list + upstream flag inventory. Eliminates three-part sync gap. |
-| `slice-drafter` | "draft S6" | **Multi-agent pipeline (4 phases, 11-13 agents).** Skeleton → Foundations (schema, router, decisions — 3 parallel) → Content sections (5-7 parallel) → Assembly → Validation. Each agent gets ~15K tokens, not 80K. |
-| `slice-stress-test` | "stress test S6" | **Parallel stress test (2 agents).** 20 scenarios targeting interface boundaries. Merge + validate via sub-agents. Writes to `stress-tests/`. |
-| `slice-fix-applier` | "apply fixes" | **Parallel fix application (2 agents).** Agent A: slice edits + AC. Agent B: sibling specs + tracker + memory. |
-| `work-item-decomposer` | "decompose S1" | **Slice → work items.** Groups AC into implementable units. Creates WORK.md with frontmatter, deliverables, dependencies. Updates chapters. |
-| `retro` | "retro", "retro for S1" | **3-layer retrospective.** Reflection (6 prompts) → Classification (bug/feature/feature-request/refactor/upgrade) → Action Register (priority/owner/definition of done). Writes to `4-work-management/retros/`. |
+**Pipeline per slice:** `/checklist` → `/draft` → `/stress-test` → `/apply-fixes` → v2 → `/decompose`.
+**Pipeline per work item:** `/impl {NNN}` → implement → `/migration-close` (if schema) → `/done {NNN}` → `/retro` → `/close`.
 
-**Pipeline per slice:** checklist → draft → stress test → apply fixes → v2 → **decompose into work items**.
-
-**Key principle:** Main context is an orchestrator. It dispatches sub-agents, gates between phases, and routes context. It does NOT read full concept design documents or write slice content directly. Sub-agents read files from disk and write results to disk.
+**Key principle:** Main context is an orchestrator. It dispatches sub-agents, gates between phases, and routes context. Sub-agents read files from disk and write results to disk.
 
 ## Working With This Repository
 

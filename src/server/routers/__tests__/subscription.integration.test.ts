@@ -3,7 +3,7 @@
 
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest"
 import { getTestDb, resetDb, closeTestDb } from "@/db/test-utils"
-import { createTestListing, seedTestUser, makeSession, ctx } from "@/db/test-fixtures"
+import { createTestListing, seedTestUser, makeSession, ctx, expectTRPCError } from "@/db/test-fixtures"
 import { InMemoryPaymentService } from "@/lib/services/mocks"
 import type { AuthSession } from "@/lib/auth"
 import { createSubscriptionRouter } from "../subscription"
@@ -92,12 +92,13 @@ describe("subscription.createCheckout", () => {
       subscriptionTier: "free",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(otherSession).createCheckout({
         listingId: listing.id,
         tier: "standard",
       }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 
   // --- AC-12: createCheckout on unclaimed listing returns BAD_REQUEST ---
@@ -108,12 +109,13 @@ describe("subscription.createCheckout", () => {
       subscriptionTier: "free",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).createCheckout({
         listingId: listing.id,
         tier: "standard",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   it("rejects pending_review listing with BAD_REQUEST", async () => {
@@ -122,12 +124,13 @@ describe("subscription.createCheckout", () => {
       subscriptionTier: "free",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).createCheckout({
         listingId: listing.id,
         tier: "standard",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   // --- AC-13: createCheckout on listing with active subscription returns BAD_REQUEST ---
@@ -139,21 +142,23 @@ describe("subscription.createCheckout", () => {
       paddleSubscriptionId: "sub_existing_123",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).createCheckout({
         listingId: listing.id,
         tier: "premium",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   it("returns NOT_FOUND for nonexistent listing", async () => {
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).createCheckout({
         listingId: "00000000-0000-0000-0000-000000000000",
         tier: "standard",
       }),
-    ).rejects.toMatchObject({ code: "NOT_FOUND" })
+      "NOT_FOUND",
+    )
   })
 })
 
@@ -166,12 +171,13 @@ describe("subscription.upgrade", () => {
       subscriptionTier: "free",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).upgrade({
         listingId: listing.id,
         newTier: "premium",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   it("rejects listing without paddleSubscriptionId with BAD_REQUEST", async () => {
@@ -181,12 +187,13 @@ describe("subscription.upgrade", () => {
       // no paddleSubscriptionId
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).upgrade({
         listingId: listing.id,
         newTier: "premium",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   // --- AC-15: upgrade to lower tier returns BAD_REQUEST ---
@@ -198,12 +205,13 @@ describe("subscription.upgrade", () => {
       paddleSubscriptionId: "sub_active_123",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).upgrade({
         listingId: listing.id,
         newTier: "standard",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   it("rejects same-tier upgrade with BAD_REQUEST", async () => {
@@ -213,12 +221,13 @@ describe("subscription.upgrade", () => {
       paddleSubscriptionId: "sub_active_123",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(ownerSession).upgrade({
         listingId: listing.id,
         newTier: "premium",
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   it("returns checkout URL for valid upgrade", async () => {
@@ -247,12 +256,13 @@ describe("subscription.upgrade", () => {
       paddleSubscriptionId: "sub_active_789",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(otherSession).upgrade({
         listingId: listing.id,
         newTier: "premium",
       }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 })
 
@@ -308,10 +318,11 @@ describe("subscription.getSubscriptionStatus", () => {
       subscriptionTier: "standard",
     })
 
-    await expect(
+    await expectTRPCError(
       caller(otherSession).getSubscriptionStatus({
         listingId: listing.id,
       }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 })

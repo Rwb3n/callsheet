@@ -7,9 +7,9 @@ import {
   seedTestUser,
   createTestListing,
   InMemoryNotificationDb,
-  emptyConsumerMatrix,
   createSchedulerDb,
   createDecisionLogDb,
+  createTestBus,
 } from "@/db/test-fixtures"
 import { listings } from "@/db/schema/data-and-listings"
 import { gracePeriods } from "@/db/schema/commercial"
@@ -36,7 +36,7 @@ function makeDeps(overrides?: Partial<WebhookHandlerDeps>): WebhookHandlerDeps {
   return {
     db,
     webhookSecret: SECRET,
-    eventBus: new InProcessEventBus({ logError: async () => {}, consumerMatrix: emptyConsumerMatrix }),
+    eventBus: createTestBus(),
     waitUntilFn: () => {},
     schedulerDb: createSchedulerDb(db),
     decisionLogDb: createDecisionLogDb(db),
@@ -50,7 +50,7 @@ function makeTrackingBus(): {
   emitted: EmittedEvent[]
 } {
   const emitted: EmittedEvent[] = []
-  const bus = new InProcessEventBus({ logError: async () => {}, consumerMatrix: emptyConsumerMatrix })
+  const bus = createTestBus()
 
   // Register tracking handlers for subscription events
   for (const eventType of ["subscription_tier_changed", "subscription_ended"] as const) {

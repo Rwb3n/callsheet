@@ -12,7 +12,7 @@ import { CONSECUTIVE_FAILURE_ESCALATION_THRESHOLD } from "./types"
 
 // DB adapter — injected for testability. Production wires Drizzle queries.
 export interface FlowDb {
-  insert(row: Omit<FlowRow, "id" | "createdAt">): Promise<string>
+  insert(row: Omit<FlowRow, "id" | "createdAt" | "updatedAt">): Promise<string>
   update(id: string, fields: Partial<Omit<FlowRow, "id" | "createdAt">>): Promise<void>
   findById(id: string): Promise<FlowRow | null>
 }
@@ -106,6 +106,7 @@ export async function skipStep(
     currentStep: nextStep,
     status: nextStep >= updatedSteps.length ? "completed" : row.status,
     completedAt: nextStep >= updatedSteps.length ? new Date() : null,
+    updatedAt: new Date(),
   })
 }
 
@@ -126,7 +127,7 @@ async function runSteps<TContext>(
 
     // AC-13: pending → in_progress
     updatedSteps[i] = { ...updatedSteps[i], status: "in_progress", attempt: updatedSteps[i].attempt + 1 }
-    await db.update(flowId, { steps: updatedSteps, currentStep: i, status: "in_progress" })
+    await db.update(flowId, { steps: updatedSteps, currentStep: i, status: "in_progress", updatedAt: new Date() })
 
     try {
       await def.execute(context)
@@ -134,7 +135,7 @@ async function runSteps<TContext>(
       // AC-13: in_progress → completed
       updatedSteps[i] = { ...updatedSteps[i], status: "completed", completedAt: new Date().toISOString() }
       // AC-16/17: persist context after each step
-      await db.update(flowId, { steps: updatedSteps, context: context as Record<string, unknown> })
+      await db.update(flowId, { steps: updatedSteps, context: context as Record<string, unknown>, updatedAt: new Date() })
     } catch (err) {
       // AC-14: step failure halts flow; status = failed
       const errorMsg = err instanceof Error ? err.message : String(err)
@@ -148,6 +149,7 @@ async function runSteps<TContext>(
         steps: updatedSteps,
         status: shouldEscalate ? "escalated" : "failed",
         context: context as Record<string, unknown>,
+        updatedAt: new Date(),
         ...(shouldEscalate ? {
           escalatedAt: new Date(),
           escalationReason: `Step "${def.name}" failed ${consecutiveFailures} consecutive times: ${errorMsg}`,
@@ -162,7 +164,7 @@ async function runSteps<TContext>(
   }
 
   // All steps completed
-  await db.update(flowId, { status: "completed", completedAt: new Date() })
+  await db.update(flowId, { status: "completed", completedAt: new Date(), updatedAt: new Date() })
   row = (await db.findById(flowId))!
   return toProgress(row, context)
 }

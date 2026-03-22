@@ -30,6 +30,21 @@ export function getTestDb() {
 /** TRUNCATE for E2E reset endpoint (runs once per suite, not per test). */
 export const TRUNCATE_ALL_TABLES_SQL = sql`
   TRUNCATE TABLE
+    principal_briefings,
+    ceremony_runs,
+    perception_aggregates,
+    decay_signals,
+    enrichment_schedules,
+    learning_hypotheses,
+    sponsored_impressions,
+    churn_analysis_log,
+    commercial_state,
+    billing_reconciliation_status,
+    billing_holds,
+    churn_risk_registry,
+    compliance_register,
+    task_specs,
+    support_tickets,
     notifications,
     grace_periods,
     pending_cancellations,
@@ -39,6 +54,7 @@ export const TRUNCATE_ALL_TABLES_SQL = sql`
     shortlist_items,
     shortlists,
     enquiry_records,
+    search_history,
     saved_searches,
     account_profiles,
     listing_taxonomy_tags,
@@ -74,6 +90,21 @@ export const TRUNCATE_ALL_TABLES_SQL = sql`
 // DELETE in reverse-FK order — no ACCESS EXCLUSIVE locks, ~2ms on empty tables
 // vs ~9.5s for TRUNCATE CASCADE. Same correctness for beforeEach.
 const DELETE_ALL_TABLES_SQL = sql`
+  DELETE FROM principal_briefings;
+  DELETE FROM ceremony_runs;
+  DELETE FROM perception_aggregates;
+  DELETE FROM decay_signals;
+  DELETE FROM enrichment_schedules;
+  DELETE FROM learning_hypotheses;
+  DELETE FROM sponsored_impressions;
+  DELETE FROM churn_analysis_log;
+  DELETE FROM commercial_state;
+  DELETE FROM billing_reconciliation_status;
+  DELETE FROM billing_holds;
+  DELETE FROM churn_risk_registry;
+  DELETE FROM compliance_register;
+  DELETE FROM task_specs;
+  DELETE FROM support_tickets;
   DELETE FROM notifications;
   DELETE FROM grace_periods;
   DELETE FROM pending_cancellations;
@@ -83,6 +114,7 @@ const DELETE_ALL_TABLES_SQL = sql`
   DELETE FROM shortlist_items;
   DELETE FROM shortlists;
   DELETE FROM enquiry_records;
+  DELETE FROM search_history;
   DELETE FROM saved_searches;
   DELETE FROM account_profiles;
   DELETE FROM listing_taxonomy_tags;

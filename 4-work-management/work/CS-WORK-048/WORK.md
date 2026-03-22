@@ -3,7 +3,7 @@ template: work_item
 id: CS-WORK-048
 title: "Implement profile editor enhancements and 90-day reminder"
 type: feature
-status: active
+status: done
 owner: null
 created: 2026-02-24
 spawned_by: null
@@ -11,7 +11,7 @@ spawned_children: []
 chapter: CH-CS-007
 arc: provider-experience
 epoch: CS-E1
-closed: null
+closed: 2026-02-24
 priority: high
 effort: large
 traces_to:
@@ -38,7 +38,17 @@ node_history:
   - node: backlog
     entered: 2026-02-24T00:00:00
     exited: null
-artifacts: []
+artifacts:
+  - drizzle/0009_lame_maximus.sql
+  - src/db/schema/data-and-listings.ts
+  - src/server/routers/listing.ts
+  - src/domains/platform/reminders/listing-update-reminder.ts
+  - src/domains/platform/reminders/email-templates.ts
+  - src/domains/data-and-listings/consumers/quality.ts
+  - src/domains/data-and-listings/consumers/index.ts
+  - src/db/adapters.ts
+  - src/server/routers/__tests__/listing-edit.integration.test.ts
+  - src/domains/platform/reminders/__tests__/listing-update-reminder.integration.test.ts
 cycle_docs: {}
 memory_refs: []
 extensions:
@@ -60,14 +70,16 @@ Enhances the S2 profile editor with optimistic concurrency control (version colu
 
 ## Deliverables
 
-- [ ] `src/db/migrations/0007_*.sql` or `0008_*.sql` — Add `version` column to `listings` table (coordinate migration numbering)
-- [ ] `src/db/schema/data-and-listings.ts` — Add `version` column to `listings` definition
-- [ ] `src/server/routers/listing.ts` — Enhance `editListing` mutation: version input, optimistic lock, lifecycle guard, profile_edited emission with accountId
-- [ ] `src/app/dashboard/listings/[listingId]/edit/page.tsx` — Enhanced profile editor page (feature-gated sections)
-- [ ] `src/domains/platform/reminders/listing-update-reminder.ts` — `listing_update_reminder` deferred action handler (self-perpetuating)
-- [ ] `src/domains/data-and-listings/consumers/quality.ts` — Extend `profileEditedHandler` with 90-day reminder scheduling
-- [ ] `src/server/routers/__tests__/listing-edit.integration.test.ts` — Integration tests for AC-31, AC-32, AC-45
-- [ ] `src/domains/platform/reminders/__tests__/listing-update-reminder.integration.test.ts` — Integration tests for AC-35, AC-36, AC-37
+- [x] `drizzle/0009_lame_maximus.sql` — Add `version` column to `listings` table
+- [x] `src/db/schema/data-and-listings.ts` — Add `version` column to `listings` definition
+- [x] `src/server/routers/listing.ts` — Enhance `update` mutation: version input, optimistic lock, lifecycle guard, profile_edited emission with accountId
+- [x] `src/domains/platform/reminders/email-templates.ts` — `listing_update_reminder` email template
+- [x] `src/domains/platform/reminders/listing-update-reminder.ts` — `listing_update_reminder` deferred action handler (self-perpetuating)
+- [x] `src/domains/data-and-listings/consumers/quality.ts` — Extend `profileEditedHandler` with 90-day reminder scheduling
+- [x] `src/domains/data-and-listings/consumers/index.ts` — Wire `schedulerDb` into consumer registration
+- [x] `src/db/adapters.ts` — Implement `cancelMatching` (was stub)
+- [x] `src/server/routers/__tests__/listing-edit.integration.test.ts` — Integration tests for AC-31, AC-32, AC-33, AC-34, AC-45
+- [x] `src/domains/platform/reminders/__tests__/listing-update-reminder.integration.test.ts` — Integration tests for AC-35, AC-36, AC-37
 
 ## References
 

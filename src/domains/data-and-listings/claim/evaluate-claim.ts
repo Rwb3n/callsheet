@@ -119,6 +119,8 @@ export async function acquireClaimLock(
     .set({
       claimStatus: newStatus as typeof listings.$inferSelect.claimStatus,
       updatedAt: new Date(),
+      // S9 §1.5: track when claim entered pending_review for abandonment check
+      ...(newStatus === "pending_review" ? { claimSubmittedAt: new Date() } : {}),
     })
     .where(
       and(

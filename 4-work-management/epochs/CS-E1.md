@@ -7,7 +7,7 @@
 **Status:** Active
 **Started:** 2026-02-19
 **Prior:** null (first CALLSHEET epoch)
-**Next:** CS-E2 (Runtime Intelligence — post-launch)
+**Next:** CS-E2 (Runtime Intelligence — requires production data)
 
 ---
 
@@ -25,16 +25,18 @@ V1 platform implementation from requirements phase output. Does NOT include: Lay
 
 ### Arc Decomposition
 
-6 arcs, 12 chapters, ~81 work items estimated.
+7 arcs, 14 chapters, ~90 work items estimated.
 
 | Arc | Chapters | Slices | Status |
 |-----|----------|--------|--------|
-| infrastructure | CH-CS-001, CH-CS-002, CH-CS-003 | S0, S1 | Active |
-| onboarding-and-claims | CH-CS-004, CH-CS-005, CH-CS-006 | S2, S3, S4 | Active |
-| provider-experience | CH-CS-007 | S5 | Planned |
-| buyer-and-operations | CH-CS-008, CH-CS-009 | S6, S7 | Planned |
-| commercial-and-intelligence | CH-CS-010, CH-CS-011 | S8, S9 | Planned |
+| infrastructure | CH-CS-001, CH-CS-002, CH-CS-003, CH-CS-013 | S0, S1 | Done |
+| onboarding-and-claims | CH-CS-004, CH-CS-005, CH-CS-006 | S2, S3, S4 | Done |
+| provider-experience | CH-CS-007 | S5 | Done |
+| buyer-and-operations | CH-CS-008, CH-CS-009 | S6, S7 | Done |
+| presentation | CH-CS-014 | Cross-cut S0–S6 | Done |
+| commercial-and-intelligence | CH-CS-010, CH-CS-011 | S8, S9 | Done |
 | hardening | CH-CS-012 | S10 | Planned |
+| deployment | — | Production infra + 4rfv import | Planned (principal-gated) |
 
 ### Critical Path
 

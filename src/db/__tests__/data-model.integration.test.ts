@@ -69,7 +69,7 @@ async function createListingWithRelations(overrides: Partial<typeof listings.$in
   await db.insert(qualityScores).values({ listingId: listing.id })
   await db.insert(qualityScoreExplanations).values({
     listingId: listing.id,
-    explanation: { dimensions: {}, suggestions: [] },
+    explanation: { composite: 0, dimensions: [], topImprovements: [] },
   })
   await db.insert(engagements).values({ listingId: listing.id })
   return listing

@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { eq } from "drizzle-orm"
 import { getTestDb, resetDb, closeTestDb } from "@/db/test-utils"
-import { createTestListing, seedUsers, makeSession, ctx } from "@/db/test-fixtures"
+import { createTestListing, seedUsers, makeSession, ctx, expectTRPCError } from "@/db/test-fixtures"
 import { listings, mediaItems } from "@/db/schema/data-and-listings"
 import { InMemoryObjectStorageService } from "@/lib/storage/r2"
 import type { AuthSession } from "@/lib/auth"
@@ -79,14 +79,12 @@ describe("media.uploadImage", () => {
     const listing = await createTestListing(db, ACCOUNT_ID)
     const caller = mediaCaller(otherSession)
 
-    await expect(
-      caller.uploadImage({
-        listingId: listing.id,
-        type: "portfolio",
-        contentType: "image/jpeg",
-        data: Buffer.from("fake"),
-      }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+    await expectTRPCError(caller.uploadImage({
+      listingId: listing.id,
+      type: "portfolio",
+      contentType: "image/jpeg",
+      data: Buffer.from("fake"),
+    }), "FORBIDDEN")
   })
 
   it("rejects upload when tier media limit reached", async () => {
@@ -104,14 +102,12 @@ describe("media.uploadImage", () => {
     }
 
     // 6th should fail
-    await expect(
-      caller.uploadImage({
-        listingId: listing.id,
-        type: "portfolio",
-        contentType: "image/jpeg",
-        data: Buffer.from("one-too-many"),
-      }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+    await expectTRPCError(caller.uploadImage({
+      listingId: listing.id,
+      type: "portfolio",
+      contentType: "image/jpeg",
+      data: Buffer.from("one-too-many"),
+    }), "BAD_REQUEST")
   })
 
   it("allows more media on higher tier", async () => {
@@ -195,16 +191,18 @@ describe("media.deleteImage", () => {
     })
 
     const otherCaller = mediaCaller(otherSession)
-    await expect(
+    await expectTRPCError(
       otherCaller.deleteImage({ mediaItemId: mediaItem.id }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 
   it("returns NOT_FOUND for nonexistent media item", async () => {
     const caller = mediaCaller(userSession)
-    await expect(
+    await expectTRPCError(
       caller.deleteImage({ mediaItemId: "00000000-0000-0000-0000-000000000000" }),
-    ).rejects.toMatchObject({ code: "NOT_FOUND" })
+      "NOT_FOUND",
+    )
   })
 })
 

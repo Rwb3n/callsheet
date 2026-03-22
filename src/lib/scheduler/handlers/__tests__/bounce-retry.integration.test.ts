@@ -6,6 +6,7 @@ import { correspondenceLog } from "@/db/schema/correspondence"
 import { ActionHandlerRegistry } from "@/lib/scheduler"
 import { InMemoryEmailService, clearTemplates, registerTemplate } from "@/lib/email"
 import { registerBounceRetryHandler } from "../bounce-retry"
+import { invokeHandler } from "./invoke-handler"
 import type { EmailSendParams } from "@/lib/email/types"
 
 const db = getTestDb()
@@ -53,8 +54,7 @@ describe("retry_bounced_email handler", () => {
       category: "transactional",
     }
 
-    const handler = registry.get("retry_bounced_email")! as (p: Record<string, unknown>) => Promise<void>
-    await handler({ correspondenceLogId: row.id, originalParams })
+    await invokeHandler(registry, "retry_bounced_email", { correspondenceLogId: row.id, originalParams })
 
     expect(emailService.getCalls()).toHaveLength(1)
     expect(emailService.getCalls()[0].to).toBe("user@test.com")
@@ -74,8 +74,7 @@ describe("retry_bounced_email handler", () => {
       category: "transactional",
     }
 
-    const handler = registry.get("retry_bounced_email")! as (p: Record<string, unknown>) => Promise<void>
-    await handler({ correspondenceLogId: row.id, originalParams })
+    await invokeHandler(registry, "retry_bounced_email", { correspondenceLogId: row.id, originalParams })
 
     expect(emailService.getCalls()).toHaveLength(0)
   })
@@ -92,8 +91,7 @@ describe("retry_bounced_email handler", () => {
       category: "transactional",
     }
 
-    const handler = registry.get("retry_bounced_email")! as (p: Record<string, unknown>) => Promise<void>
-    await handler({ correspondenceLogId: "00000000-0000-4000-8000-000000000099", originalParams })
+    await invokeHandler(registry, "retry_bounced_email", { correspondenceLogId: "00000000-0000-4000-8000-000000000099", originalParams })
 
     expect(emailService.getCalls()).toHaveLength(0)
   })

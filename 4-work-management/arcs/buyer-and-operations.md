@@ -14,8 +14,8 @@ Implement buyer experience (S6) and operations domain (S7). Parallelisable — S
 
 ## Exit Criteria
 
-- [ ] All 52 S6 acceptance criteria pass
-- [ ] All 101 S7 acceptance criteria pass
-- [ ] Search returns ranked results
+- [ ] All 7 S6 work items complete (CS-WORK-050 through CS-WORK-056), all 52 AC pass
+- [ ] All 9 S7 work items complete (CS-WORK-057 through CS-WORK-065), all 101 AC pass
+- [ ] Search returns ranked results with facets and sponsored section
 - [ ] Orchestrated flow admin UI operational
 - [ ] Support triage and compliance hold queries functional

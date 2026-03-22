@@ -4,6 +4,7 @@
 
 import {
   pgTable,
+  pgEnum,
   uuid,
   text,
   serial,
@@ -109,7 +110,32 @@ export const savedSearches = pgTable(
   ],
 )
 
-// --- Enquiry Records (§2.2) ---
+// --- Search History (S6 §1.1) — buyer search history, 12-month retention ---
+
+export const searchHistory = pgTable(
+  "search_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    accountId: text("account_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    query: text("query"),
+    filters: jsonb("filters").$type<Record<string, unknown>>(),
+    resultCount: integer("result_count").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("search_history_account_created_idx").on(table.accountId, table.createdAt),
+  ],
+)
+
+// --- Enquiry Status Enum (S5 §5) ---
+
+export const enquiryStatusEnum = pgEnum("enquiry_status", [
+  "unread", "responded", "stale",
+])
+
+// --- Enquiry Records (§2.2, S5 §5) ---
 
 export const enquiryRecords = pgTable(
   "enquiry_records",
@@ -123,6 +149,7 @@ export const enquiryRecords = pgTable(
       .references(() => listings.id, { onDelete: "cascade" }),
     subject: text("subject"),
     body: text("body").notNull(),
+    status: enquiryStatusEnum("status").notNull().default("unread"),
     sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
     respondedAt: timestamp("responded_at", { withTimezone: true }),
     responseTimeMinutes: integer("response_time_minutes"),
@@ -137,5 +164,7 @@ export const enquiryRecords = pgTable(
     index("enquiry_records_anon_email_idx")
       .on(table.senderEmail)
       .where(sql`${table.senderEmail} IS NOT NULL AND ${table.senderAccountId} IS NULL`),
+    index("enquiry_records_listing_status_idx")
+      .on(table.listingId, table.status),
   ],
 )

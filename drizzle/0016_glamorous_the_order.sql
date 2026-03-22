@@ -1,0 +1,1 @@
+ALTER TABLE "commercial_state" ADD COLUMN "revenue_health_extended" jsonb;

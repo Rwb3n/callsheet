@@ -16,6 +16,7 @@ import { EVENT_CONSUMER_MATRIX } from "@/lib/events/types"
 import type { EventConsumerError } from "@/lib/events/types"
 import { createWaitUntilCollector } from "@/lib/events/waitUntil"
 import { registerDataAndListingsConsumers } from "../index"
+import { createSchedulerDb } from "@/db/test-fixtures"
 import { createEngagementRouter } from "@/server/routers/engagement"
 
 let db: ReturnType<typeof getTestDb>
@@ -43,7 +44,7 @@ function createBusWithConsumers() {
     logError: vi.fn<(err: EventConsumerError) => Promise<void>>().mockResolvedValue(undefined),
     consumerMatrix: EVENT_CONSUMER_MATRIX,
   })
-  registerDataAndListingsConsumers(bus, { db })
+  registerDataAndListingsConsumers(bus, { db, schedulerDb: createSchedulerDb(db) })
   return bus
 }
 
@@ -59,6 +60,7 @@ describe("profile_viewed consumer", () => {
       listingId: listing.id,
       viewerAccountId: "viewer-1",
       source: "search",
+      timestamp: new Date().toISOString(),
     }, waitUntilFn)
     await Promise.all(getPromises())
 
@@ -79,6 +81,7 @@ describe("profile_viewed consumer", () => {
         listingId: listing.id,
         viewerAccountId: `viewer-${i}`,
         source: "search",
+        timestamp: new Date().toISOString(),
       }, waitUntilFn)
       await Promise.all(getPromises())
     }
@@ -100,6 +103,7 @@ describe("enquiry_submitted consumer", () => {
       _brand: "EnquirySubmittedEvent" as const,
       enquiryId: "00000000-0000-0000-0000-000000000099",
       listingId: listing.id,
+      timestamp: new Date().toISOString(),
     }, waitUntilFn)
     await Promise.all(getPromises())
 
@@ -122,6 +126,7 @@ describe("enquiry_submitted consumer", () => {
       _brand: "EnquirySubmittedEvent" as const,
       enquiryId: "00000000-0000-0000-0000-000000000098",
       listingId: listing.id,
+      timestamp: new Date().toISOString(),
     }, waitUntilFn)
     await Promise.all(getPromises())
 
@@ -145,6 +150,7 @@ describe("subscription_tier_changed consumer", () => {
     await bus.emit("subscription_tier_changed", {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: listing.id,
+      accountId: ACCOUNT_ID,
       newTier: "premium",
       previousTier: "free",
     }, waitUntilFn)
@@ -184,6 +190,9 @@ describe("search_performed consumer", () => {
       query: "underwater cameraman",
       filters: { region: "london" },
       resultCount: 0,
+      resultListingIds: [],
+      sessionId: null,
+      timestamp: new Date().toISOString(),
     }, waitUntilFn)
     await Promise.all(getPromises())
 
@@ -204,6 +213,9 @@ describe("search_performed consumer", () => {
       query: "camera operator",
       filters: {},
       resultCount: 5,
+      resultListingIds: [],
+      sessionId: null,
+      timestamp: new Date().toISOString(),
     }, waitUntilFn)
     await Promise.all(getPromises())
 
@@ -226,6 +238,7 @@ describe("getEngagementCounters via router", () => {
         listingId: listing.id,
         viewerAccountId: `v-${i}`,
         source: "search",
+        timestamp: new Date().toISOString(),
       }, waitUntilFn)
       await Promise.all(getPromises())
     }
@@ -235,6 +248,7 @@ describe("getEngagementCounters via router", () => {
         _brand: "EnquirySubmittedEvent" as const,
         enquiryId: `00000000-0000-0000-0000-00000000000${i}`,
         listingId: listing.id,
+        timestamp: new Date().toISOString(),
       }, waitUntilFn)
       await Promise.all(getPromises())
     }

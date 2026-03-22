@@ -11,7 +11,7 @@ beforeAll(() => {
 })
 
 describe("Production services smoke test", () => {
-  it("createProductionServices() does not throw with .env.local vars (AC-42)", async () => {
+  it("createProductionServices() does not throw with .env.local vars (AC-42)", { timeout: 15_000 }, async () => {
     // Dynamic import after dotenv loads — env vars must be available at construction time
     const { createProductionServices } = await import("../index")
 

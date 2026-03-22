@@ -59,6 +59,7 @@ export interface FlowRow {
   escalatedAt: Date | null
   escalationReason: string | null
   createdAt: Date
+  updatedAt: Date | null // S7 §6.5 — null for pre-migration rows
 }
 
 // Auto-escalation constants [SI §3.4]

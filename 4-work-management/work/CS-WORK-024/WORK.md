@@ -3,7 +3,7 @@ template: work_item
 id: CS-WORK-024
 title: "4rfv SQLite extraction + cleaning"
 type: feature
-status: pending
+status: done
 owner: null
 created: 2026-02-22
 spawned_by: null
@@ -11,7 +11,7 @@ spawned_children: []
 chapter: CH-CS-003
 arc: infrastructure
 epoch: CS-E1
-closed: null
+closed: 2026-02-24
 priority: high
 effort: high
 traces_to:
@@ -33,13 +33,22 @@ acceptance_criteria:
 blocked_by: []
 blocks: []
 enables: [CS-WORK-021]
-queue_position: backlog
-cycle_phase: backlog
+queue_position: done
+cycle_phase: done
 node_history:
   - node: backlog
     entered: 2026-02-22T00:00:00
+    exited: 2026-02-24T00:00:00
+  - node: done
+    entered: 2026-02-24T00:00:00
     exited: null
-artifacts: []
+artifacts:
+  - 4-work-management/work/CS-WORK-024/reports/data-profile.md
+  - src/scripts/import/extract-4rfv.ts
+  - src/scripts/import/taxonomy-map.ts
+  - src/scripts/import/profile-4rfv.ts
+  - src/scripts/import/__tests__/extract-4rfv.test.ts
+  - src/scripts/import/__tests__/extract-4rfv.integration.test.ts
 cycle_docs: {}
 memory_refs: []
 extensions:
@@ -48,7 +57,7 @@ extensions:
   spec_sections: "S2 §6, Ops §6"
 version: "2.0"
 generated: 2026-02-22
-last_updated: 2026-02-22T00:00:00
+last_updated: 2026-02-24T00:00:00
 ---
 
 # CS-WORK-024: 4rfv SQLite extraction + cleaning
@@ -61,11 +70,11 @@ The 4rfv source database (`4-work-management/4rfv_directory.db`, ~25MB, 4,657 `c
 
 ## Deliverables
 
-- [ ] `4-work-management/work/CS-WORK-024/reports/data-profile.md` — Field-level quality report: column types, null rates, value distributions, anomalies, misplaced data patterns
-- [ ] `src/scripts/import/extract-4rfv.ts` — Extraction script: reads SQLite DB, applies field mapping + cleaning, produces `ImportRecord[]`
-- [ ] `src/scripts/import/taxonomy-map.ts` — 4rfv subcategory → CALLSHEET specialisation slug mapping. Exports `map4rfvSubcategory(subcategory: string): string[]`
-- [ ] `src/scripts/import/__tests__/extract-4rfv.test.ts` — Unit tests: field extraction, entity type inference, taxonomy mapping coverage
-- [ ] `src/scripts/import/__tests__/extract-4rfv.integration.test.ts` — Integration test: full extraction → pipeline round-trip against DB
+- [x] `4-work-management/work/CS-WORK-024/reports/data-profile.md` — Field-level quality report: column types, null rates, value distributions, anomalies, misplaced data patterns
+- [x] `src/scripts/import/extract-4rfv.ts` — Extraction script: reads SQLite DB, applies field mapping + cleaning, produces `ImportRecord[]`
+- [x] `src/scripts/import/taxonomy-map.ts` — 4rfv subcategory → CALLSHEET specialisation slug mapping. Exports `map4rfvSubcategory(subcategory: string): string[]`
+- [x] `src/scripts/import/__tests__/extract-4rfv.test.ts` — Unit tests: field extraction, entity type inference, taxonomy mapping coverage (16 tests)
+- [x] `src/scripts/import/__tests__/extract-4rfv.integration.test.ts` — Integration test: full extraction → pipeline round-trip against DB (5 tests)
 
 ## Approach
 

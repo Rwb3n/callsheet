@@ -12,6 +12,7 @@ import type { EmailService } from "@/lib/email/types"
 import type { CompaniesHouseService, PaymentService } from "@/lib/services/types"
 import type { ObjectStorageService } from "@/lib/storage/types"
 import type { ImageProcessor } from "@/lib/image-processing/variants"
+import type { FlowDb } from "@/lib/flows"
 
 import { createListingRouter } from "@/server/routers/listing"
 import { createListingCreationRouter } from "@/server/routers/listing-creation"
@@ -26,6 +27,13 @@ import { createProfileRouter } from "@/server/routers/profile"
 import { createEngagementRouter } from "@/server/routers/engagement"
 import { createDashboardRouter } from "@/server/routers/dashboard"
 import { createNotificationRouter } from "@/server/routers/notification"
+import { createEnquiryRouter } from "@/server/routers/enquiry"
+import { createSearchRouter } from "@/server/routers/search"
+import { createSettingsRouter } from "@/server/routers/settings"
+import { createShortlistRouter } from "@/server/routers/shortlist"
+import { createSearchHistoryRouter } from "@/server/routers/search-history"
+import { createAdminRouter } from "@/server/routers/admin"
+import { createCommercialRouter } from "@/server/routers/commercial"
 
 // --- Shared services injected at app startup ---
 
@@ -40,6 +48,7 @@ export type AppServices = {
   companiesHouse: CompaniesHouseService
   payment: PaymentService
   storage: ObjectStorageService
+  flowDb: FlowDb
   processImage?: ImageProcessor
 }
 
@@ -98,6 +107,51 @@ export function createAppRouter(services: AppServices) {
     }),
     notification: createNotificationRouter({
       db: services.db,
+    }),
+    enquiry: createEnquiryRouter({
+      db: services.db,
+      emailService: services.emailService,
+      bus: services.bus,
+      waitUntilFn: services.waitUntilFn,
+      schedulerDb: services.schedulerDb,
+    }),
+    search: createSearchRouter({
+      db: services.db,
+      bus: services.bus,
+      waitUntilFn: services.waitUntilFn,
+    }),
+    settings: createSettingsRouter({
+      db: services.db,
+      flowDb: services.flowDb,
+      bus: services.bus,
+      waitUntilFn: services.waitUntilFn,
+      payment: services.payment,
+    }),
+    shortlist: createShortlistRouter({
+      db: services.db,
+      bus: services.bus,
+      waitUntilFn: services.waitUntilFn,
+    }),
+    searchHistory: createSearchHistoryRouter({
+      db: services.db,
+    }),
+    commercial: createCommercialRouter({
+      db: services.db,
+      decisionLogDb: services.decisionLogDb,
+      emailService: services.emailService,
+      bus: services.bus,
+      waitUntilFn: services.waitUntilFn,
+    }),
+    admin: createAdminRouter({
+      db: services.db,
+      notificationDb: services.notificationDb,
+      schedulerDb: services.schedulerDb,
+      decisionLogDb: services.decisionLogDb,
+      emailService: services.emailService,
+      flowDb: services.flowDb,
+      bus: services.bus,
+      waitUntilFn: services.waitUntilFn,
+      payment: services.payment,
     }),
   })
 }

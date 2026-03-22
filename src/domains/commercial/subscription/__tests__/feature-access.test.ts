@@ -139,9 +139,16 @@ describe("checkFeatureAccess", () => {
     expect(checkFeatureAccess("standard", "trendAnalytics")).toBe(true)
   })
 
+  // AC-46, AC-47, AC-49: premium-only analytics gates on standard tier
   it("returns false for premium-only features on standard", () => {
     expect(checkFeatureAccess("standard", "viewerDemographics")).toBe(false)
     expect(checkFeatureAccess("standard", "competitorBenchmarking")).toBe(false)
+    expect(checkFeatureAccess("standard", "enquiryResponseInsights")).toBe(false)
+  })
+
+  // AC-48: topSearchTerms available to standard+
+  it("returns true for topSearchTerms on standard tier", () => {
+    expect(checkFeatureAccess("standard", "topSearchTerms")).toBe(true)
   })
 
   it("returns true for all features on partner", () => {

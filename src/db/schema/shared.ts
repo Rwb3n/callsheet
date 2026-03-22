@@ -43,7 +43,7 @@ export const orchestratedFlows = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     flowType: flowTypeEnum("flow_type").notNull(),
-    triggeredBy: uuid("triggered_by").notNull(),
+    triggeredBy: text("triggered_by").notNull(),
     status: flowStatusEnum("status").notNull().default("initiated"),
     steps: jsonb("steps").notNull().$type<Record<string, unknown>[]>(),
     currentStep: integer("current_step").notNull().default(0),
@@ -54,6 +54,7 @@ export const orchestratedFlows = pgTable(
     escalatedAt: timestamp("escalated_at", { withTimezone: true }),
     escalationReason: text("escalation_reason"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
     index("orchestrated_flows_status_idx").on(table.status),
@@ -118,6 +119,8 @@ export const eventConsumerErrors = pgTable(
     error: text("error").notNull(),
     stack: text("stack"),
     mode: text("mode").notNull(),
+    resolved: boolean("resolved").notNull().default(false),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [

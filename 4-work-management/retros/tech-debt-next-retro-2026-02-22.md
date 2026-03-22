@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: Tech Debt — "Next" Queue Clear
 
 **Date:** 2026-02-22

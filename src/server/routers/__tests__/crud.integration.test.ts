@@ -12,6 +12,7 @@ import {
   makeSession,
   makeAdminSession,
   ctx,
+  expectTRPCError,
 } from "@/db/test-fixtures"
 import {
   listings,
@@ -142,7 +143,7 @@ describe("listing.create", () => {
     ])
 
     const caller = listingCaller(userSession)
-    await expect(
+    await expectTRPCError(
       caller.create({
         entityType: "company",
         name: "Duplicate Co",
@@ -152,7 +153,8 @@ describe("listing.create", () => {
           { sectorId: taxonomy.camera.id, serviceAreaId: taxonomy.cameraOp.id },
         ],
       }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 
   it("creates listing with companion rows when integrity passes", async () => {
@@ -188,9 +190,10 @@ describe("listing.update", () => {
     const listing = await createTestListing(db, ACCOUNT_ID)
     const caller = listingCaller(otherSession)
 
-    await expect(
-      caller.update({ listingId: listing.id, headline: "Hacked" }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+    await expectTRPCError(
+      caller.update({ listingId: listing.id, version: 1, headline: "Hacked" }),
+      "FORBIDDEN",
+    )
   })
 
   // AC-18: listing.update triggers search vector update and emits profile_edited
@@ -200,6 +203,7 @@ describe("listing.update", () => {
 
     const updated = await caller.update({
       listingId: listing.id,
+      version: 1,
       headline: "Updated headline",
       bio: "New bio",
     })
@@ -217,7 +221,7 @@ describe("listing.update", () => {
   it("returns listing unchanged when no fields provided", async () => {
     const listing = await createTestListing(db, ACCOUNT_ID, { slug: "noop-test" })
     const caller = listingCaller(userSession)
-    const result = await caller.update({ listingId: listing.id })
+    const result = await caller.update({ listingId: listing.id, version: 1 })
     expect(result.id).toBe(listing.id)
     expect(emittedEvents).toHaveLength(0)
   })
@@ -240,17 +244,19 @@ describe("listing.archive", () => {
   it("rejects archive from non-owner with FORBIDDEN", async () => {
     const listing = await createTestListing(db, ACCOUNT_ID)
     const caller = listingCaller(otherSession)
-    await expect(
+    await expectTRPCError(
       caller.archive({ listingId: listing.id }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 
   it("rejects archive of already-archived listing", async () => {
     const listing = await createTestListing(db, ACCOUNT_ID, { slug: "already-archived", lifecycleStatus: "archived" })
     const caller = listingCaller(userSession)
-    await expect(
+    await expectTRPCError(
       caller.archive({ listingId: listing.id }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 })
 
@@ -273,17 +279,19 @@ describe("listing.reactivate", () => {
     const listing = await createTestListing(db, ACCOUNT_ID, { slug: "suspended-test", lifecycleStatus: "suspended" })
     const caller = listingCaller(userSession)
 
-    await expect(
+    await expectTRPCError(
       caller.reactivate({ listingId: listing.id }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 
   it("rejects reactivation of active listing", async () => {
     const listing = await createTestListing(db, ACCOUNT_ID, { slug: "active-test" })
     const caller = listingCaller(userSession)
-    await expect(
+    await expectTRPCError(
       caller.reactivate({ listingId: listing.id }),
-    ).rejects.toMatchObject({ code: "BAD_REQUEST" })
+      "BAD_REQUEST",
+    )
   })
 })
 
@@ -301,9 +309,10 @@ describe("listing.getBySlug", () => {
   it("returns NOT_FOUND for archived listing", async () => {
     await createTestListing(db, ACCOUNT_ID, { slug: "archived-slug", lifecycleStatus: "archived" })
     const caller = listingCaller(null)
-    await expect(
+    await expectTRPCError(
       caller.getBySlug({ slug: "archived-slug" }),
-    ).rejects.toMatchObject({ code: "NOT_FOUND" })
+      "NOT_FOUND",
+    )
   })
 })
 

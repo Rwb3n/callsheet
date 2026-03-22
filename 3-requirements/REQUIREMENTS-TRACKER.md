@@ -194,7 +194,7 @@ Governing all event-driven coordination. Specified in shared-infrastructure.md �
 | Ops-Q2 | Operations | Marketplace selection for human procurement | **Resolved** | S7 | Interface contract, not vendor. TaskSpec queue, external routing fields, webhook callback. Vendor = deployment-time decision. |
 | Ops-Q4 | Operations | Regulatory monitoring approach | **Resolved** | S7 | Compliance calendar (`compliance_register` + `compliance_schedule_check`). Feed source = pre-launch governance. |
 | Ops-Q5 | Operations | Contractor onboarding process | **Resolved** | S7 | Lifecycle specified: procurement → quality gate → briefing → DPA → access → assignment. Implementation = pre-launch governance. |
-| PP-Q1 | Platform | Component library / design system choice | **Open** | S1 or S2 | Implementation-level |
+| PP-Q1 | Platform | Component library / design system choice | **In progress** | CH-CS-014 W4 | Assigned to presentation layer chapter (2026-02-25). shadcn/ui + Tailwind v4 CSS-first config. |
 | PP-Q2 | Platform | Testing strategy (unit, integration, E2E mix) | **Resolved** | S0 | Vitest (unit/integration) + Playwright (E2E). S0 §12. |
 | PP-Q3 | Platform | Error monitoring / logging service | **Resolved** | S0 | Structured logging + `event_consumer_errors` table. No external service at V1. S0 §12. |
 | PP-Q4 | Platform | CI/CD pipeline configuration | **Resolved** | S0 | GitHub Actions. Lint → type-check → unit → integration → E2E (PR) → Vercel deploy. S0 §12. |

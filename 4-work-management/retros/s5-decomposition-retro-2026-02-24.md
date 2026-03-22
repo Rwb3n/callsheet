@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: S5 Decomposition
 
 **Date:** 2026-02-24

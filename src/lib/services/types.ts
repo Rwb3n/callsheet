@@ -29,6 +29,8 @@ export interface PaymentService {
     paddleCustomerId: string
   }): Promise<PaddleSubscription[]>
 
+  listAllActiveSubscriptions(): Promise<PaddleSubscription[]>
+
   getCustomerPortalUrl(params: {
     paddleCustomerId: string
   }): Promise<string>

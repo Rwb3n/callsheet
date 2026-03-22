@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: S3 Decomposition
 
 **Date:** 2026-02-23

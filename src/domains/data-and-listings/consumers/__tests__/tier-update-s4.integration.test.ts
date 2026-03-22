@@ -9,6 +9,7 @@ import { InProcessEventBus } from "@/lib/events/bus"
 import { EVENT_CONSUMER_MATRIX } from "@/lib/events/types"
 import { createWaitUntilCollector } from "@/lib/events/waitUntil"
 import { registerDataAndListingsConsumers } from "../index"
+import { createSchedulerDb } from "@/db/test-fixtures"
 import type { EventConsumerError } from "@/lib/events/types"
 
 let db: ReturnType<typeof getTestDb>
@@ -24,7 +25,7 @@ function createBusWithConsumers() {
     logError: vi.fn<(err: EventConsumerError) => Promise<void>>().mockResolvedValue(undefined),
     consumerMatrix: EVENT_CONSUMER_MATRIX,
   })
-  registerDataAndListingsConsumers(bus, { db })
+  registerDataAndListingsConsumers(bus, { db, schedulerDb: createSchedulerDb(db) })
   return bus
 }
 
@@ -49,6 +50,7 @@ describe("subscription_tier_changed consumer — restore on upgrade", () => {
     await bus.emit("subscription_tier_changed", {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: listing.id,
+      accountId: ACCOUNT_ID,
       previousTier: "free",
       newTier: "premium",
     }, waitUntilFn)
@@ -79,6 +81,7 @@ describe("subscription_tier_changed consumer — restore on upgrade", () => {
     await bus.emit("subscription_tier_changed", {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: listing.id,
+      accountId: ACCOUNT_ID,
       previousTier: "premium",
       newTier: "standard",
     }, waitUntilFn)
@@ -119,6 +122,7 @@ describe("subscription_tier_changed consumer — restore on upgrade", () => {
     await bus.emit("subscription_tier_changed", {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: listing.id,
+      accountId: ACCOUNT_ID,
       previousTier: "free",
       newTier: "partner",
     }, waitUntilFn)

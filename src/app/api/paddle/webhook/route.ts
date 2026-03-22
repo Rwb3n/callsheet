@@ -13,8 +13,7 @@ import {
 import type { PaddleWebhookEvent } from "@/domains/operations/paddle/types"
 import { InProcessEventBus } from "@/lib/events/bus"
 import { logEventConsumerError } from "@/lib/events/errors"
-import { createSchedulerDb, createDecisionLogDb } from "@/db/adapters"
-import { NoOpNotificationDb } from "@/lib/notifications/no-op"
+import { createSchedulerDb, createDecisionLogDb, createNotificationDb } from "@/db/adapters"
 
 export async function POST(request: Request): Promise<Response> {
   const rawBody = await request.text()
@@ -49,7 +48,7 @@ export async function POST(request: Request): Promise<Response> {
     waitUntilFn: (p: Promise<void>) => { p.catch(() => {}) },
     schedulerDb: createSchedulerDb(db),
     decisionLogDb: createDecisionLogDb(db),
-    notificationDb: new NoOpNotificationDb(), // Replace with DB impl when notifications table exists (S7)
+    notificationDb: createNotificationDb(db),
   }
 
   // Async dispatch — handler runs after response

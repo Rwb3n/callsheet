@@ -3,12 +3,37 @@
 
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { AuthSession } from "@/lib/auth"
+import { logServerError, formatZodFieldErrors } from "@/server/error-handler"
 
 export type TRPCContext = {
   session: AuthSession | null
 }
 
-const t = initTRPC.context<TRPCContext>().create()
+const t = initTRPC.context<TRPCContext>().create({
+  errorFormatter({ shape, error }) {
+    const fieldErrors = formatZodFieldErrors(error.cause)
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        ...(fieldErrors ? { fieldErrors } : {}),
+      },
+    }
+  },
+})
+
+// Wire structured error logging for 500s
+export const onTRPCError = ({
+  error,
+  path,
+  input,
+}: {
+  error: TRPCError
+  path: string | undefined
+  input: unknown
+}) => {
+  logServerError(error, path, input)
+}
 
 export const router = t.router
 export const publicProcedure = t.procedure

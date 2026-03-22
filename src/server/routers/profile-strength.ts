@@ -40,7 +40,7 @@ export function createProfileStrengthRouter(deps: ProfileStrengthRouterDeps) {
           throw new TRPCError({ code: "FORBIDDEN", message: "Not the listing owner" })
         }
 
-        // Try real quality score path (S9+)
+        // Try real quality score path (S9+) — AC-14
         const [score] = await deps.db
           .select()
           .from(qualityScores)
@@ -53,12 +53,18 @@ export function createProfileStrengthRouter(deps: ProfileStrengthRouterDeps) {
           .where(eq(qualityScoreExplanations.listingId, input.listingId))
           .limit(1)
 
-        const hasRealScoring = score && explanation
-          && explanation.explanation.dimensions?.completeness
+        // AC-14: use calculatedBy to determine calibrated vs fallback path
+        const hasRealScoring = score?.calculatedBy === "calibrated" && explanation
 
         if (hasRealScoring) {
           const completeness = score.completeness
-          const factors = explanation.explanation.dimensions.completeness.factors
+          const completenessDim = explanation.explanation.dimensions
+            .find((d) => d.name === "completeness")
+          const factors = completenessDim
+            ? completenessDim.factors
+                .filter((f) => f.impact === "negative")
+                .map((f) => f.factor)
+            : []
           const missingFields = identifyMissingFields(factors)
           return computeProfileStrength(completeness, missingFields)
         }

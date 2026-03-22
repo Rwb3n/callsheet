@@ -4,6 +4,7 @@ node_modules/
 # Next.js
 .next/
 out/
+next-env.d.ts
 
 # Environment
 .env
@@ -13,8 +14,12 @@ out/
 # Drizzle
 drizzle/meta/
 
-# Supabase
+# Supabase (local state)
 supabase/.temp/
+supabase/.branches/
+
+# Claude Code (local settings)
+.claude/settings.local.json
 
 # IDE
 .vscode/
@@ -25,12 +30,21 @@ supabase/.temp/
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Coverage
 coverage/
+
+# Testing
+test-results/
+playwright-report/
 
 # Vercel
 .vercel/
 
 # TypeScript
 *.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*

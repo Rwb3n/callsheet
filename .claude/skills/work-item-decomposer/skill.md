@@ -35,7 +35,9 @@ If the slice is not at v2, stop and tell the user.
 5. **Work item template.** Read `references/work-item-template.md` for the WORK.md format.
 6. **Dependency context.** Read the arc file to understand cross-chapter dependencies. Read prior chapters' work items if the current slice depends on infrastructure from earlier slices.
 7. **Type alignment check.** Grep the codebase for type definitions that the new slice will consume or extend (e.g., `PaymentService`, `SubscriptionTier`, `EventPayloadMap`, `DeferredActionParamsMap`). Compare the existing type's shape/values against the slice's expectations. If there is a misalignment (placeholder values, missing fields, wrong union members), note it in the relevant work item's Context section so the implementer resolves it deliberately rather than discovering it mid-coding.
-8. **Router ownership check.** Glob `src/server/routers/*.ts` and note which procedures each router already owns. When a work item extends an existing procedure namespace (e.g., adding `getPortalUrl` alongside `getSubscriptionStatus`), the deliverable must target the router that already owns that namespace — not a different router that happens to consume the data. Domain co-location takes priority over consumer proximity.
+8. **Existing table column audit.** For each AC that references a column on an existing table (not a new table created by the slice's foundation work item), grep the relevant `src/db/schema/*.ts` file to verify the column exists. If the column is missing and was expected to be added by the foundation work item's migration but wasn't, add "schema amendment" as an explicit deliverable on the consuming work item — listing the table, column name, type, and nullability. This prevents mid-implementation discovery of missing columns that blocks coding until a schema push is done.
+9. **Router ownership check.** Glob `src/server/routers/*.ts` and note which procedures each router already owns. When a work item extends an existing procedure namespace (e.g., adding `getPortalUrl` alongside `getSubscriptionStatus`), the deliverable must target the router that already owns that namespace — not a different router that happens to consume the data. Domain co-location takes priority over consumer proximity.
+10. **AC test type audit.** For each AC, verify the specified test type (Unit / Integration / E2E / Manual) is achievable given the work item's deliverables. Flag mismatches — e.g., an AC labelled "Unit" that requires DB access (should be Integration), or "E2E" that tests pure logic (should be Unit). Mismatches cause downstream rework when the implementer discovers the AC can't be verified as specified.
 
 ### What NOT to read
 
@@ -60,6 +62,10 @@ Group acceptance criteria into work items. Each work item should be:
 3. **Event cluster** — AC for emitting an event + its consumers belong together IF they're in the same domain. Cross-domain consumers are separate work items.
 4. **Infrastructure dependency** — AC that depend on a shared module (event bus, scheduler, flow engine) group by the module they extend, not the module they depend on.
 5. **UI surface** — AC for a single page or component group together. Server + client for the same feature are one work item, not two.
+
+### 0-AC foundation work items
+
+A work item with 0 AC is valid when it creates shared infrastructure (schema, migration, seed data) that all other work items depend on equally. Schema correctness is verified by dependent work items' integration tests. This pattern applies when the slice's schema serves 3+ downstream work items and cannot be naturally bundled with any single functional work item. Prior examples: CS-WORK-075 (S9 — 6 tables, 4 enums, L1-L7 seed, unblocks 7 items).
 
 ### Anti-patterns
 
@@ -154,6 +160,8 @@ Example — after decomposing S3 into 4 work items (CS-WORK-030 through CS-WORK-
 | S3: Claim & Verify | CH-CS-005 | onboarding-and-claims | **4 work items** (CS-WORK-030 through CS-WORK-033, 48 AC) | decomposed |
 ```
 
+After updating the Pending Decomposition row, verify that a **per-slice work item table section** (e.g., `## S9: Entity Intelligence — Work Items`) exists in the tracker. If absent, create it with the standard table format (ID, Title, AC, Status, Blocked By, Blocks, Artifacts), a dependency graph, and a total line. The Pending Decomposition row and the work item table must be atomic — a `decomposed` status without the table breaks `/done`.
+
 Do NOT update any other section of the tracker. Work item completion rows are added only when implementation is done, not at decomposition time.
 
 ---
@@ -167,6 +175,7 @@ Run these checks before declaring the decomposition complete:
 3. **Chapter consistency** — the chapter's `work_items:` list matches the work items that reference it.
 4. **No orphan work items** — every work item has a `chapter:` pointing to an existing chapter file.
 5. **ID sequence** — work item IDs are sequential with no gaps from the starting ID. Exception: multi-chapter decompositions may have gaps caused by interleaving IDs across chapters (e.g., chapter A gets 013–020, chapter B gets 021–022, then chapter A gets 023 for a cross-chapter dependency). Gaps from interleaving are acceptable; gaps within a single chapter's range are not.
+6. **Content-file-to-AC audit (multi-file slices with >80 AC)** — for each content file (`0N-*.md`), confirm at least one work item's AC traces to it. If a content file has no direct AC, document which work items cover its implementation indirectly. Report any uncovered sections.
 
 Report the verification results to the user: work item count, total AC covered, dependency graph shape (how many independent entry points, longest chain length).
 
@@ -182,3 +191,20 @@ Report the verification results to the user: work item count, total AC covered, 
 - **Write to disk.** All WORK.md files are written via the Write tool. The files on disk are the deliverables.
 - **Work items from prior slices are immutable.** Don't modify CS-WORK-001 when decomposing S1. If S1 depends on S0 infrastructure, reference it via `blocked_by`, don't edit it.
 - **AC numbering quirks.** Some slices have non-contiguous AC numbers (e.g., S0 jumps from AC-42 to AC-45). This is intentional — stress test ACs were appended at the end. Map them as-is. The count that matters is the number of AC rows, not the highest AC number.
+
+---
+
+## Lessons (stable patterns from prior decompositions)
+
+- **No work item template file.** Use a recent work item (e.g., CS-WORK-043) as format reference.
+- **Targeted type alignment checks.** Use direct Grep/Read calls (5–6 calls, ~10s) instead of Explore agent (~77s) for checking type alignment during decomposition.
+- **Group by page surface.** When AC from different slice sections share a page surface (e.g., AC-42–44 contact feedback on profile page), group them with the page surface work item, not the slice section.
+- **Tag pure-function work items.** Items with no DB, no routes, no events get `extensions.io_profile: "pure"`. These parallelise freely and have fastest cycle time.
+- **AC coverage for large slices.** For slices with >80 AC, verify every content file section (§1–§N) has a corresponding AC block. If a section has no AC, document which work items cover its implementation indirectly. Add this as an explicit Step 6 check: for each `0N-*.md` content file, confirm at least one work item's AC traces to it.
+- **Sections without AC.** These can distribute across multiple work items — note in Context sections so implementers build shared infrastructure even though it's not directly tested by their AC.
+- **One retro per session.** Don't write a decomposition retro AND a session retro when the session's only work was decomposition. Fold findings into the session retro.
+- **Check spec file tree first.** Read `00-router-plan.md` §1 file tree before content files. Verify paths against existing `src/domains/` convention. Surface mismatches early.
+- **Deliverable path validation.** For every deliverable path in a WORK.md, verify it matches the actual codebase directory structure. If the slice pseudocode says `src/server/commercial/` but the convention is `src/domains/commercial/`, use the convention. Glob `src/domains/`, `src/server/routers/`, `src/lib/` to confirm paths exist. Three retros flagged spec-vs-convention path mismatches.
+- **Scheduler handler path convention.** Scheduler handler deliverables go in `src/lib/scheduler/handlers/`, not `src/domains/*/`. The decomposer outputs `src/lib/scheduler/handlers/{action-name}.ts` for all deferred action handlers regardless of domain. Tests go in `src/lib/scheduler/handlers/__tests__/`.
+- **Migration coordination.** When multiple work items in the same slice need schema changes, note in each WORK.md Context section that migration ordering is sequential (first to run `drizzle-kit generate` claims the next number). If parallel execution is planned, flag this as a constraint.
+- **Section-to-AC coverage audit.** For multi-file slices, after assigning all AC, verify each content file (`0N-*.md`) has at least one work item whose AC traces to it. If a content file has no direct AC, note in the relevant work item's Context which sections it covers indirectly.

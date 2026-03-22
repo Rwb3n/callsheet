@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: S2 Decomposition
 
 **Date:** 2026-02-22

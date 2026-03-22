@@ -174,7 +174,7 @@ async function createListingWithCompanions(params: CreateListingParams) {
     await tx.insert(qualityScores).values({ listingId: created.id })
     await tx.insert(qualityScoreExplanations).values({
       listingId: created.id,
-      explanation: { dimensions: {}, suggestions: [] },
+      explanation: { composite: 0, dimensions: [], topImprovements: [] },
     })
     await tx.insert(engagements).values({ listingId: created.id })
 

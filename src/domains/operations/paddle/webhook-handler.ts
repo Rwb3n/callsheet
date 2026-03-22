@@ -272,6 +272,7 @@ async function handleCheckoutCompleted(
     {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: event.listingId,
+      accountId: event.accountId,
       previousTier: listing.subscriptionTier,
       newTier: event.tier,
     },
@@ -301,6 +302,10 @@ async function handleSubscriptionUpgraded(
 ): Promise<void> {
   const { db, eventBus, waitUntilFn } = deps
 
+  // Read listing for accountId before update
+  const [listing] = await db.select({ accountId: listings.accountId })
+    .from(listings).where(eq(listings.id, event.listingId)).limit(1)
+
   await db
     .update(listings)
     .set({ subscriptionTier: event.newTier, updatedAt: new Date() })
@@ -315,6 +320,7 @@ async function handleSubscriptionUpgraded(
     {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: event.listingId,
+      accountId: listing?.accountId ?? "",
       previousTier: event.previousTier,
       newTier: event.newTier,
     },
@@ -328,6 +334,10 @@ async function handleSubscriptionDowngraded(
   event: Extract<SubscriptionEvent, { type: "subscription_downgraded" }>,
 ): Promise<void> {
   const { db, eventBus, waitUntilFn, notificationDb } = deps
+
+  // Read listing for accountId before update
+  const [listing] = await db.select({ accountId: listings.accountId })
+    .from(listings).where(eq(listings.id, event.listingId)).limit(1)
 
   await db
     .update(listings)
@@ -349,6 +359,7 @@ async function handleSubscriptionDowngraded(
     {
       _brand: "SubscriptionTierChangedEvent" as const,
       listingId: event.listingId,
+      accountId: listing?.accountId ?? "",
       previousTier: event.previousTier,
       newTier: event.newTier,
     },

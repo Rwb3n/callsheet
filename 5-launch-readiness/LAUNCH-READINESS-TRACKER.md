@@ -2,7 +2,7 @@
 
 **Status:** ACTIVE
 **Started:** 2026-02-12
-**Last updated:** 2026-02-15
+**Last updated:** 2026-02-25
 **Scope:** All non-build work required before CALLSHEET can operate as a legal commercial entity processing personal data. Layer 5 (Legal Shell) and Layer 4 (Meatspace Interface) prerequisites.
 
 ---
@@ -259,6 +259,27 @@ Which build slices are blocked by which launch readiness workstreams.
 | S10 Hardening | **NOT STARTED** | All previous slices | No |
 
 **Conclusion:** The specification phase for S0–S8 is effectively complete (Stress Tested). The build can proceed through S0–S3 without any launch readiness work completing, except for the 4rfv import (S2 Phase 2) and live verification. S4 (Paddle) and S7 (Compliance Advisor) are the primary external blockers for the mid-stage build.
+
+**Status update (2026-02-25):** Build has reached S6 complete (351/693 AC verified, 939 tests). All 8 workstreams above remain NOT STARTED. The build has outrun the legal shell — S4 code assumes a Paddle account that requires a bank that requires an incorporated Ltd. No workstream here is blocked by the build; all are blocked by principal action. The build is now pausing the vertical slice sequence to add a presentation layer (CH-CS-014) that makes the existing 6 slices of verified code visible and demo-able. A working demo will make these conversations concrete.
+
+---
+
+## 9. Production Environment Configuration
+
+**Status:** NOT STARTED — blocked by Workstreams 1–2 (company + bank → service accounts)
+**Priority:** HIGH — required before any production deployment
+**Owner:** Principal + Build
+
+| Task | Status | Notes |
+|---|---|---|
+| Document all required environment variables | Not started | `DATABASE_URL`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `RESEND_FROM_ADDRESS`, `PADDLE_PRICE_MAP_JSON`, `NEXT_PUBLIC_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `R2_*` credentials, `COMPANIES_HOUSE_API_KEY`. |
+| Create `.env.production.example` manifest | Not started | Build task — list every var with description, required/optional, source. |
+| Vercel project creation + environment setup | Not started | Requires company GitHub org or personal account decision. |
+| Supabase production project | Not started | Requires company billing (Workstream 2). |
+| DNS configuration (`callsheet.co.uk`) | Not started | Domain registration, Vercel DNS, MX records for Resend inbound (Comms Phase 2). |
+| Vercel deploy step in CI | Not started | Build task — `deploy` job after test passes on main. |
+
+**Note:** CH-CS-014 (Presentation Layer) will create `.env.production.example` and wire the Vercel deploy step. The remaining tasks (Supabase production, DNS, actual Vercel environment variables) require principal action and service accounts that depend on Workstreams 1–2.
 
 ---
 

@@ -35,6 +35,11 @@ export class InMemoryPaymentService implements PaymentService {
     return this.subscriptions
   }
 
+  async listAllActiveSubscriptions() {
+    this.calls.push({ method: "listAllActiveSubscriptions", params: {}, timestamp: Date.now() })
+    return this.subscriptions.filter((s) => s.status === "active")
+  }
+
   async getCustomerPortalUrl(params: Parameters<PaymentService["getCustomerPortalUrl"]>[0]) {
     this.calls.push({ method: "getCustomerPortalUrl", params, timestamp: Date.now() })
     return this.portalUrl

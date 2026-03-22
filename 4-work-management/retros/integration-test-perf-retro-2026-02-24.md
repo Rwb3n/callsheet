@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: Integration Test Performance Fix
 
 **Date:** 2026-02-24

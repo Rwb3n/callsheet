@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: S4 Close + Work Management Audit
 
 **Date:** 2026-02-23
@@ -36,9 +41,9 @@
 
 ## 3 — Action Register
 
-| # | Item | Priority | Owner | Definition of Done |
-|---|------|----------|-------|--------------------|
-| 1 | Add WORK.md/chapter/arc update to work item completion workflow | now | agent | Next work item completion updates WORK.md (`status`, `closed`, `queue_position`, `cycle_phase`), chapter status (if all items done), and arc status (if all chapters done) in the same session. Verified by spot-checking after CS-WORK-020 or next completed item. |
-| 2 | Build metadata consistency validation script | next | agent | `scripts/validate-metadata.ts` (or bash) that checks: every done tracker entry has `status: done` in WORK.md, every chapter with all-done items has `status: Complete`, every arc with all-complete chapters has `status: Complete`. Run manually or in CI. |
-| 3 | CS-WORK-020 (image processing, 4 AC) is the real remaining S2 item | next | agent | CS-WORK-020 implemented (3 WebP variants, deterministic naming, failure fallback). S2 status changes from "in progress" to "complete". |
-| 4 | Document the ID-reuse risk | later | agent | Add a note to `4-work-management/README.md` that work item IDs must not be reused. If a work item is absorbed, its ID is retired — a new item gets the next sequential ID. Prevents future identity conflicts. |
+| # | Item | Priority | Status | Owner | Definition of Done |
+|---|------|----------|--------|-------|--------------------|
+| 1 | Add WORK.md/chapter/arc update to work item completion workflow | now | open | agent | Next work item completion updates WORK.md (`status`, `closed`, `queue_position`, `cycle_phase`), chapter status (if all items done), and arc status (if all chapters done) in the same session. Verified by spot-checking after CS-WORK-020 or next completed item. |
+| 2 | Build metadata consistency validation script | next | open | agent | `scripts/validate-metadata.ts` (or bash) that checks: every done tracker entry has `status: done` in WORK.md, every chapter with all-done items has `status: Complete`, every arc with all-complete chapters has `status: Complete`. Run manually or in CI. |
+| 3 | CS-WORK-020 (image processing, 4 AC) is the real remaining S2 item | next | open | agent | CS-WORK-020 implemented (3 WebP variants, deterministic naming, failure fallback). S2 status changes from "in progress" to "complete". |
+| 4 | Document the ID-reuse risk | later | open | agent | Add a note to `4-work-management/README.md` that work item IDs must not be reused. If a work item is absorbed, its ID is retired — a new item gets the next sequential ID. Prevents future identity conflicts. |

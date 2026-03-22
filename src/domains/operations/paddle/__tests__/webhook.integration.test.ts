@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach, afterAll } from "vitest"
 import { eq } from "drizzle-orm"
 import { getTestDb, resetDb, closeTestDb } from "@/db/test-utils"
-import { seedTestUser, createTestListing, InMemoryNotificationDb, emptyConsumerMatrix, createSchedulerDb, createDecisionLogDb } from "@/db/test-fixtures"
+import { seedTestUser, createTestListing, InMemoryNotificationDb, createSchedulerDb, createDecisionLogDb, createTestBus } from "@/db/test-fixtures"
 import { processedPaddleEvents, pendingCancellations } from "@/db/schema/operations"
 import { listings } from "@/db/schema/data-and-listings"
 import { accountProfiles } from "@/db/schema/accounts"
@@ -21,7 +21,6 @@ import {
   cleanupStalePendingCancellations,
 } from "../pending-cancellations"
 import type { PaddleWebhookEvent } from "../types"
-import { InProcessEventBus } from "@/lib/events/bus"
 import { createHmac } from "crypto"
 
 const db = getTestDb()
@@ -31,7 +30,7 @@ function makeDeps(overrides?: Partial<WebhookHandlerDeps>): WebhookHandlerDeps {
   return {
     db,
     webhookSecret: SECRET,
-    eventBus: new InProcessEventBus({ logError: async () => {}, consumerMatrix: emptyConsumerMatrix }),
+    eventBus: createTestBus(),
     waitUntilFn: () => {},
     schedulerDb: createSchedulerDb(db),
     decisionLogDb: createDecisionLogDb(db),

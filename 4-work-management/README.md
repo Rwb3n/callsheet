@@ -23,10 +23,10 @@ Flat directories per artifact type. Relationships tracked in YAML frontmatter (`
 
 ## Current State
 
-- **CS-E1** (Platform Build): 6 arcs, 12 chapters, 6 work items (S0 only)
-- **CS-WORK-001** (Event Bus): done — 9/9 AC, 9 tests passing, 0 type errors
-- Work items CS-WORK-002 through CS-WORK-006 cover remaining 42 S0 acceptance criteria
-- Remaining slices (S1–S10) have skeleton chapters; work items created when arc activates
+- **CS-E1** (Platform Build): 7 arcs, 14 chapters, 56 work items complete (351 AC, 939 tests)
+- **S0–S6 code complete.** Vertical slice sequence paused after S6.
+- **CH-CS-014 (Presentation Layer) active** — horizontal chapter cross-cutting S0–S6. 9 work items, 35 AC. Resolves PP-Q1, wires tRPC API + client, retrofits buyer journey pages.
+- S7–S10 resume after CH-CS-014.
 - See `IMPLEMENTATION-TRACKER.md` for detailed progress
 
 ## ID Conventions

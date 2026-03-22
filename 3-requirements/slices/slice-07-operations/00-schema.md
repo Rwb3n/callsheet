@@ -53,7 +53,7 @@ Ops active ticket registry. Tracks the full support ticket lifecycle from triage
 ```typescript
 export const supportTickets = pgTable("support_tickets", {
   id: uuid("id").primaryKey().defaultRandom(),
-  accountId: uuid("account_id").references(() => users.id, { onDelete: "set null" }),
+  accountId: text("account_id").references(() => user.id, { onDelete: "set null" }),
   listingId: uuid("listing_id").references(() => listings.id, { onDelete: "set null" }),
   category: text("category").notNull(),
     // Triage-assigned: "billing_support" | "profile_support" | "claim_dispute" |
@@ -125,7 +125,7 @@ Queryable index for support triage priority elevation. Upserted from `churn_risk
 export const churnRiskRegistry = pgTable("churn_risk_registry", {
   id: uuid("id").primaryKey().defaultRandom(),
   listingId: uuid("listing_id").notNull().references(() => listings.id, { onDelete: "cascade" }),
-  accountId: uuid("account_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  accountId: text("account_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   riskLevel: text("risk_level").notNull(),  // "at_risk" | "high_risk"
   detectedAt: timestamp("detected_at", { withTimezone: true }).notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),  // detectedAt + 90 days
@@ -187,7 +187,7 @@ DSAR tracking, compliance obligations, and audit records. Serves three purposes:
 export const complianceRegister = pgTable("compliance_register", {
   id: uuid("id").primaryKey().defaultRandom(),
   type: complianceEntryTypeEnum("type").notNull(),
-  accountId: uuid("account_id").references(() => users.id, { onDelete: "set null" }),
+  accountId: text("account_id").references(() => user.id, { onDelete: "set null" }),
   status: complianceEntryStatusEnum("status").notNull(),
   receivedAt: timestamp("received_at", { withTimezone: true }),
   deadline: timestamp("deadline", { withTimezone: true }),

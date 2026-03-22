@@ -119,7 +119,7 @@ export function computeProfileStrength(
 }
 
 // --- Missing field identification from quality score explanations [AC-30] ---
-// Uses the QualityScoreExplanation.dimensions.completeness.factors array.
+// Uses the completeness dimension's factors array from QualityScoreExplanation.
 // Each factor string is a key like "missing_headline". S9 populates these.
 
 export function identifyMissingFields(

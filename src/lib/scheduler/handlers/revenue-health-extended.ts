@@ -213,7 +213,7 @@ export function registerRevenueHealthExtendedHandler(
         and(
           eq(churnAnalysisLog.eventType, "churn"),
           gte(churnAnalysisLog.createdAt, thirtyDaysAgo),
-          sql`${churnAnalysisLog.accountId} IN (
+          sql`${churnAnalysisLog.accountId}::text IN (
             SELECT account_id FROM listings
             WHERE account_id IS NOT NULL
             GROUP BY account_id

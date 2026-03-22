@@ -68,6 +68,8 @@ Three mechanisms at V1. No CAPTCHA — implement if spam rate exceeds 5%. [Sourc
 
 The core routing logic. Four branches based on listing claim status. [Source: PP concept design §5.3]
 
+**Note:** Branching is on `claimStatus` (unclaimed / pending_review / claimed / disputed), not `verificationTier`. A claimed listing may have any verification tier (claimed / verified / premium_verified) — the routing decision depends only on whether the listing has been claimed, not on its verification level.
+
 ```mermaid
 flowchart TD
     A[enquiry.submit called] --> B{Honeypot empty?}
@@ -82,7 +84,7 @@ flowchart TD
     G -->|No| NF[Reject: NOT_FOUND]
     G -->|Yes| H{listing.claimStatus?}
 
-    H -->|claimed / verified / premium_verified| I[Direct delivery]
+    H -->|claimed| I[Direct delivery]
     I --> I1[Insert enquiry_records row — status: unread]
     I1 --> I2[Send new_enquiry email to provider]
     I2 --> I3[Schedule enquiry_response_reminder — 7 days]
@@ -135,8 +137,8 @@ enquiry.submit(input):
   // 3. Route by claim status [PP concept design §5.3]
   match listing.claimStatus:
 
-    "claimed" | "verified" | "premium_verified":
-      // Branch A: Direct delivery
+    "claimed":
+      // Branch A: Direct delivery (covers all verification tiers: claimed, verified, premium_verified)
       enquiryId = insertEnquiryRecord({
         senderAccountId,
         senderEmail,

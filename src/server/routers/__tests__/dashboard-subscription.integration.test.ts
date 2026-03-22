@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest"
 import { getTestDb, resetDb, closeTestDb } from "@/db/test-utils"
-import { createTestListing, seedTestUser, makeSession, ctx } from "@/db/test-fixtures"
+import { createTestListing, seedTestUser, makeSession, ctx, expectTRPCError } from "@/db/test-fixtures"
 import { InMemoryPaymentService } from "@/lib/services/mocks"
 import type { AuthSession } from "@/lib/auth"
 import { createSubscriptionRouter } from "../subscription"
@@ -218,18 +218,16 @@ describe("subscription.getPortalUrl (AC-30)", () => {
       subscriptionTier: "standard",
     })
 
-    await expect(
-      caller(otherSession).getPortalUrl({
-        listingId: listing.id,
-      }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+    await expectTRPCError(
+      caller(otherSession).getPortalUrl({ listingId: listing.id }),
+      "FORBIDDEN",
+    )
   })
 
   it("returns NOT_FOUND for nonexistent listing", async () => {
-    await expect(
-      caller(ownerSession).getPortalUrl({
-        listingId: "a0000000-0000-4000-8000-000000000099",
-      }),
-    ).rejects.toMatchObject({ code: "NOT_FOUND" })
+    await expectTRPCError(
+      caller(ownerSession).getPortalUrl({ listingId: "a0000000-0000-4000-8000-000000000099" }),
+      "NOT_FOUND",
+    )
   })
 })

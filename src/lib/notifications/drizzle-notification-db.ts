@@ -1,5 +1,4 @@
 // Drizzle-backed NotificationDb — SI §8, S5 §6
-// Replaces NoOpNotificationDb when notifications table exists.
 
 import { eq, and, isNull, lt, desc, sql } from "drizzle-orm"
 import { notifications } from "@/db/schema/shared"

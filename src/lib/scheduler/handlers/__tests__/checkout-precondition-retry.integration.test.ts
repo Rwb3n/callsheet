@@ -16,8 +16,7 @@ import {
   registerCheckoutPreconditionRetryHandler,
   type CheckoutRetryDeps,
 } from "../checkout-precondition-retry"
-
-type Exec = (params: Record<string, unknown>) => Promise<void>
+import { invokeHandler } from "./invoke-handler"
 
 const db = getTestDb()
 const ACCOUNT_ID = makeUUID("cr01")
@@ -71,7 +70,7 @@ describe("checkout_precondition_retry handler", () => {
     const registry = new ActionHandlerRegistry()
     registerCheckoutPreconditionRetryHandler(registry, deps)
 
-    await (registry.get("checkout_precondition_retry") as unknown as Exec)({
+    await invokeHandler(registry, "checkout_precondition_retry", {
       paddleEvent: makePaddleEvent(LISTING_ID_CLAIMED),
       attemptCount: 1,
       maxAttempts: 12,
@@ -87,7 +86,7 @@ describe("checkout_precondition_retry handler", () => {
     const registry = new ActionHandlerRegistry()
     registerCheckoutPreconditionRetryHandler(registry, deps)
 
-    await (registry.get("checkout_precondition_retry") as unknown as Exec)({
+    await invokeHandler(registry, "checkout_precondition_retry", {
       paddleEvent: makePaddleEvent(LISTING_ID_UNCLAIMED),
       attemptCount: 12,
       maxAttempts: 12,
@@ -108,7 +107,7 @@ describe("checkout_precondition_retry handler", () => {
     const registry = new ActionHandlerRegistry()
     registerCheckoutPreconditionRetryHandler(registry, deps)
 
-    await (registry.get("checkout_precondition_retry") as unknown as Exec)({
+    await invokeHandler(registry, "checkout_precondition_retry", {
       paddleEvent: makePaddleEvent(LISTING_ID_UNCLAIMED),
       attemptCount: 3,
       maxAttempts: 12,

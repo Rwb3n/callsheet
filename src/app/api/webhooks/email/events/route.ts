@@ -7,8 +7,7 @@ import { getDb } from "@/db"
 import { handleResendEvent } from "@/lib/email/webhook-handler"
 import { handleBounce } from "@/lib/email/bounce-handler"
 import type { BounceHandlerDeps } from "@/lib/email/bounce-handler"
-import { createSchedulerDb, createDecisionLogDb } from "@/db/adapters"
-import { NoOpNotificationDb } from "@/lib/notifications/no-op"
+import { createSchedulerDb, createDecisionLogDb, createNotificationDb } from "@/db/adapters"
 import { ResendWebhookVerifier, NoOpWebhookVerifier } from "@/lib/email/webhook-verifier"
 import type { WebhookVerifier } from "@/lib/email/webhook-verifier"
 import type { ResendWebhookEvent } from "@/lib/email/webhook-types"
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     db,
     schedulerDb: createSchedulerDb(db),
     decisionDb: createDecisionLogDb(db),
-    notificationDb: new NoOpNotificationDb(),
+    notificationDb: createNotificationDb(db),
   }
 
   // Always return 200 — Resend retries on non-2xx

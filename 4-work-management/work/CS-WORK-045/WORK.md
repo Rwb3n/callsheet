@@ -3,7 +3,7 @@ template: work_item
 id: CS-WORK-045
 title: "Implement enquiry inbox and response tracking"
 type: feature
-status: active
+status: done
 owner: null
 created: 2026-02-24
 spawned_by: null
@@ -11,7 +11,7 @@ spawned_children: []
 chapter: CH-CS-007
 arc: provider-experience
 epoch: CS-E1
-closed: null
+closed: 2026-02-24
 priority: high
 effort: medium
 traces_to:
@@ -31,13 +31,24 @@ acceptance_criteria:
 blocked_by: [CS-WORK-043]
 blocks: []
 enables: []
-queue_position: backlog
-cycle_phase: backlog
+queue_position: done
+cycle_phase: done
 node_history:
   - node: backlog
     entered: 2026-02-24T00:00:00
+    exited: 2026-02-24T00:00:00
+  - node: done
+    entered: 2026-02-24T00:00:00
     exited: null
-artifacts: []
+artifacts:
+  - drizzle/0008_mixed_may_parker.sql
+  - src/db/schema/accounts.ts
+  - src/server/routers/enquiry.ts
+  - src/lib/scheduler/handlers/enquiry-response-reminder.ts
+  - src/domains/platform/enquiry/email-templates.ts
+  - src/server/root.ts
+  - src/server/routers/__tests__/enquiry.integration.test.ts
+  - src/lib/scheduler/handlers/__tests__/enquiry-response-reminder.integration.test.ts
 cycle_docs: {}
 memory_refs: []
 extensions:
@@ -59,13 +70,16 @@ Provider-side enquiry management — inbox with filtering, response mutation wit
 
 ## Deliverables
 
-- [ ] `src/db/migrations/0007_*.sql` — Add `enquiry_status` pgEnum + `status` column to `enquiry_records`
-- [ ] `src/db/schema/accounts.ts` — Add `enquiryStatusEnum` + `status` column to `enquiryRecords` definition
-- [ ] `src/app/dashboard/listings/[listingId]/enquiries/page.tsx` — Enquiry inbox page
-- [ ] `src/server/routers/enquiry.ts` — `createEnquiryRouter(deps)` with `getInbox`, `respondToEnquiry`
-- [ ] `src/domains/platform/enquiry/response-reminder.ts` — `enquiry_response_reminder` deferred action handler
-- [ ] `src/server/routers/__tests__/enquiry.integration.test.ts` — Integration tests for all 7 AC
-- [ ] `src/domains/platform/enquiry/__tests__/response-reminder.integration.test.ts` — Integration tests for AC-20, AC-21
+- [x] `drizzle/0008_mixed_may_parker.sql` — Add `enquiry_status` pgEnum + `status` column to `enquiry_records`
+- [x] `src/db/schema/accounts.ts` — Add `enquiryStatusEnum` + `status` column + listing_status index to `enquiryRecords`
+- [x] `src/server/routers/enquiry.ts` — `createEnquiryRouter(deps)` with `getInbox`, `respondToEnquiry`
+- [x] `src/lib/scheduler/handlers/enquiry-response-reminder.ts` — `enquiry_response_reminder` deferred action handler
+- [x] `src/domains/platform/enquiry/email-templates.ts` — `enquiry_response` + `enquiry_reminder` templates
+- [x] `src/server/root.ts` — Wire enquiry router (15th router)
+- [x] `src/server/routers/__tests__/enquiry.integration.test.ts` — 14 integration tests for AC-16 through AC-19, AC-22
+- [x] `src/lib/scheduler/handlers/__tests__/enquiry-response-reminder.integration.test.ts` — 4 integration tests for AC-20, AC-21
+
+**Note:** `src/app/dashboard/listings/[listingId]/enquiries/page.tsx` (UI page) deferred — backend-only at this phase. The router procedures provide the API surface; UI rendering is a separate concern.
 
 ## References
 

@@ -19,6 +19,10 @@ export function createAuth(params: { db: unknown; emailService: EmailService }) 
     database: drizzleAdapter(params.db as Parameters<typeof drizzleAdapter>[0], {
       provider: "pg",
     }),
+    // Accept dev server on any localhost port (Next.js picks next available if 3000 is taken)
+    trustedOrigins: process.env.NODE_ENV === "production"
+      ? []
+      : ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
     emailAndPassword: { enabled: true },
     emailVerification: {
       sendOnSignUp: true,

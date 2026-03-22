@@ -3,7 +3,7 @@ template: work_item
 id: CS-WORK-049
 title: "Implement account settings and feature gating UI"
 type: feature
-status: active
+status: done
 owner: null
 created: 2026-02-24
 spawned_by: null
@@ -11,7 +11,7 @@ spawned_children: []
 chapter: CH-CS-007
 arc: provider-experience
 epoch: CS-E1
-closed: null
+closed: 2026-02-24
 priority: medium
 effort: medium
 traces_to:
@@ -39,7 +39,13 @@ node_history:
   - node: backlog
     entered: 2026-02-24T00:00:00
     exited: null
-artifacts: []
+artifacts:
+  - src/server/routers/settings.ts
+  - src/domains/platform/dashboard/map-feature-access-to-ui.ts
+  - src/domains/platform/dashboard/__tests__/map-feature-access-to-ui.test.ts
+  - src/server/routers/__tests__/settings.integration.test.ts
+  - src/app/dashboard/settings/page.tsx
+  - src/server/root.ts
 cycle_docs: {}
 memory_refs: []
 extensions:

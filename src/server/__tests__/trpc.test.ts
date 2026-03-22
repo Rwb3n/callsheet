@@ -4,6 +4,7 @@
 // AC-24: adminProcedure returns 403 non-admin
 
 import { describe, it, expect } from "vitest"
+import { expectTRPCError } from "@/db/test-fixtures"
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc"
 import type { TRPCContext } from "../trpc"
 import type { AuthSession } from "@/lib/auth"
@@ -49,9 +50,10 @@ describe("tRPC Auth Middleware", () => {
 
   // AC-23: protectedProcedure returns 401 unauthenticated
   it("protectedProcedure throws UNAUTHORIZED when no session", async () => {
-    await expect(
+    await expectTRPCError(
       callProcedure(appRouter, "protectedHello", { session: null }),
-    ).rejects.toMatchObject({ code: "UNAUTHORIZED" })
+      "UNAUTHORIZED",
+    )
   })
 
   // AC-23 inverse: protectedProcedure works with valid session
@@ -62,9 +64,10 @@ describe("tRPC Auth Middleware", () => {
 
   // AC-24: adminProcedure returns 403 non-admin
   it("adminProcedure throws FORBIDDEN for non-admin user", async () => {
-    await expect(
+    await expectTRPCError(
       callProcedure(appRouter, "adminHello", { session: userSession }),
-    ).rejects.toMatchObject({ code: "FORBIDDEN" })
+      "FORBIDDEN",
+    )
   })
 
   // AC-24 inverse: adminProcedure works with admin session
@@ -91,8 +94,9 @@ describe("tRPC Auth Middleware", () => {
 
   // AC-23: adminProcedure also returns UNAUTHORIZED when no session
   it("adminProcedure throws UNAUTHORIZED when no session", async () => {
-    await expect(
+    await expectTRPCError(
       callProcedure(appRouter, "adminHello", { session: null }),
-    ).rejects.toMatchObject({ code: "UNAUTHORIZED" })
+      "UNAUTHORIZED",
+    )
   })
 })

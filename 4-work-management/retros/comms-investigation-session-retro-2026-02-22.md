@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: Communications Investigation Session
 
 **Date:** 2026-02-22

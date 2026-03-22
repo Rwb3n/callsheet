@@ -19,6 +19,7 @@ import type { AuthSession } from "@/lib/auth"
 import type { TRPCContext } from "@/server/trpc"
 import type { Db } from "@/db/types"
 import type { ConsumerEntry, EventType } from "@/lib/events/types"
+import { InProcessEventBus } from "@/lib/events/bus"
 import { accountProfiles } from "@/db/schema/accounts"
 import type { NotificationDb } from "@/lib/notifications"
 import type { Notification } from "@/lib/notifications"
@@ -117,7 +118,7 @@ export async function createTestListing(
   })
   await db.insert(qualityScoreExplanations).values({
     listingId: created.id,
-    explanation: { dimensions: {}, suggestions: [] },
+    explanation: { composite: 0, dimensions: [], topImprovements: [] },
   })
   await db.insert(engagements).values({ listingId: created.id })
 
@@ -210,7 +211,7 @@ export async function seedTaxonomy(db: Db) {
 
 // --- DB adapters (re-exported from production module) ---
 
-export { createSchedulerDb, createDecisionLogDb, createNotificationDb } from "@/db/adapters"
+export { createSchedulerDb, createDecisionLogDb, createNotificationDb, createFlowDb } from "@/db/adapters"
 
 // --- In-memory NotificationDb for tests ---
 
@@ -262,6 +263,65 @@ export class InMemoryNotificationDb implements NotificationDb {
   getAll(): Notification[] {
     return [...this.store.values()]
   }
+
+  clear(): void {
+    this.store.clear()
+  }
+}
+
+// --- TRPCError assertion helper ---
+
+import type { TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc"
+import { expect } from "vitest"
+
+/**
+ * Assert that a promise rejects with a TRPCError having the expected code.
+ * Optionally asserts the error message contains `messageSubstring`.
+ *
+ *   await expectTRPCError(caller.getOverview(), "UNAUTHORIZED")
+ *   await expectTRPCError(caller.archive({ id }), "NOT_FOUND", "Listing not found")
+ */
+export async function expectTRPCError(
+  promise: Promise<unknown>,
+  code: TRPC_ERROR_CODE_KEY,
+  messageSubstring?: string,
+) {
+  let caught: unknown
+  try {
+    await promise
+  } catch (err) {
+    caught = err
+  }
+  expect(caught).toBeDefined()
+  expect(caught).toMatchObject({ code })
+  if (messageSubstring != null) {
+    expect(caught).toMatchObject({ message: expect.stringContaining(messageSubstring) })
+  }
+}
+
+// --- Mock DecisionLogDb for tests that don't write to a real DB ---
+
+import type { DecisionLogDb } from "@/lib/decisions/logger"
+
+export function createMockDecisionLogDb(): { db: DecisionLogDb; getDecisions: () => Array<Record<string, unknown>> } {
+  const decisions: Array<Record<string, unknown>> = []
+  return {
+    db: {
+      insert: async (row: Record<string, unknown>) => {
+        decisions.push(row)
+        return "decision-id"
+      },
+      findByDomainAndType: async () => [],
+    },
+    getDecisions: () => decisions,
+  }
+}
+
+// --- Test event bus helper ---
+
+/** Creates an InProcessEventBus with no-op error logging and empty consumer matrix. */
+export function createTestBus() {
+  return new InProcessEventBus({ logError: async () => {}, consumerMatrix: emptyConsumerMatrix })
 }
 
 // --- Empty consumer matrix for tests that don't need event handlers ---

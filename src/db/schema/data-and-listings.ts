@@ -140,11 +140,17 @@ export const listings = pgTable(
     subscriptionStartDate: timestamp("subscription_start_date", { withTimezone: true }),
     subscriptionEndDate: timestamp("subscription_end_date", { withTimezone: true }),
 
+    // Optimistic concurrency [S5 §8.2]
+    version: integer("version").notNull().default(1),
+
     // Lifecycle
     lifecycleStatus: lifecycleStatusEnum("lifecycle_status").notNull().default("active"),
     lastProviderLogin: timestamp("last_provider_login", { withTimezone: true }),
     mergedInto: uuid("merged_into"),
     succeededBy: uuid("succeeded_by"),
+
+    // Claim tracking — S9 §1.5 abandonment check
+    claimSubmittedAt: timestamp("claim_submitted_at", { withTimezone: true }),
 
     // Provenance
     source: text("source"), // null for user-created, "4rfv_import" for seed data [S2 §6.8]
@@ -200,13 +206,37 @@ export const qualityScores = pgTable("quality_scores", {
   verification: integer("verification").notNull().default(0),
   composite: integer("composite").notNull().default(0),
   lastCalculated: timestamp("last_calculated", { withTimezone: true }).notNull().defaultNow(),
+  // S9 additions — calibrated quality scoring coexistence
+  calculatedBy: text("calculated_by").notNull().default("zero_init"),
+  // "zero_init" (S1 placeholder) | "calibrated" (S9 computed)
+  algorithmVersion: integer("algorithm_version").notNull().default(1),
 })
 
 // --- Quality Score Explanations (§1.5) ---
 
+export type QualityScoreExplanationFactor = {
+  factor: string
+  impact: "positive" | "negative" | "neutral"
+  detail: string
+}
+
+export type QualityScoreExplanationDimension = {
+  name: string
+  score: number
+  maxScore: number
+  factors: QualityScoreExplanationFactor[]
+}
+
 export type QualityScoreExplanation = {
-  dimensions: Record<string, { score: number; maxScore: number; factors: string[] }>
-  suggestions: string[]
+  composite: number
+  dimensions: QualityScoreExplanationDimension[]
+  topImprovements: string[]
+}
+
+export const ZERO_INIT_EXPLANATION: QualityScoreExplanation = {
+  composite: 0,
+  dimensions: [],
+  topImprovements: [],
 }
 
 export const qualityScoreExplanations = pgTable("quality_score_explanations", {
@@ -228,6 +258,10 @@ export const engagements = pgTable("engagements", {
   enquiriesReceived: integer("enquiries_received").notNull().default(0),
   enquiryResponseRate: real("enquiry_response_rate"),
   enquiryResponseTime: real("enquiry_response_time"),
+  // S9 additions — quality scoring freshness + dedup
+  lastViewerAccountId: text("last_viewer_account_id"), // AC-11 dedup: last viewer for 1-hour window
+  lastProfileViewAt: timestamp("last_profile_view_at", { withTimezone: true }), // AC-11 dedup + AC-4 freshness
+  lastEnquiryAt: timestamp("last_enquiry_at", { withTimezone: true }), // AC-4 freshness engagement recency
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 })
 

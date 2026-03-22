@@ -164,7 +164,7 @@ export function registerProactiveChurnDetectionHandler(
         },
         confidence: 0.7,
         listingId: signal.listingId,
-        accountId: signal.accountId,
+        additionalContext: { accountId: signal.accountId },
       })
 
       // Emit churn_risk_detected for medium or high risk

@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { TRPCProvider } from "./providers"
+import { SiteHeader } from "@/components/layout/header"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -13,7 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TRPCProvider>
+          <SiteHeader />
+          <div className="min-h-[calc(100vh-3.5rem)]">{children}</div>
+        </TRPCProvider>
+      </body>
     </html>
   )
 }

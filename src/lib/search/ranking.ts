@@ -3,13 +3,14 @@
 // quality_boost = composite / 100 * 0.5  (max 0.5)
 // paid_boost = TIER_LIMITS[tier].rankingBoost / 100  (0 / 0.15 / 0.25 / 0.25) — P4 import from CR §4.1
 
-import { sql, eq, and, type SQL } from "drizzle-orm"
+import { sql, eq, and, inArray, type SQL } from "drizzle-orm"
 import {
   listings,
   qualityScores,
   listingTaxonomyTags,
 } from "@/db/schema/data-and-listings"
-import { TIER_LIMITS, type ListingSubscriptionTier } from "@/domains/commercial/tier-limits"
+import { TIER_LIMITS } from "@/domains/commercial/tier-limits"
+import { asSubscriptionTier } from "@/domains/commercial/subscription/as-subscription-tier"
 import type { Db } from "@/db/types"
 import { expandQuery } from "./synonyms"
 
@@ -55,7 +56,7 @@ const TRIGRAM_THRESHOLD = 0.3
 
 /** Build paid boost value from subscription tier. */
 function paidBoost(tier: string): number {
-  const limits = TIER_LIMITS[tier as ListingSubscriptionTier]
+  const limits = TIER_LIMITS[asSubscriptionTier(tier)]
   if (!limits) return 0
   return limits.rankingBoost / 100
 }
@@ -264,10 +265,16 @@ function buildFilterConditions(filters: SearchFilters): SQL[] {
     conditions.push(sql`${listingTaxonomyTags.specialisationId} = ${filters.specialisationId}`)
   }
   if (filters.entityType && filters.entityType.length > 0) {
-    conditions.push(sql`${listings.entityType} = ANY(${filters.entityType})`)
+    conditions.push(inArray(
+      listings.entityType,
+      filters.entityType as ("freelancer" | "company" | "education" | "industry_body" | "public_sector" | "non_profit")[],
+    ))
   }
   if (filters.subscriptionTier && filters.subscriptionTier.length > 0) {
-    conditions.push(sql`${listings.subscriptionTier} = ANY(${filters.subscriptionTier})`)
+    conditions.push(inArray(
+      listings.subscriptionTier,
+      filters.subscriptionTier as ("free" | "standard" | "premium" | "partner")[],
+    ))
   }
   return conditions
 }

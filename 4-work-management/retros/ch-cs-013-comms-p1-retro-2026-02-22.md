@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: Communications Phase 1 (CH-CS-013)
 
 **Date:** 2026-02-22

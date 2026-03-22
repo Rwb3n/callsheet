@@ -3,7 +3,7 @@ template: work_item
 id: CS-WORK-044
 title: "Implement analytics display and quality score panel"
 type: feature
-status: active
+status: done
 owner: null
 created: 2026-02-24
 spawned_by: null
@@ -11,7 +11,7 @@ spawned_children: []
 chapter: CH-CS-007
 arc: provider-experience
 epoch: CS-E1
-closed: null
+closed: 2026-02-24
 priority: high
 effort: large
 traces_to:
@@ -35,13 +35,23 @@ acceptance_criteria:
 blocked_by: [CS-WORK-043]
 blocks: []
 enables: []
-queue_position: backlog
-cycle_phase: backlog
+queue_position: done
+cycle_phase: done
 node_history:
   - node: backlog
     entered: 2026-02-24T00:00:00
+    exited: 2026-02-24T00:00:00
+  - node: done
+    entered: 2026-02-24T00:00:00
     exited: null
-artifacts: []
+artifacts:
+  - src/domains/platform/dashboard/map-analytics.ts
+  - src/domains/platform/dashboard/__tests__/map-analytics.test.ts
+  - src/server/routers/dashboard.ts
+  - src/server/routers/__tests__/dashboard-analytics.integration.test.ts
+  - src/app/dashboard/listings/[listingId]/page.tsx
+  - src/app/dashboard/listings/[listingId]/analytics/page.tsx
+  - src/app/quality-methodology/page.tsx
 cycle_docs: {}
 memory_refs: []
 extensions:
@@ -63,13 +73,13 @@ Tier-gated analytics display and quality score transparency — the primary paid
 
 ## Deliverables
 
-- [ ] `src/app/dashboard/listings/[listingId]/page.tsx` — Listing detail: analytics + quality + enquiry summary
-- [ ] `src/app/dashboard/listings/[listingId]/analytics/page.tsx` — Full analytics view (tier-gated)
-- [ ] `src/app/quality-methodology/page.tsx` — Static SSG methodology page
-- [ ] `src/domains/platform/dashboard/map-analytics.ts` — `mapAnalyticsToUI` pure function + `comparePeriods`
-- [ ] `src/server/routers/dashboard.ts` — Extend with `getListingDashboard` and `getQualityExplanation` queries
-- [ ] `src/domains/platform/dashboard/__tests__/map-analytics.test.ts` — Unit tests for tier gating logic
-- [ ] `src/server/routers/__tests__/dashboard-analytics.integration.test.ts` — Integration tests for AC-9, AC-10, AC-14
+- [x] `src/app/dashboard/listings/[listingId]/page.tsx` — Listing detail: analytics + quality + enquiry summary
+- [x] `src/app/dashboard/listings/[listingId]/analytics/page.tsx` — Full analytics view (tier-gated)
+- [x] `src/app/quality-methodology/page.tsx` — Static SSG methodology page
+- [x] `src/domains/platform/dashboard/map-analytics.ts` — `mapAnalyticsToUI` pure function + `comparePeriods`
+- [x] `src/server/routers/dashboard.ts` — Extend with `getListingDashboard` and `getQualityExplanation` queries
+- [x] `src/domains/platform/dashboard/__tests__/map-analytics.test.ts` — Unit tests for tier gating logic (19 tests)
+- [x] `src/server/routers/__tests__/dashboard-analytics.integration.test.ts` — Integration tests for AC-6 through AC-14 (19 tests)
 
 ## References
 

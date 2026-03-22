@@ -11,7 +11,7 @@ import { listings, mediaItems } from "@/db/schema/data-and-listings"
 import type { ObjectStorageService } from "@/lib/storage/types"
 import { MAX_UPLOAD_SIZE_BYTES, ALLOWED_CONTENT_TYPES } from "@/lib/storage/types"
 import { TIER_LIMITS } from "@/domains/commercial/tier-limits"
-import type { ListingSubscriptionTier } from "@/domains/commercial/tier-limits"
+import { asSubscriptionTier } from "@/domains/commercial/subscription/as-subscription-tier"
 import type { ImageProcessor } from "@/lib/image-processing/variants"
 
 const MEDIA_TYPE_VALUES = ["logo", "headshot", "portfolio", "gallery"] as const
@@ -62,7 +62,7 @@ export function createMediaRouter(deps: MediaRouterDeps) {
         assertOwnership(listing, ctx.session.accountId)
 
         // Check tier media limit — CR §4.1, AC-24: count only visible items
-        const tier = listing.subscriptionTier as ListingSubscriptionTier
+        const tier = asSubscriptionTier(listing.subscriptionTier)
         const limit = TIER_LIMITS[tier].maxMedia
         const [{ count }] = await db
           .select({ count: sql<number>`count(*)::int` })

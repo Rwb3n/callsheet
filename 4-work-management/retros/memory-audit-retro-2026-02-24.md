@@ -1,3 +1,8 @@
+---
+triaged: true
+status: complete
+---
+
 # Retro: Memory Audit
 
 **Date:** 2026-02-24
