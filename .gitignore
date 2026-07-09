@@ -32,6 +32,12 @@ supabase/.branches/
 Thumbs.db
 desktop.ini
 
+# Quarantined data — never in the public repo (see reference/README.md)
+reference/*
+!reference/README.md
+*.db
+*.sqlite
+
 # Coverage
 coverage/
 
@@ -48,3 +54,6 @@ playwright-report/
 # Logs
 *.log
 npm-debug.log*
+
+# Local dev helpers (machine-specific)
+dev.py
