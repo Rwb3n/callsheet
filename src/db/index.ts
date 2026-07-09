@@ -4,8 +4,11 @@ import * as sharedSchema from "./schema/shared"
 import * as dalSchema from "./schema/data-and-listings"
 import * as accountsSchema from "./schema/accounts"
 import * as correspondenceSchema from "./schema/correspondence"
+import * as operationsSchema from "./schema/operations"
+import * as intelligenceSchema from "./schema/intelligence"
+import * as commercialSchema from "./schema/commercial"
 
-const schema = { ...authSchema, ...sharedSchema, ...dalSchema, ...accountsSchema, ...correspondenceSchema }
+const schema = { ...authSchema, ...sharedSchema, ...dalSchema, ...accountsSchema, ...correspondenceSchema, ...operationsSchema, ...intelligenceSchema, ...commercialSchema }
 
 // Lazy singleton — no connection attempt until first query
 let _db: ReturnType<typeof drizzle> | null = null

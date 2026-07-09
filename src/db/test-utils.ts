@@ -76,6 +76,7 @@ export const TRUNCATE_ALL_TABLES_SQL = sql`
     taxonomy_specialisations,
     taxonomy_service_areas,
     taxonomy_sectors,
+    api_keys,
     deferred_actions,
     orchestrated_flows,
     decision_logs,
@@ -136,6 +137,7 @@ const DELETE_ALL_TABLES_SQL = sql`
   DELETE FROM taxonomy_specialisations;
   DELETE FROM taxonomy_service_areas;
   DELETE FROM taxonomy_sectors;
+  DELETE FROM api_keys;
   DELETE FROM deferred_actions;
   DELETE FROM orchestrated_flows;
   DELETE FROM decision_logs;

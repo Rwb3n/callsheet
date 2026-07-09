@@ -2,7 +2,7 @@
 // logDecision() persists structured decision records; queryable by domain + type.
 
 type UUID = string
-type Domain = "data-and-listings" | "operations" | "platform" | "commercial"
+type Domain = "data-and-listings" | "operations" | "platform" | "commercial" | "cross-domain"
 
 export interface LogDecisionParams {
   domain: Domain

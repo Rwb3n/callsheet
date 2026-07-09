@@ -126,6 +126,7 @@ export function createAppRouter(services: AppServices) {
       bus: services.bus,
       waitUntilFn: services.waitUntilFn,
       payment: services.payment,
+      schedulerDb: services.schedulerDb,
     }),
     shortlist: createShortlistRouter({
       db: services.db,
@@ -152,6 +153,7 @@ export function createAppRouter(services: AppServices) {
       bus: services.bus,
       waitUntilFn: services.waitUntilFn,
       payment: services.payment,
+      storage: services.storage,
     }),
   })
 }

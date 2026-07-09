@@ -22,8 +22,24 @@ import { createAdminRefundsRouter } from "./refunds"
 import type { AdminRefundsRouterDeps } from "./refunds"
 import { createAdminIntelligenceRouter } from "./intelligence"
 import type { AdminIntelligenceRouterDeps } from "./intelligence"
+import { createAdminGraduationRouter } from "./graduation"
+import type { AdminGraduationRouterDeps } from "./graduation"
+import { createAdminSchedulerRouter } from "./scheduler"
+import type { AdminSchedulerRouterDeps } from "./scheduler"
+import { createAdminDecisionsRouter } from "./decisions"
+import type { AdminDecisionsRouterDeps } from "./decisions"
+import { createAdminNotificationsRouter } from "./notifications"
+import type { AdminNotificationsRouterDeps } from "./notifications"
+import { createAdminUsersRouter } from "./users"
+import type { AdminUsersRouterDeps } from "./users"
+import { createAdminListingsRouter } from "./listings"
+import type { AdminListingsRouterDeps } from "./listings"
+import { createAdminTasksRouter } from "./tasks"
+import type { AdminTasksRouterDeps } from "./tasks"
+import { createAdminApiKeysRouter } from "./api-keys"
+import type { AdminApiKeysRouterDeps } from "./api-keys"
 
-export type AdminRouterDeps = AdminDashboardRouterDeps & AdminSupportRouterDeps & AdminBillingRouterDeps & AdminComplianceRouterDeps & AdminFlowsRouterDeps & AdminEventsRouterDeps & AdminHealthRouterDeps & AdminFrictionRouterDeps & AdminRefundsRouterDeps & AdminIntelligenceRouterDeps
+export type AdminRouterDeps = AdminDashboardRouterDeps & AdminSupportRouterDeps & AdminBillingRouterDeps & AdminComplianceRouterDeps & AdminFlowsRouterDeps & AdminEventsRouterDeps & AdminHealthRouterDeps & AdminFrictionRouterDeps & AdminRefundsRouterDeps & AdminIntelligenceRouterDeps & AdminGraduationRouterDeps & AdminSchedulerRouterDeps & AdminDecisionsRouterDeps & AdminNotificationsRouterDeps & AdminUsersRouterDeps & AdminListingsRouterDeps & AdminTasksRouterDeps & AdminApiKeysRouterDeps
 
 export function createAdminRouter(deps: AdminRouterDeps) {
   return router({
@@ -37,5 +53,13 @@ export function createAdminRouter(deps: AdminRouterDeps) {
     friction: createAdminFrictionRouter(deps),
     refunds: createAdminRefundsRouter(deps),
     intelligence: createAdminIntelligenceRouter(deps),
+    graduation: createAdminGraduationRouter(deps),
+    scheduler: createAdminSchedulerRouter(deps),
+    decisions: createAdminDecisionsRouter(deps),
+    notifications: createAdminNotificationsRouter(deps),
+    users: createAdminUsersRouter(deps),
+    listings: createAdminListingsRouter(deps),
+    tasks: createAdminTasksRouter(deps),
+    apiKeys: createAdminApiKeysRouter(deps),
   })
 }

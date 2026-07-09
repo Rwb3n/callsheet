@@ -299,6 +299,35 @@ export async function expectTRPCError(
   }
 }
 
+// --- Chainable mock Db for unit tests that mock Drizzle queries ---
+// Each query call produces a thenable chain. Results consumed in order: first query → results[0], etc.
+
+export function createChainableMockDb(results: unknown[][]) {
+  let queryIndex = 0
+
+  function makeChain(): Record<string, unknown> {
+    const chain: Record<string, unknown> = {}
+    const methods = ["from", "where", "orderBy", "limit"]
+
+    for (const method of methods) {
+      chain[method] = () => chain
+    }
+
+    // Thenable so `await db.select().from().where()` resolves at any chain position
+    chain.then = (resolve: (val: unknown) => void, reject: (err: unknown) => void) => {
+      const result = results[queryIndex] ?? []
+      queryIndex++
+      return Promise.resolve(result).then(resolve, reject)
+    }
+
+    return chain
+  }
+
+  return {
+    select: () => makeChain(),
+  }
+}
+
 // --- Mock DecisionLogDb for tests that don't write to a real DB ---
 
 import type { DecisionLogDb } from "@/lib/decisions/logger"

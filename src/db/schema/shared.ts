@@ -64,7 +64,7 @@ export const orchestratedFlows = pgTable(
 
 // Decision log enums [SI §9, S0 §10]
 export const decisionDomainEnum = pgEnum("decision_domain", [
-  "data-and-listings", "operations", "platform", "commercial",
+  "data-and-listings", "operations", "platform", "commercial", "cross-domain",
 ])
 
 export const decisionLogs = pgTable(
@@ -129,5 +129,25 @@ export const eventConsumerErrors = pgTable(
       table.consumerDomain,
       table.createdAt,
     ),
+  ],
+)
+
+// API keys for machine-to-machine auth [CS-E2, CH-CS-016]
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    accountId: text("account_id").notNull(),
+    name: text("name").notNull(),
+    keyHash: text("key_hash").notNull().unique(),
+    keyPrefix: text("key_prefix").notNull(), // first 8 chars for identification
+    scopes: jsonb("scopes").notNull().$type<string[]>().default([]),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("api_keys_account_idx").on(table.accountId),
+    index("api_keys_key_hash_idx").on(table.keyHash),
   ],
 )
