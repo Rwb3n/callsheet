@@ -11,10 +11,13 @@ import {
   ctx,
   createTestListing,
   emptyConsumerMatrix,
+  createSchedulerDb,
+  expectTRPCError,
 } from "@/db/test-fixtures"
 import { accountProfiles } from "@/db/schema/accounts"
 import type { EmailPreferences } from "@/db/schema/accounts"
 import { listings } from "@/db/schema/data-and-listings"
+import { orchestratedFlows } from "@/db/schema/shared"
 import { createSettingsRouter, type SettingsRouterDeps } from "../settings"
 import { InProcessEventBus } from "@/lib/events/bus"
 import { createWaitUntilCollector } from "@/lib/events/waitUntil"
@@ -58,7 +61,7 @@ let flowDb: ReturnType<typeof createMockFlowDb>
 const ACCOUNT_ID = "test-settings-owner"
 
 function makeDeps(): SettingsRouterDeps {
-  return { db, flowDb, bus, waitUntilFn, payment }
+  return { db, flowDb, bus, waitUntilFn, payment, schedulerDb: createSchedulerDb(db) }
 }
 
 function caller(session: AuthSession) {
@@ -190,12 +193,29 @@ describe("settings.initiateAccountClosure (AC-40)", () => {
     expect(row.steps).toHaveLength(6)
     expect(row.steps.map((s) => s.name)).toEqual([
       "archive_listings",
-      "cancel_subscriptions",
-      "anonymise_buyer_data",
+      "cancel_paddle_subscriptions",
+      "anonymise_enquiry_data",
       "delete_defer_buyer_data",
       "deactivate_account",
       "emit_account_closed",
     ])
+  })
+
+  it("rejects with CONFLICT if a non-terminal closure flow already exists", async () => {
+    // Seed an in-progress closure flow for this account
+    await db.insert(orchestratedFlows).values({
+      flowType: "closure",
+      triggeredBy: ACCOUNT_ID,
+      status: "in_progress",
+      steps: [],
+      context: {},
+    })
+
+    await expectTRPCError(
+      caller(ownerSession).initiateAccountClosure(),
+      "CONFLICT",
+      "active closure flow already exists",
+    )
   })
 })
 
@@ -206,6 +226,7 @@ describe("settings.initiateAccountClosure — full flow (AC-41)", () => {
     // Seed two listings: one with subscription, one without
     const listing1 = await createTestListing(db, ACCOUNT_ID, {
       paddleSubscriptionId: "sub_123",
+      subscriptionTier: "standard",
     })
     const listing2 = await createTestListing(db, ACCOUNT_ID)
 
@@ -264,8 +285,8 @@ describe("settings.initiateAccountClosure — full flow (AC-41)", () => {
     expect(result.status).toBe("completed")
 
     const row = flowDb.rows.get("flow-1")!
-    const context = row.context as { listingsArchived: string[]; subscriptionsCancelled: string[] }
+    const context = row.context as { listingsArchived: string[]; subscriptionsCancelled: number }
     expect(context.listingsArchived).toEqual([])
-    expect(context.subscriptionsCancelled).toEqual([])
+    expect(context.subscriptionsCancelled).toBe(0)
   })
 })

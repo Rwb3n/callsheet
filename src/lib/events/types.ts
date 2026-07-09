@@ -185,7 +185,10 @@ export interface AccountClosedEvent {
   readonly _brand: "AccountClosedEvent"
   accountId: string
   listingsArchived: string[]
-  complianceHoldActive?: boolean
+  buyerDataDeleted: boolean
+  complianceHoldActive: boolean
+  paddleCancellationsPending: boolean
+  timestamp: string
 }
 export type ConversionMilestoneId =
   | "first_subscription"

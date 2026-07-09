@@ -10,3 +10,7 @@ export type {
   FlowRow,
 } from "./types"
 export { CONSECUTIVE_FAILURE_ESCALATION_THRESHOLD } from "./types"
+export { buildErasureSteps, initiateErasureFlow } from "./erasure"
+export type { ErasureContext, ErasureFlowDeps } from "./erasure"
+export { buildClosureSteps, initiateAccountClosure } from "./closure"
+export type { ClosureContext, ClosureFlowDeps } from "./closure"

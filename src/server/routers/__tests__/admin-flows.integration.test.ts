@@ -1,4 +1,4 @@
-// Admin flows router integration tests — CS-WORK-061 AC-6.1 through AC-6.10
+// Admin flows router integration tests — CS-WORK-061 AC-6.1 through AC-6.10, CS-WORK-091
 
 import { describe, it, expect, beforeEach, afterAll } from "vitest"
 import { getTestDb, resetDb, closeTestDb } from "@/db/test-utils"
@@ -10,21 +10,33 @@ import {
   seedTestUser,
   createFlowDb,
   createDecisionLogDb,
-  createNotificationDb,
+  createSchedulerDb,
+  createTestBus,
   InMemoryNotificationDb,
+  expectTRPCError,
 } from "@/db/test-fixtures"
 import { createAdminFlowsRouter } from "@/server/routers/admin/flows"
 import { decisionLogs, orchestratedFlows } from "@/db/schema/shared"
+import { complianceRegister } from "@/db/schema/operations"
 import { eq } from "drizzle-orm"
 import type { OrchestratedFlowStep } from "@/lib/flows"
+import { InMemoryObjectStorageService } from "@/lib/storage"
+import { InMemoryPaymentService } from "@/lib/services/mocks"
 
 const db = getTestDb()
 const flowDb = createFlowDb(db)
 const decisionLogDb = createDecisionLogDb(db)
+const schedulerDb = createSchedulerDb(db)
 const notificationDb = new InMemoryNotificationDb()
+const bus = createTestBus()
+const storage = new InMemoryObjectStorageService()
+const payment = new InMemoryPaymentService()
 const adminId = makeUUID("admin001")
 
-const router = createAdminFlowsRouter({ db, flowDb, decisionLogDb, notificationDb })
+const router = createAdminFlowsRouter({
+  db, flowDb, decisionLogDb, notificationDb,
+  bus, waitUntilFn: () => {}, schedulerDb, storage, payment,
+})
 const caller = router.createCaller(ctx(makeAdminSession(adminId)))
 const userCaller = router.createCaller(ctx(makeSession({ accountId: makeUUID("user001") })))
 
@@ -32,7 +44,7 @@ function makeErasureSteps(): OrchestratedFlowStep[] {
   return [
     { name: "verify_identity", domain: "operations", status: "completed", attempt: 1, retryable: true, skippable: false, completedAt: new Date().toISOString() },
     { name: "extract_account_data", domain: "data-and-listings", status: "failed", attempt: 1, retryable: true, skippable: true, error: "extraction timeout" },
-    { name: "close_support_tickets", domain: "operations", status: "pending", attempt: 0, retryable: true, skippable: true },
+    { name: "close_active_tickets", domain: "operations", status: "pending", attempt: 0, retryable: true, skippable: true },
     { name: "process_erasure", domain: "data-and-listings", status: "pending", attempt: 0, retryable: true, skippable: false },
     { name: "close_dsar_case", domain: "operations", status: "pending", attempt: 0, retryable: true, skippable: false },
     { name: "emit_erasure_completed", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: true },
@@ -42,8 +54,8 @@ function makeErasureSteps(): OrchestratedFlowStep[] {
 function makeClosureSteps(): OrchestratedFlowStep[] {
   return [
     { name: "archive_listings", domain: "data-and-listings", status: "completed", attempt: 1, retryable: true, skippable: false, completedAt: new Date().toISOString() },
-    { name: "cancel_subscriptions", domain: "commercial", status: "failed", attempt: 1, retryable: true, skippable: true, error: "Paddle timeout" },
-    { name: "anonymise_buyer_data", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: true },
+    { name: "cancel_paddle_subscriptions", domain: "commercial", status: "failed", attempt: 1, retryable: true, skippable: true, error: "Paddle timeout" },
+    { name: "anonymise_enquiry_data", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: true },
     { name: "delete_defer_buyer_data", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: true },
     { name: "deactivate_account", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: false },
     { name: "emit_account_closed", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: true },
@@ -204,7 +216,7 @@ describe("admin.flows.getDetail", () => {
 
     // Skippable steps
     expect(detail.steps[1].skippable).toBe(true) // extract_account_data
-    expect(detail.steps[2].skippable).toBe(true) // close_support_tickets
+    expect(detail.steps[2].skippable).toBe(true) // close_active_tickets
     expect(detail.steps[5].skippable).toBe(true) // emit_erasure_completed
   })
 
@@ -215,34 +227,156 @@ describe("admin.flows.getDetail", () => {
 })
 
 describe("admin.flows.retryStep", () => {
-  it("AC-6.4: increments attempt, sets step to in_progress, logs decision", async () => {
-    const flowId = await insertFlow({ status: "failed" })
+  it("AC-1: retry actually re-executes the failed step via resumeFlow", async () => {
+    // Seed a closure flow failed at the last step (emit_account_closed).
+    // On retry, the emit step just calls bus.emit() — succeeds with test bus.
+    const closureContext = {
+      accountId: makeUUID("target01"),
+      listingsArchived: [],
+      subscriptionsCancelled: 0,
+      subscriptionsFailed: [],
+      enquiriesAnonymised: 0,
+      buyerDataDeleted: true,
+      buyerDataDeferred: false,
+      accountDeactivated: true,
+      accountClosedEmitted: false,
+    }
+    const closureSteps: OrchestratedFlowStep[] = makeClosureSteps().map((s, i) => ({
+      ...s,
+      status: i < 5 ? "completed" as const : "failed" as const,
+      attempt: i < 5 ? 1 : 1,
+      completedAt: i < 5 ? new Date().toISOString() : undefined,
+      error: i === 5 ? "network timeout" : undefined,
+    }))
 
-    await caller.retryStep({ flowId })
+    const flowId = await flowDb.insert({
+      flowType: "closure",
+      triggeredBy: adminId,
+      status: "failed",
+      steps: closureSteps,
+      currentStep: 5,
+      context: closureContext,
+      startedAt: new Date(),
+      completedAt: null,
+      deadline: null,
+      escalatedAt: null,
+      escalationReason: null,
+    })
+
+    const result = await caller.retryStep({ flowId })
+
+    // Flow actually completed — the emit step ran successfully
+    expect(result.status).toBe("completed")
 
     const updated = await flowDb.findById(flowId)
-    expect(updated!.status).toBe("in_progress")
-    expect(updated!.steps[1].status).toBe("in_progress")
-    expect(updated!.steps[1].attempt).toBe(2)
-    expect(updated!.updatedAt).not.toBeNull()
-
-    // AC-6.10: decision log
-    const logs = await decisionLogDb.findByDomainAndType("operations", "flow_step_retry")
-    expect(logs.length).toBeGreaterThanOrEqual(1)
-    expect(logs.some((l) => l.decisionType === "flow_step_retry")).toBe(true)
+    expect(updated!.status).toBe("completed")
+    expect(updated!.steps[5].status).toBe("completed")
+    expect(updated!.steps[5].attempt).toBe(2)
+    expect(updated!.completedAt).not.toBeNull()
   })
 
-  it("AC-6.4: rejects retry when flow is not in failed state", async () => {
+  it("AC-2: retry returns flowId and status", async () => {
+    const closureSteps: OrchestratedFlowStep[] = makeClosureSteps().map((s, i) => ({
+      ...s,
+      status: i < 5 ? "completed" as const : "failed" as const,
+      attempt: i < 5 ? 1 : 1,
+      completedAt: i < 5 ? new Date().toISOString() : undefined,
+      error: i === 5 ? "timeout" : undefined,
+    }))
+
+    const flowId = await flowDb.insert({
+      flowType: "closure",
+      triggeredBy: adminId,
+      status: "failed",
+      steps: closureSteps,
+      currentStep: 5,
+      context: {
+        accountId: makeUUID("target01"), listingsArchived: [], subscriptionsCancelled: 0,
+        subscriptionsFailed: [], enquiriesAnonymised: 0, buyerDataDeleted: true,
+        buyerDataDeferred: false, accountDeactivated: true, accountClosedEmitted: false,
+      },
+      startedAt: new Date(), completedAt: null, deadline: null,
+      escalatedAt: null, escalationReason: null,
+    })
+
+    const result = await caller.retryStep({ flowId })
+
+    expect(result).toEqual({ flowId, status: "completed" })
+  })
+
+  it("AC-3: retry works for erasure flow type", async () => {
+    // Seed erasure flow failed at last step (emit_erasure_completed, index 5).
+    // Step executor calls bus.emit — succeeds with test bus.
+    const erasureSteps: OrchestratedFlowStep[] = makeErasureSteps().map((s, i) => ({
+      ...s,
+      status: i < 5 ? "completed" as const : "failed" as const,
+      attempt: i < 5 ? 1 : 1,
+      completedAt: i < 5 ? new Date().toISOString() : undefined,
+      error: i === 5 ? "timeout" : undefined,
+    }))
+
+    const flowId = await flowDb.insert({
+      flowType: "erasure",
+      triggeredBy: adminId,
+      status: "failed",
+      steps: erasureSteps,
+      currentStep: 5,
+      context: {
+        accountId: makeUUID("target01"), dsarCaseId: makeUUID("dsar0001"),
+        listingIdsDeleted: [], listingIdsAnonymised: [],
+        freelancerListingsDeleted: 0, companyListingsAnonymised: 0,
+      },
+      startedAt: new Date(), completedAt: null,
+      deadline: new Date(Date.now() + 10 * 86400000),
+      escalatedAt: null, escalationReason: null,
+    })
+
+    const result = await caller.retryStep({ flowId })
+    expect(result.status).toBe("completed")
+  })
+
+  it("rejects retry when flow is not in failed state", async () => {
     const flowId = await insertFlow({ status: "in_progress" })
 
     await expect(caller.retryStep({ flowId }))
       .rejects.toThrow("Flow is not in failed state")
   })
 
-  it("AC-6.10: requires adminProcedure", async () => {
+  it("requires adminProcedure", async () => {
     const flowId = await insertFlow()
     await expect(userCaller.retryStep({ flowId }))
       .rejects.toThrow("Admin access required")
+  })
+
+  it("logs decision before execution", async () => {
+    const closureSteps: OrchestratedFlowStep[] = makeClosureSteps().map((s, i) => ({
+      ...s,
+      status: i < 5 ? "completed" as const : "failed" as const,
+      attempt: i < 5 ? 1 : 1,
+      completedAt: i < 5 ? new Date().toISOString() : undefined,
+      error: i === 5 ? "timeout" : undefined,
+    }))
+
+    const flowId = await flowDb.insert({
+      flowType: "closure",
+      triggeredBy: adminId,
+      status: "failed",
+      steps: closureSteps,
+      currentStep: 5,
+      context: {
+        accountId: makeUUID("target01"), listingsArchived: [], subscriptionsCancelled: 0,
+        subscriptionsFailed: [], enquiriesAnonymised: 0, buyerDataDeleted: true,
+        buyerDataDeferred: false, accountDeactivated: true, accountClosedEmitted: false,
+      },
+      startedAt: new Date(), completedAt: null, deadline: null,
+      escalatedAt: null, escalationReason: null,
+    })
+
+    await caller.retryStep({ flowId })
+
+    const logs = await decisionLogDb.findByDomainAndType("operations", "flow_step_retry")
+    expect(logs.length).toBeGreaterThanOrEqual(1)
+    expect(logs.some((l) => l.decisionType === "flow_step_retry")).toBe(true)
   })
 })
 
@@ -358,7 +492,28 @@ describe("admin.flows.escalate", () => {
 
 describe("AC-6.9: updatedAt tracking", () => {
   it("updatedAt is set on retryStep", async () => {
-    const flowId = await insertFlow({ status: "failed" })
+    // Use a closure flow at the last step — emit_account_closed succeeds with test bus
+    const closureSteps: OrchestratedFlowStep[] = makeClosureSteps().map((s, i) => ({
+      ...s,
+      status: i < 5 ? "completed" as const : "failed" as const,
+      attempt: i < 5 ? 1 : 1,
+      completedAt: i < 5 ? new Date().toISOString() : undefined,
+      error: i === 5 ? "timeout" : undefined,
+    }))
+    const flowId = await flowDb.insert({
+      flowType: "closure",
+      triggeredBy: adminId,
+      status: "failed",
+      steps: closureSteps,
+      currentStep: 5,
+      context: {
+        accountId: makeUUID("target01"), listingsArchived: [], subscriptionsCancelled: 0,
+        subscriptionsFailed: [], enquiriesAnonymised: 0, buyerDataDeleted: true,
+        buyerDataDeferred: false, accountDeactivated: true, accountClosedEmitted: false,
+      },
+      startedAt: new Date(), completedAt: null, deadline: null,
+      escalatedAt: null, escalationReason: null,
+    })
 
     await caller.retryStep({ flowId })
 
@@ -383,5 +538,226 @@ describe("AC-6.9: updatedAt tracking", () => {
 
     const after = await flowDb.findById(flowId)
     expect(after!.updatedAt).not.toBeNull()
+  })
+})
+
+// --- CS-WORK-091: Flow initiation routes ---
+
+const targetAccountId = makeUUID("target01")
+
+async function insertDSARCase(overrides: Partial<{
+  accountId: string
+  status: "open" | "in_progress" | "completed" | "overdue"
+}> = {}) {
+  const [row] = await db.insert(complianceRegister).values({
+    type: "dsar",
+    accountId: overrides.accountId ?? targetAccountId,
+    status: overrides.status ?? "open",
+    receivedAt: new Date(),
+    deadline: new Date(Date.now() + 30 * 86400000),
+  }).returning({ id: complianceRegister.id })
+  return row.id
+}
+
+describe("admin.flows.initiateErasure", () => {
+  it("AC-1: initiates erasure flow and returns flowId + status", async () => {
+    await seedTestUser(db, targetAccountId)
+    const dsarCaseId = await insertDSARCase()
+
+    const result = await caller.initiateErasure({ dsarCaseId, accountId: targetAccountId })
+
+    expect(result.flowId).toBeDefined()
+    expect(typeof result.flowId).toBe("string")
+    expect(result.status).toBeDefined()
+
+    // Verify flow exists in DB
+    const flow = await flowDb.findById(result.flowId)
+    expect(flow).not.toBeNull()
+    expect(flow!.flowType).toBe("erasure")
+    expect(flow!.triggeredBy).toBe(targetAccountId)
+  })
+
+  it("AC-2: rejects when DSAR case does not exist", async () => {
+    await expectTRPCError(
+      caller.initiateErasure({ dsarCaseId: makeUUID("nocase01"), accountId: targetAccountId }),
+      "NOT_FOUND",
+      "DSAR case not found",
+    )
+  })
+
+  it("AC-2: rejects when DSAR case is completed", async () => {
+    await seedTestUser(db, targetAccountId)
+    const dsarCaseId = await insertDSARCase({ status: "completed" })
+
+    await expectTRPCError(
+      caller.initiateErasure({ dsarCaseId, accountId: targetAccountId }),
+      "NOT_FOUND",
+      "DSAR case not found",
+    )
+  })
+
+  it("AC-6: rejects when accountId does not match DSAR case", async () => {
+    const otherAccountId = makeUUID("other001")
+    await seedTestUser(db, targetAccountId)
+    await seedTestUser(db, otherAccountId, "other@example.com")
+    const dsarCaseId = await insertDSARCase({ accountId: targetAccountId })
+
+    await expectTRPCError(
+      caller.initiateErasure({ dsarCaseId, accountId: otherAccountId }),
+      "BAD_REQUEST",
+      "accountId does not match",
+    )
+  })
+
+  it("AC-7: rejects when an active erasure flow already exists", async () => {
+    await seedTestUser(db, targetAccountId)
+    const dsarCaseId = await insertDSARCase()
+
+    // Insert an existing in_progress erasure flow for same account
+    await flowDb.insert({
+      flowType: "erasure",
+      triggeredBy: targetAccountId,
+      status: "in_progress",
+      steps: makeErasureSteps(),
+      currentStep: 1,
+      context: { accountId: targetAccountId },
+      startedAt: new Date(),
+      completedAt: null,
+      deadline: new Date(Date.now() + 20 * 86400000),
+      escalatedAt: null,
+      escalationReason: null,
+    })
+
+    await expectTRPCError(
+      caller.initiateErasure({ dsarCaseId, accountId: targetAccountId }),
+      "CONFLICT",
+      "active erasure flow already exists",
+    )
+  })
+
+  it("AC-7: allows initiation when existing flow is completed", async () => {
+    await seedTestUser(db, targetAccountId)
+    const dsarCaseId = await insertDSARCase()
+
+    // Insert a completed flow — should not block
+    await flowDb.insert({
+      flowType: "erasure",
+      triggeredBy: targetAccountId,
+      status: "completed",
+      steps: makeErasureSteps(),
+      currentStep: 5,
+      context: { accountId: targetAccountId },
+      startedAt: new Date(),
+      completedAt: new Date(),
+      deadline: new Date(Date.now() + 20 * 86400000),
+      escalatedAt: null,
+      escalationReason: null,
+    })
+
+    const result = await caller.initiateErasure({ dsarCaseId, accountId: targetAccountId })
+    expect(result.flowId).toBeDefined()
+  })
+
+  it("AC-4: logs flow_initiation decision", async () => {
+    await seedTestUser(db, targetAccountId)
+    const dsarCaseId = await insertDSARCase()
+
+    await caller.initiateErasure({ dsarCaseId, accountId: targetAccountId })
+
+    const logs = await decisionLogDb.findByDomainAndType("operations", "flow_initiation")
+    expect(logs.some((l) => l.decisionType === "flow_initiation")).toBe(true)
+  })
+
+  it("AC-5: rejects non-admin callers", async () => {
+    await seedTestUser(db, targetAccountId)
+    const dsarCaseId = await insertDSARCase()
+
+    await expectTRPCError(
+      userCaller.initiateErasure({ dsarCaseId, accountId: targetAccountId }),
+      "FORBIDDEN",
+      "Admin access required",
+    )
+  })
+})
+
+describe("admin.flows.initiateClosureForAccount", () => {
+  it("AC-3: initiates closure flow and returns flowId + status", async () => {
+    await seedTestUser(db, targetAccountId)
+
+    const result = await caller.initiateClosureForAccount({ accountId: targetAccountId })
+
+    expect(result.flowId).toBeDefined()
+    expect(typeof result.flowId).toBe("string")
+    expect(result.status).toBeDefined()
+
+    // Verify flow exists in DB
+    const flow = await flowDb.findById(result.flowId)
+    expect(flow).not.toBeNull()
+    expect(flow!.flowType).toBe("closure")
+    expect(flow!.triggeredBy).toBe(targetAccountId)
+  })
+
+  it("AC-7: rejects when an active closure flow already exists", async () => {
+    await seedTestUser(db, targetAccountId)
+
+    // Insert an existing initiated closure flow
+    await flowDb.insert({
+      flowType: "closure",
+      triggeredBy: targetAccountId,
+      status: "initiated",
+      steps: makeClosureSteps(),
+      currentStep: 0,
+      context: { accountId: targetAccountId },
+      startedAt: new Date(),
+      completedAt: null,
+      deadline: null,
+      escalatedAt: null,
+      escalationReason: null,
+    })
+
+    await expectTRPCError(
+      caller.initiateClosureForAccount({ accountId: targetAccountId }),
+      "CONFLICT",
+      "active closure flow already exists",
+    )
+  })
+
+  it("AC-7: allows initiation when existing flow is failed", async () => {
+    await seedTestUser(db, targetAccountId)
+
+    // Insert a failed flow — should not block
+    await flowDb.insert({
+      flowType: "closure",
+      triggeredBy: targetAccountId,
+      status: "failed",
+      steps: makeClosureSteps(),
+      currentStep: 1,
+      context: { accountId: targetAccountId },
+      startedAt: new Date(),
+      completedAt: null,
+      deadline: null,
+      escalatedAt: null,
+      escalationReason: null,
+    })
+
+    const result = await caller.initiateClosureForAccount({ accountId: targetAccountId })
+    expect(result.flowId).toBeDefined()
+  })
+
+  it("AC-4: logs flow_initiation decision", async () => {
+    await seedTestUser(db, targetAccountId)
+
+    await caller.initiateClosureForAccount({ accountId: targetAccountId })
+
+    const logs = await decisionLogDb.findByDomainAndType("operations", "flow_initiation")
+    expect(logs.some((l) => l.decisionType === "flow_initiation")).toBe(true)
+  })
+
+  it("AC-5: rejects non-admin callers", async () => {
+    await expectTRPCError(
+      userCaller.initiateClosureForAccount({ accountId: targetAccountId }),
+      "FORBIDDEN",
+      "Admin access required",
+    )
   })
 })

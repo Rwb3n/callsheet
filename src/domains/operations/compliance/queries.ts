@@ -1,5 +1,6 @@
-// Compliance query interfaces — Ops §3.2 (checkComplianceHold), Ops §3.3 (getDSARStatus)
+// Compliance query interfaces — Ops §3.2 (checkComplianceHold), Ops §3.3 (getDSARStatus), Ops §3.6 (closeDSARCase)
 // CS-WORK-060 AC-5.1, AC-5.2, AC-5.8, AC-5.9
+// CS-WORK-083 AC-9, AC-10 (closeDSARCase)
 
 import { eq, and, inArray, sql, gt, lt, isNotNull } from "drizzle-orm"
 import { complianceRegister } from "@/db/schema/operations"
@@ -161,4 +162,53 @@ export async function getDSARStatus(db: Db): Promise<DSARDashboardView> {
         dueDate: d.deadline!.toISOString(),
       })),
   }
+}
+
+// --- closeDSARCase (Ops §3.6) ---
+// Mutation. Called by erasure flow step 5 — NOT via event bus [XI-11].
+// Updates DSAR case status → completed. Inserts erasure_audit compliance record.
+// Clearing the hold is automatic: checkComplianceHold queries for status: "open".
+
+export type CloseDSARCaseParams = {
+  dsarCaseId: string
+  accountId: string
+  auditData: {
+    listingIdsDeleted: string[]
+    listingIdsAnonymised: string[]
+    freelancerListingsDeleted: number
+    companyListingsAnonymised: number
+    accountHash: string
+  }
+}
+
+export async function closeDSARCase(
+  db: Db,
+  params: CloseDSARCaseParams,
+): Promise<{ completed: boolean }> {
+  const now = new Date()
+
+  // Close the DSAR case
+  await db
+    .update(complianceRegister)
+    .set({ status: "completed", completedAt: now })
+    .where(eq(complianceRegister.id, params.dsarCaseId))
+
+  // Insert erasure audit record
+  await db.insert(complianceRegister).values({
+    type: "erasure_audit",
+    accountId: params.accountId,
+    status: "completed",
+    completedAt: now,
+    details: {
+      dsarCaseId: params.dsarCaseId,
+      accountHash: params.auditData.accountHash,
+      listingIdsDeleted: params.auditData.listingIdsDeleted,
+      listingIdsAnonymised: params.auditData.listingIdsAnonymised,
+      freelancerListingsDeleted: params.auditData.freelancerListingsDeleted,
+      companyListingsAnonymised: params.auditData.companyListingsAnonymised,
+      completedAt: now.toISOString(),
+    },
+  })
+
+  return { completed: true }
 }

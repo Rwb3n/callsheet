@@ -31,7 +31,7 @@ export const taskSpecStatusEnum = pgEnum("task_spec_status", [
 ])
 
 export const complianceEntryTypeEnum = pgEnum("compliance_entry_type", [
-  "dsar", "erasure", "article_14", "complaint", "investigation", "obligation",
+  "dsar", "erasure", "erasure_audit", "article_14", "complaint", "investigation", "obligation",
 ])
 
 export const complianceEntryStatusEnum = pgEnum("compliance_entry_status", [
@@ -203,6 +203,7 @@ export const pendingCancellations = pgTable(
   },
   (table) => [
     index("pending_cancellations_paddle_sub_idx").on(table.paddleSubscriptionId),
+    uniqueIndex("pending_cancellations_sub_reason_idx").on(table.paddleSubscriptionId, table.reason),
   ],
 )
 

@@ -3,18 +3,18 @@
 
 import { z } from "zod"
 import { TRPCError } from "@trpc/server"
-import { eq } from "drizzle-orm"
+import { eq, and, inArray } from "drizzle-orm"
 import { router, protectedProcedure } from "@/server/trpc"
 import type { Db } from "@/db/types"
 import { accountProfiles } from "@/db/schema/accounts"
 import type { EmailPreferences } from "@/db/schema/accounts"
-import { listings } from "@/db/schema/data-and-listings"
-import { executeOrchestratedFlow } from "@/lib/flows"
+import { orchestratedFlows } from "@/db/schema/shared"
 import type { FlowDb } from "@/lib/flows"
-import type { FlowStepDefinition } from "@/lib/flows"
 import type { InProcessEventBus } from "@/lib/events/bus"
 import type { WaitUntilFn } from "@/lib/events/waitUntil"
 import type { PaymentService } from "@/lib/services/types"
+import type { SchedulerDb } from "@/lib/scheduler/api"
+import { initiateAccountClosure } from "@/lib/flows"
 
 // --- Email preference categories (SI §5.3: 4 subscribable) ---
 
@@ -32,14 +32,6 @@ const updateEmailPrefInput = z.object({
   enabled: z.boolean(),
 })
 
-// --- Closure flow context ---
-
-type ClosureContext = {
-  accountId: string
-  listingsArchived: string[]
-  subscriptionsCancelled: string[]
-}
-
 // --- Deps ---
 
 export type SettingsRouterDeps = {
@@ -48,101 +40,7 @@ export type SettingsRouterDeps = {
   bus: InProcessEventBus
   waitUntilFn: WaitUntilFn
   payment: PaymentService
-}
-
-// --- Closure step builders (PP §5: 6 steps) ---
-
-function buildClosureSteps(deps: SettingsRouterDeps): FlowStepDefinition<ClosureContext>[] {
-  return [
-    {
-      name: "archive_listings",
-      domain: "data-and-listings",
-      skippable: false,
-      async execute(ctx) {
-        const owned = await deps.db
-          .select({ id: listings.id, lifecycleStatus: listings.lifecycleStatus })
-          .from(listings)
-          .where(eq(listings.accountId, ctx.accountId))
-
-        for (const listing of owned) {
-          if (listing.lifecycleStatus === "archived") continue
-          await deps.db
-            .update(listings)
-            .set({ lifecycleStatus: "archived", updatedAt: new Date() })
-            .where(eq(listings.id, listing.id))
-          ctx.listingsArchived.push(listing.id)
-        }
-      },
-    },
-    {
-      name: "cancel_subscriptions",
-      domain: "commercial",
-      skippable: false,
-      async execute(ctx) {
-        // Cancel all active Paddle subscriptions for archived listings
-        const owned = await deps.db
-          .select({
-            id: listings.id,
-            paddleSubscriptionId: listings.paddleSubscriptionId,
-          })
-          .from(listings)
-          .where(eq(listings.accountId, ctx.accountId))
-
-        for (const listing of owned) {
-          if (!listing.paddleSubscriptionId) continue
-          await deps.payment.cancelSubscription({
-            paddleSubscriptionId: listing.paddleSubscriptionId,
-            reason: "account_closed",
-            effectiveFrom: "immediately",
-          })
-          ctx.subscriptionsCancelled.push(listing.paddleSubscriptionId)
-        }
-      },
-    },
-    {
-      name: "anonymise_buyer_data",
-      domain: "platform",
-      skippable: true,
-      async execute(_ctx) {
-        // S10 implements full anonymisation. S5 no-op placeholder.
-      },
-    },
-    {
-      name: "delete_defer_buyer_data",
-      domain: "platform",
-      skippable: true,
-      async execute(_ctx) {
-        // S10 implements delete/defer with compliance hold check. S5 no-op placeholder.
-      },
-    },
-    {
-      name: "deactivate_account",
-      domain: "platform",
-      skippable: false,
-      async execute(ctx) {
-        await deps.db
-          .update(accountProfiles)
-          .set({ suppressedAt: new Date(), suppressionReason: "account_closed", updatedAt: new Date() })
-          .where(eq(accountProfiles.accountId, ctx.accountId))
-      },
-    },
-    {
-      name: "emit_account_closed",
-      domain: "platform",
-      skippable: false,
-      async execute(ctx) {
-        await deps.bus.emit(
-          "account_closed",
-          {
-            _brand: "AccountClosedEvent" as const,
-            accountId: ctx.accountId,
-            listingsArchived: ctx.listingsArchived,
-          },
-          deps.waitUntilFn,
-        )
-      },
-    },
-  ]
+  schedulerDb: SchedulerDb
 }
 
 // --- Router ---
@@ -192,18 +90,37 @@ export function createSettingsRouter(deps: SettingsRouterDeps) {
 
     // AC-40, AC-41: account closure initiates orchestrated flow
     initiateAccountClosure: protectedProcedure.mutation(async ({ ctx }) => {
-      const steps = buildClosureSteps(deps)
+      // Guard: prevent duplicate concurrent closure flows (mirrors admin.flows.initiateClosureForAccount)
+      const [existingFlow] = await deps.db
+        .select({ id: orchestratedFlows.id })
+        .from(orchestratedFlows)
+        .where(
+          and(
+            eq(orchestratedFlows.flowType, "closure"),
+            eq(orchestratedFlows.triggeredBy, ctx.session.accountId),
+            inArray(orchestratedFlows.status, ["initiated", "in_progress"]),
+          ),
+        )
+        .limit(1)
 
-      const result = await executeOrchestratedFlow(deps.flowDb, {
-        flowType: "closure",
-        triggeredBy: ctx.session.accountId,
-        steps,
-        initialContext: {
-          accountId: ctx.session.accountId,
-          listingsArchived: [],
-          subscriptionsCancelled: [],
+      if (existingFlow) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "An active closure flow already exists for this account",
+        })
+      }
+
+      const result = await initiateAccountClosure(
+        {
+          db: deps.db,
+          flowDb: deps.flowDb,
+          bus: deps.bus,
+          waitUntilFn: deps.waitUntilFn,
+          payment: deps.payment,
+          schedulerDb: deps.schedulerDb,
         },
-      })
+        ctx.session.accountId,
+      )
 
       return { flowId: result.flowId, status: result.status }
     }),
