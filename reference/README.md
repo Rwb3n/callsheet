@@ -14,4 +14,4 @@ The 4RFV records in `4rfv_directory.db` are NOT used for listing seeding. P1 see
 
 Permitted use of this file: aggregate category/subcategory counts for internal decision support (density mapping), nothing else. Any proposal to extract records must cite a lawful basis and update this file first.
 
-The file was removed from git tracking on 2026-07-10. It remains in pushed GitHub history pending a history purge (tracked in session log).
+The file was removed from git tracking on 2026-07-10 and purged from all git history the same day (`git filter-repo`, force-pushed; pre-purge backup bundle retained locally at `../callsheet-pre-purge-2026-07-10.bundle`). Old commit SHAs may remain resolvable on GitHub's servers until their garbage collection runs; contact GitHub support if immediate object removal is required.
