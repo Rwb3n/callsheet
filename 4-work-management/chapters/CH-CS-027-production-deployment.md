@@ -3,7 +3,8 @@ id: CH-CS-027
 title: Production Deployment
 arc: deployment-e2
 epoch: CS-E2
-status: Planned
+status: Superseded
+superseded_by: CH-CS-029/CH-CS-030 (venture-p1 arc — CH-primary seed replaces 4RFV import; see phase-gate-model.md)
 depends: [CH-CS-026]
 work_items: [CS-WORK-126, CS-WORK-127, CS-WORK-128]
 ---

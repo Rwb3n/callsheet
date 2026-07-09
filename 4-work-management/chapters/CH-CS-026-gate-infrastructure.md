@@ -3,7 +3,8 @@ id: CH-CS-026
 title: Gate Infrastructure
 arc: deployment-e2
 epoch: CS-E2
-status: Planned
+status: Superseded
+superseded_by: venture-p1 arc (browser E2E/journeys move behind P2 gate; see phase-gate-model.md)
 depends: [CH-CS-019, CH-CS-020]
 work_items: [CS-WORK-123, CS-WORK-124, CS-WORK-125]
 ---

@@ -9,6 +9,10 @@ started: 2026-03-29
 
 # Epoch CS-E2: Operational Readiness
 
+## Re-scope (2026-07-10)
+
+Deployment is now governed by `0-strategic-frame/phase-gate-model.md` (signal-gated venture model). The deployment arc below is superseded by `venture-p1` (CH-CS-028–031): P1 ships an inert, read-only, CH-verified directory; claim loop, enquiries, Paddle, and S9 activate only behind recorded gates. Exit criteria referencing full-platform deployment, 4rfv import, and Paddle live are void — replaced by the venture-p1 arc's P1 definition of done. The three interface layers (R1/R2/R3) remain built and regression-tested; they enable per-phase, not at once.
+
 ## Definition
 
 Make CALLSHEET deployable, operable, and usable by three principals: human users (browser), human admins (browser), and machine agents (CLI). CS-E1 built the complete backend (54 tables, 118 tRPC procedures, 25 events, 48 consumers, 37 deferred actions, 12 flow steps, 1,863 tests). CS-E2 wraps that backend in production-ready interfaces and deploys it.

@@ -1,8 +1,8 @@
 # Implementation Tracker
 
 **Status:** Active
-**Epoch:** CS-E2 (Operational Readiness)
-**Last updated:** 2026-03-30
+**Epoch:** CS-E2 (Operational Readiness — re-scoped 2026-07-10 to the signal-gated venture model, see `0-strategic-frame/phase-gate-model.md`)
+**Last updated:** 2026-07-10
 
 ---
 
@@ -694,6 +694,19 @@ Both items independent — completed in parallel.
 
 ---
 
+### Venture P1 Arc (adopted 2026-07-10 — supersedes deployment-e2 / CH-CS-026 / CH-CS-027)
+
+Deployment authority: `0-strategic-frame/phase-gate-model.md`. CS-WORK-123–128 retired unused.
+
+| Chapter | Work Items | AC | Status |
+|---------|-----------|----|--------|
+| CH-CS-028 Inertness & Takedown | CS-WORK-129–133 | 22 | **Active** — all 5 items independent |
+| CH-CS-029 CH Seed Pipeline | CS-WORK-134–136 | 14 | Planned (136 principal-gated: CH API key, prod DB) |
+| CH-CS-030 P1 Deploy | CS-WORK-137–138 | 8 | Planned (principal-gated: domain, GSC, Vercel/Supabase) |
+| CH-CS-031 P2 Prep (build-ahead) | CS-WORK-139–141 | 14 | Planned (enablement gated by Gate Record entry) |
+
+---
+
 ## Completion Log
 
 | Date | Work Item | AC | Notes |
@@ -805,6 +818,7 @@ Both items independent — completed in parallel.
 | 2026-03-30 | CS-WORK-117 | 5 | Subscription + analytics pages. Subscription shows tier, renewal, grace period, upgrade CTA via `subscription.getSubscriptionStatus`. Analytics shows stat cards, quality score, decay warning, tier gate via `dashboard.getListingDashboard`. 0 type errors. **CH-CS-021 code complete (3/3, 12/12 AC).** |
 | 2026-03-30 | CS-WORK-118 | 4 | Tasks admin page. Wired to `admin.tasks.list`. Status color dots, priority badges, domain display. 0 type errors. |
 | 2026-03-30 | CS-WORK-119 | 5 | Scheduler + decisions + user admin pages. 3 new pages (scheduler queue, decision log with filters, user list). Admin sidebar updated with 3 new nav items (11 total). 0 type errors. **CH-CS-022 code complete (2/2, 9/9 AC). presentation-e2 arc complete.** |
+| 2026-07-10 | — | — | **Venture model adopted.** Signal-gated phase model (external spike 2026-07-09) adopted as deployment authority: `phase-gate-model.md` + Amendments 1 (P1/P2 decoupling) and 2 (P2 deliverability validity). deployment-e2 arc + CH-CS-026/027 superseded; venture-p1 arc created (CH-CS-028–031, 58 AC, CS-WORK-129–141). 4RFV database removed from repo tracking, quarantined to `reference/` with recorded non-use decision (spike B.1). March working tree (S10 + CS-E2, ~40 work items) committed and pushed in 4 commits. Health verified: 0 type errors, 850 unit + 1215 integration pass. |
 
 ---
 

@@ -2,12 +2,17 @@
 
 Running register of outstanding retro actions. Managed by `/triage-retros`. Do not edit manually.
 
-**Last triaged:** 2026-03-30 (session-2026-03-30-retro)
+**Last triaged:** 2026-07-10 (venture model adoption — P0 items added)
 
 | Source | # | Item | Priority | Owner | Definition of Done |
 |--------|---|------|----------|-------|--------------------|
-| ch-cs-014-w4-w9-retro | 2 | Create Vercel project + configure 3 CI secrets | next | Principal | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` set in GitHub repo secrets. CI deploy job passes on main push. |
-| ch-cs-014-w4-w9-retro | 3 | Configure production env vars in Vercel dashboard | next | Principal | All 14 vars from `.env.production.example` set in Vercel environment settings. App boots successfully in production. |
+| venture-p0 | 0.1 | **Verify `callsheet.co.uk` ownership** — resolves to parked host (88.208.252.9, no TLS); launch tracker says registration "Not started". Scope-changing if squatted | now | Principal | Ownership confirmed and DNS controllable, or alternate domain decided. Blocks CS-WORK-138. |
+| venture-p0 | 0.2 | Google Search Console + analytics property | now | Principal | GSC property verified for the production domain. P1 gate unreadable without it. |
+| venture-p0 | 0.3 | Companies House live API key | now | Principal | Key issued and stored. Blocks CS-WORK-136 (seed verify) and CS-WORK-139 (real CH client). |
+| venture-p0 | 0.4 | Google Ads Basic access re-application | next | Principal | Keyword Planner accessible; demand cell of Wedge Decision Record re-scored before P1 content build completes (pre-registered flip condition). |
+| venture-p0 | 0.6 | Seed enrichment acceleration decision — 492-record cut at 33/492 on autonomous nightly drip (~92 nights); alternatives: search API (~£8) or assisted pass (~20h) | next | Principal | Enriched CSV for ≥150 launch records delivered to CS-WORK-134. |
+| ch-cs-014-w4-w9-retro | 2 | Create Vercel project + configure 3 CI secrets (= venture P0.5a) | next | Principal | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` set in GitHub repo secrets. CI deploy job passes on main push. |
+| ch-cs-014-w4-w9-retro | 3 | Configure production env vars in Vercel dashboard (= venture P0.5b; per P1 default-off list in CS-WORK-137, NOT the full 14-var list) | next | Principal | P1 env set per `phase-gate-model.md` default-off list. App boots in production, inert. |
 | ~~ch-cs-014-retro~~ | ~~1~~ | ~~Add browser-mode Playwright tests for search and dashboard pages~~ | ~~next~~ | ~~S7+ or E2E Phase 2~~ | **CLOSED — verified manually via Chrome DevTools MCP (2026-03-06).** AC-20, AC-30, AC-31 all render correctly with live tRPC data. Browser Playwright deferred to post-launch: 948 integration tests cover route logic, browser tests add marginal value vs maintenance cost at this stage. |
 | ~~cs-work-051-retro~~ | ~~1~~ | ~~Wire production event bus singleton for server components~~ | ~~next~~ | ~~Platform~~ | **DONE.** `emit.ts` uses `createProductionAppServices()` (singleton, fully wired bus). `createProductionAppServices()` passes `emailService` + `waitUntilFn` to `getEventBus()` so CR/Ops consumers register. |
 | ~~cs-work-051-retro~~ | ~~2~~ | ~~Create `toThrowTRPCError(code)` test helper~~ | ~~next~~ | ~~Platform~~ | **DONE.** `expectTRPCError(promise, code, messageSubstring?)` in `test-fixtures.ts`. 3 test files updated (crud, subscription, listing-edit — 22 call sites). |

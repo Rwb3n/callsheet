@@ -1,9 +1,19 @@
 # Entity Architecture — Design Frame
 
-**Status:** Active
-**Last updated:** 2026-02-12
+**Status:** Active — design authority only; deployment authority is `phase-gate-model.md` (see Deployment Posture below)
+**Last updated:** 2026-07-10
 **Scope:** Framework-level document. CALLSHEET is the current instance.
-**Revision:** v2 — adds composability principle, sub-entity hierarchy, black box contracts. Informed by concept design phase (5 domains, 341 stress-test scenarios).
+**Revision:** v2.1 — adds Deployment Posture addendum (2026-07-10). v2 added composability principle, sub-entity hierarchy, black box contracts.
+
+## Deployment Posture (addendum, 2026-07-10)
+
+This frame governs *design*: sub-entity boundaries, contracts, decision architectures. It no longer governs *deployment sequencing*. Deployment and feature enablement are governed exclusively by `phase-gate-model.md` — five phases (P1 Inert Directory → P5 Autonomy), each with numeric kill/proceed gates measured on market signal, not thesis completion.
+
+Consequences for this frame:
+
+- **The entity thesis is deferred, not deleted.** S9 (entity intelligence) and autonomy graduation activate only at the P5 gate, in shadow mode first, and must beat a holdout. All design principles in this document remain binding on *how* systems are built.
+- **Design for gating.** Sub-entity consumers and Layer 4 integrations must be enableable/inertable via environment gates at the event-consumer registry (`src/lib/events/singleton.ts`) — inertness is verifiable, not assumed.
+- **Sunk cost containment.** The scale of what is already built is not an argument for enabling it. Any early-activation proposal cites the P5 gate row or does not proceed.
 
 ---
 

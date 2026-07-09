@@ -1,50 +1,33 @@
 ---
 id: deployment-e2
 epoch: CS-E2
-status: Planned
+status: Superseded
 depends: [api-completion, presentation-e2]
 chapters: [CH-CS-026, CH-CS-027]
+superseded_by: venture-p1 (phase-gate-model.md adoption, 2026-07-10)
 ---
 
 # Arc: Deployment (CS-E2)
 
-## Mission
+**Superseded 2026-07-10.** The full-platform deployment thesis this arc encoded (deploy everything, import ~4,700 scraped 4RFV listings, Paddle live at launch) is replaced by the signal-gated phase model (`0-strategic-frame/phase-gate-model.md`). Replacement arc: `venture-p1`.
 
-Deploy CALLSHEET to production. Provision infrastructure, run data import, verify all 4 deployment quality gates, and promote to the production URL. Absorbs the scope from CS-E1's superseded deployment arc, with expanded gate-based verification.
+Disposition of scope:
 
-## Prerequisites
+- **CH-CS-026 (Gate Infrastructure)** — superseded. Browser E2E + journey tests move behind the P2 gate (authenticated UI is inert at P1). `callsheet smoke` / `data validate` (CH-CS-019) carry forward into venture-p1 as-is.
+- **CH-CS-027 (Production Deployment)** — superseded. 4RFV record import is **prohibited** (Seed Source Register: counts-only; database quarantined 2026-07-10). Seeding is Companies House-primary at 500 curated records. Paddle live is P4 scope. Infrastructure provisioning carries into CH-CS-030.
+- Work item IDs CS-WORK-123–128 are retired unused; venture-p1 items start at CS-WORK-129.
 
-- api-completion arc complete (all operational routes available for smoke testing)
-- presentation-e2 blockers resolved (CH-CS-020: error boundaries + homepage)
-- Principal-gated external prerequisites: Vercel project created, Supabase production project, DNS configured, Paddle live account, ICO registration, Companies House API key
+Original mission and exit criteria retained below for the record.
 
-## Scope
+## Mission (superseded)
 
-### CH-CS-026: Gate Infrastructure (~3 work items, ~15 AC)
+Deploy CALLSHEET to production. Provision infrastructure, run data import, verify all 4 deployment quality gates, and promote to the production URL.
 
-Build the testing infrastructure defined in `deployment-gates.md`.
+## Exit Criteria (superseded)
 
-| Work Item | Gate | Deliverables |
-|-----------|------|-------------|
-| Browser E2E tests | Gate 1 | 5-10 Playwright browser-mode tests for critical paths (sign up, search, dashboard, admin, enquiry) |
-| User journey tests | Gate 4 | 7 Playwright journey tests (anonymous browse, sign up + create listing, claim, subscribe, enquiry, admin dashboard, account closure) |
-| CI pipeline enhancement | Gates 1-4 | Enhanced `.github/workflows/deploy.yml` with gate-sequenced jobs, manual approval for production promotion |
-
-Note: `callsheet smoke` (Gate 2) and `callsheet data validate` (Gate 3) are built in the agent-cli arc (CH-CS-019).
-
-### CH-CS-027: Production Deployment (~3 work items, ~12 AC)
-
-| Work Item | Deliverables |
-|-----------|-------------|
-| Infrastructure provisioning | Supabase production project, `drizzle-kit migrate`, `db:custom-sql`, env var configuration, Vercel project + secrets |
-| 4rfv data import | Import pipeline execution, Gate 3 validation, quality score bulk recalculation |
-| Go-live verification | Gate 2 smoke against production, Gate 4 journeys against production, Paddle live webhook verification, Article 14 notice batch (if ICO registration complete) |
-
-## Exit Criteria
-
-- [ ] All 4 deployment quality gates pass against production
-- [ ] Platform accessible at production URL (callsheet.co.uk)
-- [ ] ~4,700 listings searchable with computed quality scores
-- [ ] Paddle checkout completes in live mode
-- [ ] CI deploys to production on main push (gated by all 4 gates)
-- [ ] Agent can run `callsheet smoke --env production` and all checks pass
+- [ ] ~~All 4 deployment quality gates pass against production~~
+- [ ] ~~Platform accessible at production URL (callsheet.co.uk)~~
+- [ ] ~~4,700 listings searchable with computed quality scores~~
+- [ ] ~~Paddle checkout completes in live mode~~
+- [ ] ~~CI deploys to production on main push (gated by all 4 gates)~~
+- [ ] ~~Agent can run `callsheet smoke --env production` and all checks pass~~
