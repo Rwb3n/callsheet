@@ -172,6 +172,10 @@ describe("account_closed consumer", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     }, waitUntilFn)
     await Promise.all(getPromises())
 

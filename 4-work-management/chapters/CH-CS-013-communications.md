@@ -3,7 +3,7 @@ id: CH-CS-013
 title: Communications Infrastructure
 arc: infrastructure
 epoch: CS-E1
-status: Done
+status: Complete
 depends: null
 work_items: [CS-WORK-025, CS-WORK-026, CS-WORK-027, CS-WORK-028]
 ---

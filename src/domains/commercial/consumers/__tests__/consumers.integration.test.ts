@@ -516,6 +516,10 @@ describe("account_closed consumer", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [listing.id],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     // Win-back cancelled
@@ -543,6 +547,10 @@ describe("account_closed consumer", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [listing.id],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     const logs = await db.select().from(churnAnalysisLog)
@@ -556,6 +564,10 @@ describe("account_closed consumer", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
     // No error thrown
   })

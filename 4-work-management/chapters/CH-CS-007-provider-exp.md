@@ -3,7 +3,7 @@ id: CH-CS-007
 title: Provider Experience
 arc: provider-experience
 epoch: CS-E1
-status: Active
+status: Complete
 depends: [CH-CS-004, CH-CS-005, CH-CS-006]
 work_items: [CS-WORK-043, CS-WORK-044, CS-WORK-045, CS-WORK-046, CS-WORK-047, CS-WORK-048, CS-WORK-049]
 ---

@@ -1,8 +1,8 @@
 # Implementation Tracker
 
 **Status:** Active
-**Epoch:** CS-E1 (Platform Build)
-**Last updated:** 2026-03-08
+**Epoch:** CS-E2 (Operational Readiness)
+**Last updated:** 2026-03-30
 
 ---
 
@@ -10,11 +10,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Work items complete | **7 / 7 (S0)**, **6 / 6 (S1)**, **2 / 2 (S1 Seed)**, **4 / 4 (Comms P1)**, **10 / 10 (S2)**, **4 / 4 (S3)**, **8 / 8 (S4)**, **7 / 7 (S5)**, **7 / 7 (S6)**, **9 / 9 (S7)**, **9 / 9 (S8)**, **8 / 8 (S9)** |
-| AC verified (unit/integration/e2e) | **52 / 51 (S0)**, **42 / 42 (S1)**, **9 / 9 (S1 Seed)**, **17 / 17 (Comms P1)**, **41 / 41 (S2)**, **48 / 48 (S3)**, **47 / 50 + 3 e2e (S4)**, **46 / 46 (S5)**, **49 / 52 (S6)**, **101 / 101 (S7)**, **93 / 93 (S8)**, **101 / 101 (S9)**, 646 / 806 (total) |
+| Work items complete | **7 / 7 (S0)**, **6 / 6 (S1)**, **2 / 2 (S1 Seed)**, **4 / 4 (Comms P1)**, **10 / 10 (S2)**, **4 / 4 (S3)**, **8 / 8 (S4)**, **7 / 7 (S5)**, **7 / 7 (S6)**, **9 / 9 (S7)**, **9 / 9 (S8)**, **8 / 8 (S9)**, **8 / 8 (S10)**, **8 / 8 (CH-CS-015)**, **4 / 4 (CH-CS-016)**, **3 / 3 (CH-CS-017)**, **4 / 4 (CH-CS-018)**, **3 / 3 (CH-CS-019)**, **2 / 2 (CH-CS-020)**, **1 / 1 (CH-CS-023)**, **1 / 1 (CH-CS-024)**, **1 / 1 (CH-CS-025)**, **3 / 3 (CH-CS-021)**, **2 / 2 (CH-CS-022)** |
+| AC verified (unit/integration/e2e) | **52 / 51 (S0)**, **42 / 42 (S1)**, **9 / 9 (S1 Seed)**, **17 / 17 (Comms P1)**, **41 / 41 (S2)**, **48 / 48 (S3)**, **47 / 50 + 3 e2e (S4)**, **46 / 46 (S5)**, **49 / 52 (S6)**, **101 / 101 (S7)**, **93 / 93 (S8)**, **101 / 101 (S9)**, **72 / 72 (S10)**, 718 / 878 (E1 total), **37 / 37 (CH-CS-015)**, **22 / 22 (CH-CS-016)**, **12 / 12 (CH-CS-017)**, **19 / 19 (CH-CS-018)**, **14 / 14 (CH-CS-019)**, **8 / 8 (CH-CS-020)**, **6 / 6 (CH-CS-023)**, **5 / 5 (CH-CS-024)**, **6 / 6 (CH-CS-025)**, **12 / 12 (CH-CS-021)**, **9 / 9 (CH-CS-022)** |
 | AC deferred to E2E | 6 (see E2E Debt below) |
-| Slices with code | **S0 complete**, **S1 complete**, **S1 Seed complete**, **Comms Phase 1 complete**, **S2 complete**, **S3 complete**, **S4 complete**, **S5 complete**, **S6 complete**, **S7 complete**, **S8 complete**, **S9 complete** |
-| Tests passing | 1723 (690 unit + 1026 integration + 7 E2E). 0 pre-existing failures. |
+| Slices with code | **S0 complete**, **S1 complete**, **S1 Seed complete**, **Comms Phase 1 complete**, **S2 complete**, **S3 complete**, **S4 complete**, **S5 complete**, **S6 complete**, **S7 complete**, **S8 complete**, **S9 complete**, **S10 complete** |
+| Tests passing | 2073 (850 unit + 1215 integration + 8 E2E). 0 pre-existing failures. |
 | Type errors | 0 |
 
 ---
@@ -358,6 +358,40 @@ CS-WORK-075 (Schema + Seed, 0 AC) ✅
 
 ---
 
+## S10: Hardening — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-083 | GDPR erasure flow wiring | 10/10 | **done** | — | 084, 087, 088 | `src/lib/flows/erasure.ts`, `src/lib/scheduler/handlers/auto-escalation-check.ts`, `src/domains/operations/compliance/queries.ts` |
+| CS-WORK-084 | processErasure implementation | 12/12 | **done** | ~~083~~ | 087, 088 | `src/domains/data-and-listings/erasure/process-erasure.ts`, `src/lib/flows/erasure.ts`, `src/domains/data-and-listings/erasure/__tests__/process-erasure.test.ts`, `src/domains/data-and-listings/erasure/__tests__/process-erasure.integration.test.ts` |
+| CS-WORK-085 | Account closure flow wiring | 8/8 | **done** | — | 086, 087, 088 | `src/lib/flows/closure.ts`, `src/lib/flows/__tests__/closure.test.ts`, `src/lib/flows/__tests__/closure.integration.test.ts`, `src/lib/events/types.ts`, `src/server/routers/admin/flows.ts`, `src/server/routers/settings.ts`, `src/db/schema/operations.ts` |
+| CS-WORK-086 | Closure data operations | 9/9 | **done** | ~~085~~ | 087, 088 | `src/lib/flows/closure.ts`, `src/lib/scheduler/handlers/compliance-hold-recheck.ts`, `src/lib/flows/__tests__/closure-data-ops.integration.test.ts`, `src/server/routers/settings.ts` |
+| CS-WORK-087 | Concurrent flow interaction | 6/6 | **done** | ~~083, 084, 085, 086~~ | 088 | `src/lib/flows/__tests__/concurrent-flows.integration.test.ts` |
+| CS-WORK-088 | End-to-end validation and failure injection | 12/12 | **done** | ~~083, 084, 085, 086, 087~~ | — | `src/lib/flows/__tests__/erasure-e2e.integration.test.ts`, `closure-e2e.integration.test.ts`, `concurrent-e2e.integration.test.ts` |
+| CS-WORK-089 | Autonomy graduation | 7/7 | **done** | — | 090 | `src/domains/intelligence/graduation/*`, `src/server/routers/admin/graduation.ts` |
+| CS-WORK-090 | Algorithm versioning and controlled rollout | 8/8 | **done** | ~~089~~ | — | `src/domains/intelligence/graduation/algorithm-rollout.ts`, `graduation.ts` (+2 routes), `algorithm-rollout.test.ts`, `algorithm-rollout.integration.test.ts` |
+
+**S10 total:** 72/72 AC verified. 8/8 work items done. **S10 code complete.**
+
+### S10 Dependency Graph
+
+```
+CS-WORK-083 (Erasure Flow, 10 AC) ✅
+  └──▶ CS-WORK-084 (processErasure, 12 AC) ✅
+         └──▶ CS-WORK-087 (Concurrent Flows, 6 AC) ✅
+                └──▶ CS-WORK-088 (E2E Validation, 12 AC) ✅
+
+CS-WORK-085 (Closure Flow, 8 AC) ✅
+  └──▶ CS-WORK-086 (Closure Data Ops, 9 AC) ✅
+         └──▶ CS-WORK-087 (also blocked by 086) ✅
+                └──▶ CS-WORK-088 (also blocked by 087) ✅
+
+CS-WORK-089 (Autonomy Graduation, 7 AC) ✅
+  └──▶ CS-WORK-090 (Algorithm Rollout, 8 AC) ✅
+```
+
+---
+
 ## E2E Debt
 
 ACs deferred to E2E verification, classified by verification category. See `1-investigation/e2e-verification-workflow.md` for full analysis, tooling recommendation, and phased build plan.
@@ -440,7 +474,7 @@ ACs deferred to E2E verification, classified by verification category. See `1-in
 | S7: Operations | CH-CS-009 | buyer-and-operations | **9 work items** (CS-WORK-057 through CS-WORK-065, 101 AC) | complete |
 | S8: Commercial | CH-CS-010 | commercial-and-intelligence | **9 work items** (CS-WORK-066 through CS-WORK-074, 93 AC) | complete |
 | **S9: Entity Intel** | **CH-CS-011** | **commercial-and-intelligence** | **8 work items** (CS-WORK-075 through CS-WORK-082, 101 AC) | **complete** |
-| S10: Hardening | CH-CS-012 | hardening | not decomposed | — |
+| **S10: Hardening** | **CH-CS-012** | **hardening** | **8 work items** (CS-WORK-083 through CS-WORK-090, 72 AC) | **complete (8/8)** |
 
 ---
 
@@ -462,6 +496,201 @@ Created 2026-02-19 as part of CS-WORK-001.
 | Styling | Tailwind CSS v4 |
 | Tests | Vitest + @vitest/coverage-v8 |
 | Path alias | `@/*` → `src/*` |
+
+---
+
+## CS-E2: Operational Readiness
+
+### CH-CS-015: Operational Routes — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-091 | Erasure and closure flow initiation routes | 7/7 | **done** | — | — | `src/server/routers/admin/flows.ts`, `src/server/root.ts` |
+| CS-WORK-092 | Flow retry execution fix | 4/4 | **done** | — | — | `src/server/routers/admin/flows.ts` |
+| CS-WORK-093 | Scheduler visibility routes | 6/6 | **done** | — | — | `src/server/routers/admin/scheduler.ts` |
+| CS-WORK-094 | Decision log search route | 4/4 | **done** | — | — | `src/server/routers/admin/decisions.ts` |
+| CS-WORK-095 | Notification management routes | 3/3 | **done** | — | — | `src/server/routers/admin/notifications.ts` |
+| CS-WORK-096 | User and account management routes | 5/5 | **done** | — | — | `src/server/routers/admin/users.ts` |
+| CS-WORK-097 | Listing admin routes | 3/3 | **done** | — | — | `src/server/routers/admin/listings.ts` |
+| CS-WORK-098 | Task management routes | 5/5 | **done** | — | — | `src/server/routers/admin/tasks.ts` |
+
+**CH-CS-015 total:** 37/37 AC verified. 8/8 work items complete. **CH-CS-015 code complete.**
+
+### Dependency Graph
+
+```
+CS-WORK-091 (Erasure/Closure Initiation, 7 AC) ✅
+CS-WORK-092 (Flow Retry Fix, 4 AC) ✅
+CS-WORK-093 (Scheduler Visibility, 6 AC) ✅
+CS-WORK-094 (Decision Log Search, 4 AC) ✅
+CS-WORK-095 (Notification Mgmt, 3 AC) ✅
+CS-WORK-096 (User/Account Mgmt, 5 AC) ✅
+CS-WORK-097 (Listing Admin, 3 AC) ✅
+CS-WORK-098 (Task Mgmt, 5 AC) ✅
+
+All 8 items are independent — fully parallelisable.
+```
+
+---
+
+### CH-CS-016: Machine Auth — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-099 | API key infrastructure | 6/6 | **done** | — | 100 | `src/db/schema/shared.ts` (api_keys table), `src/lib/api-keys/index.ts` |
+| CS-WORK-100 | API key admin routes | 4/4 | **done** | ~~099~~ | — | `src/server/routers/admin/api-keys.ts` |
+
+| CS-WORK-101 | CS-E2 audit critical + high fixes | 7/7 | **done** | — | — | `route.ts`, `auth-instance.ts`, `flows.ts`, `api-keys.ts`, `scheduler.ts`, `notifications.ts`, `0017_*.sql` |
+| CS-WORK-102 | CS-E2 audit medium fixes | 5/5 | **done** | — | — | `users.ts`, `api-keys.ts`, `tasks.ts`, `flows.ts`, `db/index.ts` |
+
+**CH-CS-016 total:** 22/22 AC verified. 4/4 work items complete. **CH-CS-016 code complete.**
+
+### Dependency Graph
+
+```
+CS-WORK-099 (API Key Infrastructure, 6 AC) ✅
+  └──▶ CS-WORK-100 (API Key Admin Routes, 4 AC) ✅
+
+CS-WORK-101 (Audit Critical+High, 7 AC) ✅
+CS-WORK-102 (Audit Medium, 5 AC) ✅
+```
+
+---
+
+### CH-CS-017: CLI Scaffold — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-103 | CLI bootstrap and framework | 5/5 | **done** | — | 104, 105 | `src/cli/index.ts`, `src/cli/config.ts`, `src/cli/client.ts`, `src/cli/output.ts`, `src/cli/errors.ts` |
+| CS-WORK-104 | CLI auth commands | 4/4 | **done** | ~~103~~ | — | `src/cli/commands/auth.ts` |
+| CS-WORK-105 | CLI config commands | 3/3 | **done** | ~~103~~ | — | `src/cli/commands/config.ts` |
+
+**CH-CS-017 total:** 12/12 AC verified. 3/3 work items complete. **CH-CS-017 code complete.**
+
+### Dependency Graph
+
+```
+CS-WORK-103 (CLI Bootstrap, 5 AC) ✅
+  ├──▶ CS-WORK-104 (CLI Auth Commands, 4 AC) ✅
+  └──▶ CS-WORK-105 (CLI Config Commands, 3 AC) ✅
+```
+
+---
+
+### CH-CS-018: CLI Operational — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-106 | CLI flow management commands | 5/5 | **done** | ~~103~~ | — | `src/cli/commands/flows.ts` |
+| CS-WORK-107 | CLI compliance and support commands | 5/5 | **done** | ~~103~~ | — | `src/cli/commands/compliance.ts` |
+| CS-WORK-108 | CLI billing and events commands | 4/4 | **done** | ~~103~~ | — | `src/cli/commands/billing.ts` |
+| CS-WORK-109 | CLI scheduler, health, and decisions commands | 5/5 | **done** | ~~103~~ | — | `src/cli/commands/scheduler.ts` |
+
+**CH-CS-018 total:** 19/19 AC verified. 4/4 work items complete. **CH-CS-018 code complete.**
+
+### Dependency Graph
+
+```
+CS-WORK-103 (CLI Bootstrap — from CH-CS-017) ✅
+  ├──▶ CS-WORK-106 (Flow Mgmt Commands, 5 AC) ✅
+  ├──▶ CS-WORK-107 (Compliance/Support Commands, 5 AC) ✅
+  ├──▶ CS-WORK-108 (Billing/Events Commands, 4 AC) ✅
+  └──▶ CS-WORK-109 (Scheduler/Health/Decisions Commands, 5 AC) ✅
+```
+
+---
+
+### CH-CS-019: CLI Intelligence — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-110 | CLI intelligence commands | 4/4 | **done** | ~~103~~ | — | `src/cli/commands/intelligence.ts` |
+| CS-WORK-111 | CLI graduation commands | 4/4 | **done** | ~~103~~ | — | `src/cli/commands/graduation.ts` |
+| CS-WORK-112 | CLI gate commands (smoke + data validate) | 6/6 | **done** | ~~103~~ | — | `src/cli/commands/gates.ts` |
+
+**CH-CS-019 total:** 14/14 AC verified. 3/3 work items complete. **CH-CS-019 code complete.**
+
+### Dependency Graph
+
+```
+CS-WORK-103 (CLI Bootstrap — from CH-CS-017) ✅
+  ├──▶ CS-WORK-110 (Intelligence Commands, 4 AC) ✅
+  ├──▶ CS-WORK-111 (Graduation Commands, 4 AC) ✅
+  └──▶ CS-WORK-112 (Gate Commands, 6 AC) ✅
+```
+
+---
+
+### CH-CS-020: Deployment Blockers — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-113 | Error boundaries and loading states | 4/4 | **done** | — | — | `error.tsx`, `global-error.tsx`, `not-found.tsx`, `loading.tsx` (root + dashboard + admin) |
+| CS-WORK-114 | Homepage | 4/4 | **done** | — | — | `src/app/page.tsx` |
+
+**CH-CS-020 total:** 8/8 AC verified. 2/2 work items complete. **CH-CS-020 code complete.**
+
+### Dependency Graph
+
+```
+CS-WORK-113 (Error Boundaries/Loading States, 4 AC) ✅
+CS-WORK-114 (Homepage, 4 AC) ✅
+
+Both items independent — completed in parallel.
+```
+
+---
+
+### CH-CS-023: SEO — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-120 | SEO infrastructure | 6/6 | **done** | — | — | `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/layout.tsx` (metadata) |
+
+**CH-CS-023 total:** 6/6 AC verified. 1/1 work items complete. **CH-CS-023 code complete.**
+
+---
+
+### CH-CS-024: Image Optimization — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-121 | Image optimization and Next.js config | 5/5 | **done** | — | — | `next.config.ts` |
+
+**CH-CS-024 total:** 5/5 AC verified. 1/1 work items complete. **CH-CS-024 code complete.**
+
+---
+
+### CH-CS-025: Auth Hardening — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-122 | Middleware and ownership enforcement | 6/6 | **done** | — | — | `src/middleware.ts` |
+
+**CH-CS-025 total:** 6/6 AC verified. 1/1 work items complete. **CH-CS-025 code complete.**
+
+---
+
+### CH-CS-021: Dashboard Completion — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-115 | Settings page | 4/4 | **done** | — | — | `src/app/dashboard/settings/page.tsx` |
+| CS-WORK-116 | Notifications page | 3/3 | **done** | — | — | `src/app/dashboard/notifications/page.tsx` |
+| CS-WORK-117 | Subscription and analytics pages | 5/5 | **done** | — | — | `subscription/page.tsx`, `analytics/page.tsx` |
+
+**CH-CS-021 total:** 12/12 AC verified. 3/3 work items complete. **CH-CS-021 code complete.**
+
+---
+
+### CH-CS-022: Admin Completion — Work Items
+
+| ID | Title | AC | Status | Blocked By | Blocks | Artifacts |
+|----|-------|----|--------|------------|--------|-----------|
+| CS-WORK-118 | Tasks admin page | 4/4 | **done** | — | — | `src/app/admin/tasks/page.tsx` |
+| CS-WORK-119 | Scheduler, decisions, and user admin pages | 5/5 | **done** | — | — | `scheduler/page.tsx`, `decisions/page.tsx`, `users/page.tsx`, `admin-sidebar.tsx` |
+
+**CH-CS-022 total:** 9/9 AC verified. 2/2 work items complete. **CH-CS-022 code complete.**
 
 ---
 
@@ -536,6 +765,46 @@ Created 2026-02-19 as part of CS-WORK-001.
 | 2026-03-07 | CS-WORK-080 | 15 | Entity learning and commercial intelligence. 7 handlers: `learning_hypothesis_analysis` (L1-L7 measurement, confound detection, inputsHash ceremony logging), `proactive_churn_detection` (engagement_dropping 30% decline + billing_cadence_switch_to_monthly, emits churn_risk_detected), `revenue_health_extended` (8 S9 extension fields on commercial_state), `sponsored_placement_learning` (quality floor + fairness cap from decision logs), `conversion_funnel_analysis` (per-gate friction ratio, 5:1 threshold escalation), `operational_health_review` (L1-L7 + ticket trends + task rates), `contractor_performance_review` (quarterly, insufficientData guard). 2 admin intelligence routes. 3-agent parallel delegation. 64 unit + 9 integration tests. 0 type errors. |
 | 2026-03-07 | CS-WORK-081 | 9 | Event consumers — D&L perception. 10 intelligence consumer handlers: `profile_viewed` (dedup via `deduplicateProfileView` + viewer demographics), `account_closed` (no-op — D&L consumer handles), `contact_attempt` (unreachable → `evaluateDecayResponse`), `decay_signal_detected` (`hasActiveTicket` annotation on `checkDetails`), `listing_created` (schedule `quality_score_recalculation` + enrichment schedules at unclaimed cadence), `profile_edited` (freshness reset + quality recalc), `claim_approved` (quality recalc + enrichment upgrade to claimed + L2/L3 hypothesis tracking), `search_performed` (per-listing `aggregateSearchTerm`), `shortlist_added` (quality calibration signal), `enquiry_submitted` (calibration + outreach prioritisation). 4 shared helpers in `helpers.ts`. `registerIntelligenceConsumers` barrel. `"intelligence"` added to `Domain` union + 10 `EVENT_CONSUMER_MATRIX` entries. 12 unit + 9 integration tests. 0 type errors. |
 | 2026-03-08 | CS-WORK-082 | 8 | Event consumers — CR/Ops and matrix wiring. 5 intelligence consumer handlers: `subscription_tier_changed` (revenue signal + paid enrichment upgrade on tier upgrade), `subscription_ended` (churn analysis for all 3 origins, paddle win-back attribution), `conversion_milestone` (per-gate attribution via decision log correlation, organic fallback), `winback_delivery_result` (delivered/failed tracking), `enquiry_responded` (delegates to `computeEnquiryResponseInsights`). +5 `EVENT_CONSUMER_MATRIX` entries (15 total intelligence). `registerIntelligenceConsumers` wired into `getEventBus()` singleton. 20 unit + 5 integration tests. 2 existing tests updated for matrix cascade. 0 type errors. **S9 code complete (8/8 work items, 101/101 AC). CH-CS-011 complete.** |
+| 2026-03-28 | CS-WORK-083 | 10 | GDPR erasure flow wiring. `buildErasureSteps(deps)` — 6-step flow definition with step executors for steps 1-3/5-6, step 4 placeholder for CS-WORK-084. `ErasureContext` type, `initiateErasureFlow()` with 30-day deadline + deadline proximity scheduling. `closeDSARCase()` mutation (compliance_register status→completed + erasure_audit record). `registerAutoEscalationCheckHandler` for deadline proximity alerts (7d alert, 3d escalate, 0d critical). SKIP_CONSTRAINTS key fix (`close_support_tickets`→`close_active_tickets`). Schema migration: `"erasure_audit"` added to `complianceEntryTypeEnum`. 5 unit + 10 integration tests. 0 type errors. **S10 first work item — unblocks CS-WORK-084.** |
+| 2026-03-28 | CS-WORK-085 | 8 | Account closure flow wiring. `buildClosureSteps(deps)` — 5-step flow definition with step executors. `ClosureContext` type, `initiateAccountClosure()` with 30-day deadline + deadline proximity scheduling. `AccountClosedEvent` amended (+3 fields: `listingIds`, `subscriptionTier`, `complianceHoldActive`). SKIP_CONSTRAINTS closure keys renamed to match step names. Settings router refactored to import from `flows/closure.ts`. Unique index on `pending_cancellations(paddleSubscriptionId, reason)`. 4 unit + 12 integration tests. 0 type errors. **Unblocks CS-WORK-086.** |
+| 2026-03-29 | CS-WORK-084 | 12 | processErasure implementation. `processErasureRequest(deps)` — D&L erasure operations: listing anonymisation, media deletion, taxonomy/engagement/quality cleanup, search index removal. Wired as erasure flow step 4. Full unit + integration test coverage. 0 type errors. **Unblocks CS-WORK-087 (with 086).** |
+| 2026-03-29 | CS-WORK-086 | 9 | Closure data operations. Closure flow steps 3-4 wired: archive listings + deactivate account with subscription cancellation, compliance hold recheck scheduling, grace period cleanup. `compliance_hold_recheck` handler registered. Settings router amended with `schedulerDb` dependency. 0 type errors. **Unblocks CS-WORK-087 (with 084).** |
+| 2026-03-29 | CS-WORK-087 | 6 | Concurrent flow interaction. Erasure-blocks-closure and closure-blocks-erasure mutual exclusion tested. In-progress flow detection, correct error propagation, step-level isolation between independent flows. Integration test coverage in `concurrent-flows.integration.test.ts`. 0 type errors. **Unblocks CS-WORK-088.** |
+| 2026-03-29 | CS-WORK-088 | 12 | End-to-end validation and failure injection. 3 integration test files: `erasure-e2e` (15 tests — 6 per-step failure injection, attempt counter, context round-trip, prior-step non-re-execution, D2 sub-step skip, auto-escalation, deadline proximity 3-tier), `closure-e2e` (11 tests — 6 per-step failure injection, non-skippable rejection, skippable skip with reason/adminId), `concurrent-e2e` (4 tests — concurrent flow coexistence with compliance hold lifecycle, recheck reschedule/delete). Controllable-step wrapper pattern + dep-level R2 failure injection for AC-51. 0 unit + 30 integration tests. 0 type errors. |
+| 2026-03-29 | CS-WORK-089 | 7 | Autonomy graduation. `evaluateGraduation(deps)` — 4-domain readiness assessment (D&L, Ops, CR, Intelligence) with per-domain metric queries, threshold evaluation, and composite graduation scoring. `dispatchGraduation(deps)` — applies graduated autonomy level changes with decision logging. `createAdminGraduationRouter(deps)` with evaluate + dispatch routes. Cross-domain `Domain` type in shared schema. 6 unit + 6 integration tests. 0 type errors. **Unblocks CS-WORK-090.** |
+| 2026-03-29 | CS-WORK-090 | 8 | Algorithm versioning and controlled rollout. `selectAlgorithmVersion` (CRC32 deterministic bucketing), `scoreListingDuringRollout` (dual V1/V2 scoring + `algorithm_comparison` decision log), `handleRolloutPercentageChange` (boundary detection + `quality_score_recalculation` scheduling + `graduation_evaluation` logging), `checkAlgorithmRollbackTrigger` (declassification rate >10% → rollback), `evaluateAlgorithmRolloutGraduation` (4-week stability at 100% with <5% declassification). +2 admin routes (`algorithmRollout`, `algorithmComparison`). `evaluate.ts` stub replaced with real implementation. 7 unit + 12 integration tests. 0 type errors. **S10 code complete (8/8 work items, 72/72 AC). CH-CS-012 complete. CS-E1 Platform Build complete.** |
+| 2026-03-29 | CS-WORK-091 | 7 | Erasure and closure flow initiation routes. `admin.flows.initiateErasure` (DSAR case validation, accountId cross-check, duplicate flow guard) + `admin.flows.initiateClosureForAccount` (duplicate flow guard). `AdminFlowsRouterDeps` widened (+5 deps). `root.ts` +storage to admin deps. Decision logging (flow_initiation type). 13 integration tests. 0 type errors. **CS-E2 first work item complete.** |
+| 2026-03-30 | CS-WORK-092 | 4 | Flow retry execution fix. `retryStep` now calls `resumeFlow()` via `buildStepDefinitions()` helper — reconstructs erasure/closure step definitions from deps and actually re-executes the failed step. Removed manual step state manipulation (double attempt-increment bug). Returns `{ flowId, status }` result. Also: duplicate flow guard added to `settings.initiateAccountClosure` (retro action fix). 6 retry integration tests + 1 settings guard test. 0 type errors. |
+| 2026-03-30 | CS-WORK-093 | 6 | Scheduler visibility routes. New `admin.scheduler` sub-router with 4 routes: `list` (paginated, status/action filters, createdAt cursor), `getDetail`, `trigger` (forces immediate execution by setting executeAt to now), `cancel` (with reason + cancelledBy). Wired into admin index. 14 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-094 | 4 | Decision log search route. New `admin.decisions` sub-router with `search` route — paginated, filterable by domain, decisionType, date range, listingId, accountId. Returns full rows including inputs/output JSONB. Wired into admin index. 5 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-095 | 3 | Notification management routes. New `admin.notifications` sub-router: `list` (cross-account, type/dismissed filters, cursor pagination), `dismiss` (soft-delete by ID). 6 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-096 | 5 | User and account management routes. New `admin.users` sub-router: `list` (search by name/email, role filter, cursor pagination), `getDetail` (user + accountProfile), `updateRole`. 11 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-097 | 3 | Listing admin routes. New `admin.listings` sub-router: `suspend` (sets lifecycleStatus=suspended), `unsuspend` (restores to active). Guards for already-suspended and not-suspended states. 7 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-098 | 5 | Task management routes. New `admin.tasks` sub-router: `list` (domain/status/priority filters, cursor pagination), `getDetail`, `create` (full TaskSpec fields), `updateStatus` (sets completedAt on completion). 11 integration tests. 0 type errors. **CH-CS-015 code complete (8/8 work items, 37/37 AC).** |
+| 2026-03-30 | CS-WORK-099 | 6 | API key infrastructure. `api_keys` table (keyHash, keyPrefix, scopes, revokedAt, lastUsedAt). `generateApiKey()` (crypto-random 32-byte, SHA-256 hash), `validateApiKey()` (DB lookup, revocation check, AuthSession construction, lastUsedAt update). 5 unit + 6 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-100 | 4 | API key admin routes. New `admin.apiKeys` sub-router: `create` (generates key, returns plaintext once), `list` (shows prefix only, never full key), `revoke` (sets revokedAt). 9 integration tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-101 | 7 | CS-E2 audit critical+high fixes. Bearer auth wired to HTTP handler (`extractSession` checks `Authorization: Bearer`, calls `validateApiKey`). Auth-instance uses production Resend when `RESEND_API_KEY` set. retryStep bounds check. Scopes removed from create input (V2-reserved). lastUsedAt awaited. 3 mutations return `{ success: true }`. Migration `0017` generated for api_keys table. 0 type errors. |
+| 2026-03-30 | CS-WORK-102 | 5 | CS-E2 audit medium fixes. users.list role filter → z.enum. API key create/revoke audit logging via logDecision (api_key_created, api_key_revoked). tasks.create max lengths (500/2000/500). buildStepDefinitions extension comment. db/index.ts +3 missing schema imports (operations, intelligence, commercial). 0 type errors. **CH-CS-016 code complete (4/4, 22/22 AC). api-completion arc complete.** |
+| 2026-03-30 | CS-WORK-103 | 5 | CLI bootstrap and framework. Commander.js program with `callsheet` name + `--help`/`--version`. Config module (`~/.callsheet/config.json` read/write). tRPC vanilla client factory with Bearer auth header. Output formatter (JSON default + cli-table3 table). Error handler mapping tRPC errors to exit codes (0/1/2). New deps: commander, chalk, cli-table3. 27 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-104 | 4 | CLI auth commands. `callsheet auth login/logout/whoami/token`. Login saves token+URL to config, logout clears, whoami verifies via `admin.health`, token shows masked key. 8 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-105 | 3 | CLI config commands. `callsheet config show/set-url/set-token`. Show displays config path+values (token masked), set-url/set-token update individual fields. 7 unit tests. 0 type errors. **CH-CS-017 code complete (3/3, 12/12 AC).** |
+| 2026-03-30 | CS-WORK-106 | 5 | CLI flow commands. 7 commands: list (status/type/cursor/limit), get, retry, skip, escalate, initiate-erasure (dsarCaseId+accountId), initiate-closure (accountId). Type-safe against actual admin.flows Zod schemas. 11 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-107 | 5 | CLI compliance + support commands. 4 compliance (list/get/create/update) + 5 support (list/get/create/update/priority). Enum casts for status/priority/type unions. 15 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-108 | 4 | CLI billing + events commands. 4 billing (status/reconcile/holds/release) + 3 events (list/resolve/retry). Events list uses --resolved/--unresolved boolean flags. 12 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-109 | 5 | CLI scheduler + health + decisions commands. 4 scheduler (list/get/trigger/cancel) + health (getStatus) + decisions search (domain/type/account/listing/date filters). 12 unit tests. 0 type errors. **CH-CS-018 code complete (4/4, 19/19 AC).** |
+| 2026-03-30 | CS-WORK-110 | 4 | CLI intelligence commands. 6 query commands: quality distribution, decay signals (status/severity filters), enrichment status (tier filter), ceremonies (type filter), learning hypotheses, revenue health. 10 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-111 | 4 | CLI graduation commands. 5 commands: status (sub-entity/capability filters), history, override (boolean from string), rollout (percentage), algorithm comparison. 10 unit tests. 0 type errors. |
+| 2026-03-30 | CS-WORK-112 | 6 | CLI gate commands. `callsheet smoke` (4 infrastructure checks: tRPC, auth, search, admin health) with --env/--check options. `callsheet data validate` (4 data checks: search, health, quality, enrichment) with --check option. Both output JSON with per-check pass/fail + exit code. 6 unit tests. 0 type errors. **CH-CS-019 code complete (3/3, 14/14 AC). agent-cli arc complete.** |
+| 2026-03-30 | CS-WORK-113 | 4 | Error boundaries + loading states. `global-error.tsx` (own html/body), `error.tsx` + `not-found.tsx` + `loading.tsx` at root level, `error.tsx` + `loading.tsx` at dashboard and admin levels. Skeleton-based loading UI. Error digest display + try-again + navigation. 8 files created. 0 type errors. |
+| 2026-03-30 | CS-WORK-114 | 4 | Homepage. Hero section (headline, description, 2 CTAs), value proposition (3 cards: quality ranked, verified, built for broadcast), how it works (3 steps: search, compare, connect), pricing preview (£199/year, link to /pricing), bottom CTA. Responsive. Metadata with SEO title/description. Replaces placeholder. 0 type errors. **CH-CS-020 code complete (2/2, 8/8 AC).** |
+| 2026-03-30 | CS-WORK-120 | 6 | SEO infrastructure. Dynamic `sitemap.ts` (static pages + active listings from DB), `robots.ts` (disallow /api, /dashboard, /admin, /login, /signup). Root layout metadata: title template (`%s | Callsheet`), metadataBase, OG tags. JSON-LD pre-satisfied on provider profiles. 0 type errors. **CH-CS-023 code complete (1/1, 6/6 AC).** |
+| 2026-03-30 | CS-WORK-121 | 5 | Image optimization + Next.js config. `next.config.ts`: remotePatterns for R2 + cdn.callsheet.co.uk, security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy). No `<img>` tags to migrate (pre-satisfied). 0 type errors. **CH-CS-024 code complete (1/1, 5/5 AC).** |
+| 2026-03-30 | CS-WORK-122 | 6 | Auth hardening middleware. `src/middleware.ts`: /dashboard/* redirects to /login with ?redirect param, /admin/* requires admin role (non-admin→/dashboard), public paths pass through, API routes excluded. Uses Better Auth getAuthInstance(). Route matcher excludes _next/static. 0 type errors. **CH-CS-025 code complete (1/1, 6/6 AC).** |
+| 2026-03-30 | CS-WORK-115 | 4 | Settings page. Email preferences wired to `settings.getEmailPreferences` + `updateEmailPreference`. Account closure with confirmation flow calling `settings.initiateAccountClosure`. 0 type errors. |
+| 2026-03-30 | CS-WORK-116 | 3 | Notifications page. Wired to `notification.list` with dismiss + mark-read mutations. Unread badge, read opacity. 0 type errors. |
+| 2026-03-30 | CS-WORK-117 | 5 | Subscription + analytics pages. Subscription shows tier, renewal, grace period, upgrade CTA via `subscription.getSubscriptionStatus`. Analytics shows stat cards, quality score, decay warning, tier gate via `dashboard.getListingDashboard`. 0 type errors. **CH-CS-021 code complete (3/3, 12/12 AC).** |
+| 2026-03-30 | CS-WORK-118 | 4 | Tasks admin page. Wired to `admin.tasks.list`. Status color dots, priority badges, domain display. 0 type errors. |
+| 2026-03-30 | CS-WORK-119 | 5 | Scheduler + decisions + user admin pages. 3 new pages (scheduler queue, decision log with filters, user list). Admin sidebar updated with 3 new nav items (11 total). 0 type errors. **CH-CS-022 code complete (2/2, 9/9 AC). presentation-e2 arc complete.** |
 
 ---
 

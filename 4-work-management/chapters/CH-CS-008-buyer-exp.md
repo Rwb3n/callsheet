@@ -3,7 +3,7 @@ id: CH-CS-008
 title: Buyer Experience
 arc: buyer-and-operations
 epoch: CS-E1
-status: Active
+status: Complete
 depends: CH-CS-007
 work_items: [CS-WORK-050, CS-WORK-051, CS-WORK-052, CS-WORK-053, CS-WORK-054, CS-WORK-055, CS-WORK-056]
 ---

@@ -1,7 +1,7 @@
 ---
 id: buyer-and-operations
 epoch: CS-E1
-status: Planned
+status: Complete
 depends: provider-experience
 chapters: [CH-CS-008, CH-CS-009]
 ---

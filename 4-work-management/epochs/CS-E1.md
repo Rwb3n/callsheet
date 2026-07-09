@@ -4,10 +4,11 @@
 
 **Epoch ID:** CS-E1
 **Name:** Platform Build
-**Status:** Active
+**Status:** Complete
 **Started:** 2026-02-19
+**Completed:** 2026-03-29
 **Prior:** null (first CALLSHEET epoch)
-**Next:** CS-E2 (Runtime Intelligence — requires production data)
+**Next:** CS-E2 (Operational Readiness)
 
 ---
 
@@ -35,8 +36,8 @@ V1 platform implementation from requirements phase output. Does NOT include: Lay
 | buyer-and-operations | CH-CS-008, CH-CS-009 | S6, S7 | Done |
 | presentation | CH-CS-014 | Cross-cut S0–S6 | Done |
 | commercial-and-intelligence | CH-CS-010, CH-CS-011 | S8, S9 | Done |
-| hardening | CH-CS-012 | S10 | Planned |
-| deployment | — | Production infra + 4rfv import | Planned (principal-gated) |
+| hardening | CH-CS-012 | S10 | Done |
+| deployment | — | Production infra + 4rfv import | Superseded — absorbed into CS-E2 |
 
 ### Critical Path
 
@@ -46,12 +47,12 @@ S0 → S1 → S5 → S8 → S10 (5 sequential gates). Parallelisation: S2|S3|S4,
 
 ## Exit Criteria
 
-- [ ] All 693 acceptance criteria pass (Unit/Integration/E2E per AC test type)
-- [ ] All 45 tables deployed to Supabase PostgreSQL
-- [ ] All 25 event types wired with consumers per EVENT_CONSUMER_MATRIX
-- [ ] All 34 deferred actions registered and scheduled
-- [ ] CI/CD pipeline green (lint, type-check, unit, integration)
-- [ ] Production deployment on Vercel
+- [x] All 693 acceptance criteria pass — 718 verified (scope grew: 54 tables, 37 deferred actions, 48 consumers). 1,863 tests (727 unit + 1,129 integration + 7 E2E). 0 type errors.
+- [x] All tables deployed to Supabase PostgreSQL (local dev). 54 tables across 8 schema files.
+- [x] All 25 event types wired with 48 consumers per EVENT_CONSUMER_MATRIX.
+- [x] 37 deferred actions declared, 30 with handlers, 18 self-perpetuating.
+- [x] CI/CD pipeline green (lint, type-check, unit, integration, E2E, Vercel deploy job).
+- [ ] Production deployment on Vercel — **carried forward to CS-E2** (Operational Readiness). Principal-gated prerequisites (Companies House, ICO, Paddle live account) not yet complete.
 
 ---
 

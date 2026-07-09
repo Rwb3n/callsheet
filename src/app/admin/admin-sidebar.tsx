@@ -3,6 +3,7 @@
 
 "use client"
 
+import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -16,6 +17,9 @@ const ADMIN_NAV_ITEMS = [
   { href: "/admin/compliance", label: "Compliance" },
   { href: "/admin/flows", label: "Flows" },
   { href: "/admin/events", label: "Events" },
+  { href: "/admin/scheduler", label: "Scheduler" },
+  { href: "/admin/decisions", label: "Decisions" },
+  { href: "/admin/users", label: "Users" },
   { href: "/admin/health", label: "Health" },
 ] as const
 
@@ -24,6 +28,29 @@ type NavItem = { href: string; label: string; exact?: boolean }
 function isActive(pathname: string, item: NavItem): boolean {
   if (item.exact) return pathname === item.href
   return pathname === item.href || pathname.startsWith(item.href + "/")
+}
+
+function AdminSignOutButton() {
+  const [loading, setLoading] = useState(false)
+
+  async function handleSignOut() {
+    setLoading(true)
+    await fetch("/api/auth/sign-out", { method: "POST", credentials: "include" })
+    document.cookie = "better-auth.session_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    document.cookie = "__Secure-better-auth.session_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure"
+    window.location.href = "/"
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleSignOut}
+      disabled={loading}
+      className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground disabled:opacity-50"
+    >
+      {loading ? "Signing out..." : "Sign out"}
+    </button>
+  )
 }
 
 export function AdminSidebar() {
@@ -53,6 +80,15 @@ export function AdminSidebar() {
             </li>
           ))}
         </ul>
+        <div className="mt-4 border-t border-sidebar-border pt-4">
+          <Link
+            href="/dashboard"
+            className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+          >
+            Dashboard
+          </Link>
+          <AdminSignOutButton />
+        </div>
       </nav>
     </aside>
   )

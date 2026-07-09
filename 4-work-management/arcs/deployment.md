@@ -1,9 +1,10 @@
 ---
 id: deployment
 epoch: CS-E1
-status: Planned
+status: Superseded
 depends: commercial-and-intelligence
 chapters: []
+superseded_by: CS-E2 (deployment arc)
 ---
 
 # Arc: Deployment
@@ -28,9 +29,11 @@ This arc consumes the outputs of `5-launch-readiness/LAUNCH-READINESS-TRACKER.md
 
 ## Exit Criteria
 
-- [ ] Platform accessible at production URL
-- [ ] ~4,700 4rfv listings searchable
-- [ ] Paddle checkout completes in live mode
-- [ ] Article 14 notices dispatched (30-day clock started)
-- [ ] Admin dashboard shows real operational data
-- [ ] CI deploys to production on main push
+**Superseded.** These exit criteria are carried forward to `CS-E2 > deployment` arc with expanded scope (agent CLI operability, API key auth, presentation polish).
+
+- [ ] ~~Platform accessible at production URL~~
+- [ ] ~~4,700 4rfv listings searchable~~
+- [ ] ~~Paddle checkout completes in live mode~~
+- [ ] ~~Article 14 notices dispatched~~
+- [ ] ~~Admin dashboard shows real operational data~~
+- [ ] ~~CI deploys to production on main push~~

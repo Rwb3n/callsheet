@@ -127,6 +127,10 @@ describe("account_closed consumer (AC-87)", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: "acct-001",
       listingsArchived: ["list-001", "list-002"],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
   })
 })

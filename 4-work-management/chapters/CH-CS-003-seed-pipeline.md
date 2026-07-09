@@ -3,7 +3,7 @@ id: CH-CS-003
 title: Seed Pipeline
 arc: infrastructure
 epoch: CS-E1
-status: Active
+status: Complete
 depends: CH-CS-002
 work_items: [CS-WORK-021, CS-WORK-022, CS-WORK-024]
 ---

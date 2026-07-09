@@ -51,9 +51,12 @@ function SignOutButton() {
 
   async function handleSignOut() {
     setLoading(true)
-    await fetch("/api/auth/sign-out", { method: "POST" })
-    // Full reload to clear RSC cache — ensures header shows "Sign In"
-    window.location.replace("/")
+    await fetch("/api/auth/sign-out", { method: "POST", credentials: "include" })
+    // Clear session cookies client-side to ensure header RSC re-renders as unauthenticated
+    document.cookie = "better-auth.session_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    document.cookie = "__Secure-better-auth.session_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure"
+    // Full document reload
+    window.location.href = "/"
   }
 
   return (

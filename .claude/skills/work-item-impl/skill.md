@@ -94,6 +94,8 @@ For each deliverable file in the WORK.md, launch parallel checks:
 
    **UUID-vs-text cross-table comparison audit:** Any SQL that joins or compares columns across tables must verify both sides have matching Postgres types. Known uuid-vs-text pairs: `churn_analysis_log.account_id` (uuid) vs `listings.account_id` (text), `decision_logs.account_id` (uuid) vs Better Auth user IDs (text). Drizzle's `eq()` does not catch this at compile time — it only fails at runtime with `operator does not exist: uuid = text`. Fix with `::text` cast on the uuid side, or use `additionalContext` instead of `accountId` when logging decisions with Better Auth text IDs.
 
+   **String literal key rename cascade:** When the work item renames a string literal key in a constraint map, config object, or `Record<string, ...>` (e.g., SKIP_CONSTRAINTS step names, CADENCE_MAP keys), grep for the old key in `__tests__/` and `seed/` directories. List all test fixture files and demo seed files that construct objects with the old key — they must be updated too. Fallback defaults (e.g., `?? true`) mask the mismatch, so tests pass despite stale data.
+
 3. **Pattern reference** — read ONE recent completed work item's primary source file from the same slice or same domain as a code style reference. Pick the most recently completed sibling (same `chapter:` or same `arc:`).
 
 4. **Fixture and helper signature check** — before writing any test code, read actual function signatures for helpers this work item will use. Grep `src/db/test-fixtures.ts` and `src/db/test-utils.ts` for:
@@ -104,7 +106,7 @@ For each deliverable file in the WORK.md, launch parallel checks:
    - `invokeHandler` — from `src/lib/scheduler/handlers/__tests__/invoke-handler.ts`
    - Any other test helper referenced in the AC or deliverables
 
-5. **Enum value pre-read** — if any deliverable or AC involves inserting/filtering on a `pgEnum` column, read the enum definition in the relevant `src/db/schema/*.ts` file. Never guess enum values from spec terminology — the pgEnum literal values are authoritative.
+5. **Enum value pre-read** — if any deliverable or AC involves inserting/filtering on a `pgEnum` column, read the enum definition in the relevant `src/db/schema/*.ts` file. Never guess enum values from spec terminology — the pgEnum literal values are authoritative. If the work item *adds* a new pgEnum value (not just reads existing ones), include `DATABASE_URL=... npx drizzle-kit push` as a prerequisite step in the implementation order before any integration tests. The TypeScript type change compiles but the DB rejects the insert at runtime until the enum is pushed.
 
 6. **Wrapper API check** — if deliverables involve `NotificationDb`, `SchedulerDb`, or `DecisionLogDb`, grep for existing usage patterns in sibling implementations. The public API is wrapper functions (`logDecision()`, `scheduleDeferredAction()`, `createNotification()`) — not the raw interface methods (`.insert()`). Check how the nearest sibling calls them before writing the first invocation.
 

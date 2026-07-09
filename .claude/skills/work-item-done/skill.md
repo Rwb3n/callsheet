@@ -113,6 +113,8 @@ Run these checks after updating the tracker:
 
 6. **Chapter close-out** — if this is the final work item in its chapter (all siblings have `status: done`), verify: (a) chapter YAML `status:` is updated to `complete`, (b) tracker summary row totals match, (c) arc file exit criteria are met.
 
+7. **Arc close-out** — if this chapter close-out means all chapters in the arc are now complete (check the arc file's `chapters:` list, verify each has `status: Complete`), update the arc YAML `status: Complete`. This prevents stale arc statuses from accumulating — the CS-E1 closure found 4 arcs still marked Active despite all their chapters being done.
+
 ---
 
 ### Step 6: Report

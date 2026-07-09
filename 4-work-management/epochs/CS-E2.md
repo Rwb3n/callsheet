@@ -1,76 +1,116 @@
 ---
 id: CS-E2
-name: Runtime Intelligence
-status: Planned
+name: Operational Readiness
+status: Active
 prior: CS-E1
-next: null
-started: null
+next: CS-E3
+started: 2026-03-29
 ---
 
-# Epoch CS-E2: Runtime Intelligence
+# Epoch CS-E2: Operational Readiness
 
 ## Definition
 
-The entity layer. CS-E1 builds the platform — the domain instance (Layer 3) and shared infrastructure (Layer 2 scaffolding). CS-E2 builds the cognitive substrate that operates the platform without a human in the loop for routine decisions.
+Make CALLSHEET deployable, operable, and usable by three principals: human users (browser), human admins (browser), and machine agents (CLI). CS-E1 built the complete backend (54 tables, 118 tRPC procedures, 25 events, 48 consumers, 37 deferred actions, 12 flow steps, 1,863 tests). CS-E2 wraps that backend in production-ready interfaces and deploys it.
 
-CS-E2 transforms CALLSHEET from a platform the principal operates into an entity that operates itself, with the principal receiving briefings and governing through constraints.
+**The Mission:** Three interface layers over one API surface. A human can browse and subscribe. An admin can monitor and intervene. An agent can operate headlessly via CLI tool calls.
 
 ## Prerequisites
 
-- CS-E1 complete (all slices S0–S10 implemented)
-- Platform deployed to production (deployment arc)
-- Operational data flowing (4rfv import complete, real traffic generating perception signals)
-
-Production data is a hard prerequisite. Every feedback loop in CS-E2 requires signal to close against. The entity cannot learn from an empty system.
+- CS-E1 complete (all 90 work items, 718 AC verified, 0 type errors)
+- Principal-gated external prerequisites tracked in `5-launch-readiness/` (Companies House, ICO, Paddle live, banking)
 
 ## Scope
 
-Four capabilities, ordered by dependency:
+### Three Interface Requirements
 
-### 1. Escalation & Principal Channel
+**R1 — Human SaaS UI.** Users interact via browser in standard SaaS patterns. Browse, search, claim, subscribe, manage listings, send enquiries, view dashboards. Production-quality pages with error handling, SEO, image optimization, and responsive design.
 
-The entity can communicate with the principal. Threshold-triggered alerts, principal briefing delivery, operational anomaly notification. Without this, the principal is polling the admin dashboard manually — the entity has no voice.
+**R2 — Admin Observability UI.** The principal (or assistant principal) can see everything and take over anything. Full operational dashboards: flows, compliance, health, scheduler queue, decision audit trail, user management. If an agent malfunctions, a human can diagnose and intervene through the admin UI.
 
-**Depends on:** S9 ceremony outputs (principal briefing generation), S7 operations (admin health signals).
+**R3 — Agent CLI.** A machine agent (e.g., Claude Code) operates CALLSHEET via a TypeScript CLI tool. Structured JSON output, flag-based input, composable with pipes. Every operational procedure is a CLI command. API key authentication for stateless sessions.
 
-### 2. Closed-Loop Enrichment
+### Arc Decomposition
 
-The entity adjusts its own enrichment behaviour based on observed outcomes. Decay check types that consistently return clean get wider intervals. Types that detect problems get tighter intervals. S9-1 (enrichment cadence auto-adjustment) made operational.
+4 arcs, 13 chapters, 38 work items, 168 AC.
 
-**Depends on:** S9 enrichment scheduling, S9 decay detection, production decay signal data.
+| Arc | Scope | Depends On |
+|-----|-------|------------|
+| api-completion | Fill 10 operational API gaps, auth for machines, flow retry fix | — |
+| agent-cli | TypeScript CLI tool (~60 commands), API key auth | api-completion |
+| presentation | Production UI: homepage, error boundaries, stub pages, SEO, images, auth hardening | — |
+| deployment | Supabase production, Vercel, DNS, 4rfv import, Paddle live, smoke test | api-completion + presentation |
 
-### 3. Closed-Loop Quality
+### Build Sequence
 
-The entity calibrates its own quality scoring. Measures whether dimension weights correlate with engagement outcomes (L1 hypothesis). Proposes weight adjustments — principal approves until graduation criteria are met.
+```
+Phase 1 (parallel):
+  api-completion  (unblocks agent-cli + deployment)
+  presentation    (deployment blockers: homepage, error boundaries)
 
-**Depends on:** S9 quality scoring, S9 analytics pipeline (engagement data), sufficient listing volume for statistical signal.
+Phase 2 (parallel):
+  agent-cli       (requires api-completion)
+  presentation    (dashboard + admin completion, polish)
 
-### 4. Operational Autonomy
-
-The entity acts on its own recommendations. Ceremony auto-apply for low-risk decisions (taxonomy suggestions below confidence threshold). Algorithm versioning with A/B testing. Autonomy graduation from "propose and wait" to "act and report."
-
-**Depends on:** S10 autonomy graduation infrastructure (§7–§8), CS-E2 chapters 1–3 (escalation channel + at least one closed loop proven).
+Phase 3:
+  deployment      (requires api-completion + presentation blockers resolved)
+  presentation    (SEO, images, auth hardening — can continue post-deploy)
+```
 
 ## What CS-E2 Is Not
 
-- **Not a rewrite.** CS-E2 builds on top of CS-E1 infrastructure. Event bus, decision logging, ceremony handlers, deferred actions — all exist. CS-E2 adds the closed loops and autonomous action that make those components intelligent.
-- **Not HAIOS-as-monolith.** There is no single "orchestrator" to build. Each closed loop is independent. The orchestration pattern emerges from the loops operating concurrently, not from a central controller.
-- **Not speculative.** Every capability in CS-E2 has a concrete foundation in CS-E1 code. Enrichment scheduling exists — CS-E2 makes it adaptive. Quality scoring exists — CS-E2 makes it self-calibrating. Ceremonies exist — CS-E2 makes them self-applying.
+- **Not new domain logic.** No new events, no new sub-entity behavior, no new business rules. CS-E2 builds interfaces over existing behavior.
+- **Not Runtime Intelligence.** The cognitive substrate (closed-loop enrichment, closed-loop quality, operational autonomy) requires production data. That scope is CS-E3.
+- **Not a rewrite.** The 118 tRPC procedures, 48 event consumers, and 37 deferred actions from CS-E1 are consumed as-is. CS-E2 adds ~15 new tRPC routes (operational gaps) and wraps everything in a CLI.
 
-## Design Approach
+## Technology Decisions
 
-CS-E2 gets the same rigour as CS-E1: investigation → concept design → requirements (slices with AC) → stress test → decompose → implement. The scope above defines the *what*. The investigation phase defines the *how* — what signals close each loop, what thresholds trigger action, what graduation criteria gate autonomy expansion.
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| CLI framework | Commander.js | Mature, TypeScript-native, subcommand support |
+| CLI tRPC client | `@trpc/client` vanilla (httpBatchLink) | Same types as web client, no React dependency |
+| CLI output | JSON default + chalk/cli-table3 for `--format table` | Machine-first, human-readable optional |
+| CLI distribution | `npx callsheet` (npm package) | No build step for dev |
+| Auth for agents | API key in `Authorization: Bearer <key>` header | Stateless, no cookie management |
+| Image optimization | `next/image` + R2 `remotePatterns` | Standard Next.js, free WebP/AVIF conversion |
+| Route protection | `middleware.ts` (replaces layout-level auth) | Standard Next.js pattern |
+
+## Deployment Quality Gates
+
+All deployments must pass the 4-gate framework defined in `0-strategic-frame/deployment-gates.md`:
+
+1. **Gate 1 — Code Verification:** All unit, integration, E2E API, and E2E browser tests pass. 0 type errors.
+2. **Gate 2 — Infrastructure Smoke:** Production environment checks via `callsheet smoke`. Auth, tRPC, Paddle, Resend, R2, Companies House, scheduler all reachable.
+3. **Gate 3 — Data Validation:** Imported data integrity via `callsheet data validate`. Row counts, FK integrity, search functionality, quality computation.
+4. **Gate 4 — User Journey:** 7 browser-level Playwright journeys complete against preview deployment.
+
+The deployment arc's work items must build the infrastructure for these gates (smoke CLI command, validate CLI command, browser E2E tests, journey tests, CI pipeline integration). The gates document defines the acceptance criteria.
 
 ## Exit Criteria
 
-- [ ] Principal receives automated operational briefings without polling
-- [ ] At least one sub-entity feedback loop operates autonomously (enrichment or quality)
-- [ ] Autonomy graduation criteria defined and measurable for all four sub-entities
-- [ ] Entity makes at least one class of decision without human approval
-- [ ] Decision outcomes are tracked and feed back into the learning system
+- [ ] Human users can: sign up, search, view profiles, claim listings, subscribe, manage dashboard, send enquiries — all via browser with production-quality UI
+- [ ] Admin can: monitor health, manage flows (initiate/retry/skip/escalate), view scheduler queue, search decision logs, manage users, manage compliance — all via browser
+- [ ] Agent can: authenticate via API key, perform all admin operations via CLI, receive structured JSON output, compose commands with standard Unix tools
+- [ ] Homepage has real content (hero, value proposition, CTAs)
+- [ ] Error boundaries exist at all levels (root, dashboard, admin)
+- [ ] SEO: sitemap, robots.txt, per-page metadata, JSON-LD on profiles
+- [ ] All 4 deployment quality gates pass (see `deployment-gates.md`)
+- [ ] CI/CD deploys to production on main push with gate-sequenced pipeline
+- [ ] Platform accessible at production URL with real data (4rfv import)
+- [ ] Paddle checkout completes in live mode
+- [ ] All CS-E1 tests continue to pass (regression-free)
+
+## Carried Forward from CS-E1
+
+- Production deployment on Vercel (CS-E1 exit criterion, principal-gated)
+- 4rfv import pipeline execution (CS-E1 deployment arc scope)
+- Paddle live mode cutover (CS-E1 deployment arc scope)
+- Article 14 notice batch (requires ICO registration)
 
 ## References
 
-- `0-strategic-frame/entity-architecture-frame.md` — Layer 2 (Cognitive Substrate), §Design Principle 5 (Autonomy Graduated)
-- `3-requirements/slices/slice-10-hardening/07-autonomy-graduation.md` — S10 §7–§8 graduation infrastructure
-- `3-requirements/slices/slice-09-entity-intelligence/05-entity-learning.md` — L1–L7 hypotheses
+- `0-strategic-frame/entity-architecture-frame.md` — Layer 4 (Meatspace Interface)
+- `0-strategic-frame/deployment-gates.md` — 4-gate deployment quality framework
+- `0-strategic-frame/implementation-phase-evidence.md` — CS-E1 methodology learnings
+- `4-work-management/epochs/CS-E1.md` — Prior epoch (complete)
+- `4-work-management/epochs/CS-E3.md` — Next epoch (Runtime Intelligence, requires production data)

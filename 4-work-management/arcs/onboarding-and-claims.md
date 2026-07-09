@@ -1,7 +1,7 @@
 ---
 id: onboarding-and-claims
 epoch: CS-E1
-status: Active
+status: Complete
 depends: infrastructure
 chapters: [CH-CS-004, CH-CS-005, CH-CS-006]
 ---

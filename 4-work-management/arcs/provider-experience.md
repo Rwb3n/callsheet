@@ -1,7 +1,7 @@
 ---
 id: provider-experience
 epoch: CS-E1
-status: Active
+status: Complete
 depends: onboarding-and-claims
 chapters: [CH-CS-007]
 ---

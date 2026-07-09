@@ -451,7 +451,7 @@ async function main() {
       steps: [
         { name: "verify_identity", domain: "operations", status: "completed", attempt: 1, retryable: true, skippable: false, completedAt: daysAgo(1).toISOString() },
         { name: "extract_account_data", domain: "platform", status: "in_progress", attempt: 1, retryable: true, skippable: true },
-        { name: "close_support_tickets", domain: "operations", status: "pending", attempt: 0, retryable: true, skippable: true },
+        { name: "close_active_tickets", domain: "operations", status: "pending", attempt: 0, retryable: true, skippable: true },
         { name: "process_erasure", domain: "data-and-listings", status: "pending", attempt: 0, retryable: true, skippable: false },
         { name: "close_dsar_case", domain: "operations", status: "pending", attempt: 0, retryable: true, skippable: false },
         { name: "emit_erasure_completed", domain: "platform", status: "pending", attempt: 0, retryable: true, skippable: true },

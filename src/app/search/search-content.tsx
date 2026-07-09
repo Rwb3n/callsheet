@@ -177,7 +177,7 @@ export function SearchPageContent() {
           </section>
         )}
 
-        {/* AC-20: Search results */}
+        {/* AC-20: Search results (exclude sponsored to avoid duplication) */}
         {searchResult.isLoading ? (
           <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -186,9 +186,11 @@ export function SearchPageContent() {
           </div>
         ) : data?.results && data.results.length > 0 ? (
           <div className="grid gap-3">
-            {data.results.map((r) => (
-              <ListingCard key={r.slug} listing={r} />
-            ))}
+            {data.results
+              .filter((r) => !data.sponsoredResults?.some((s) => s.slug === r.slug))
+              .map((r) => (
+                <ListingCard key={r.slug} listing={r} />
+              ))}
           </div>
         ) : data?.totalCount === 0 ? (
           /* AC-24: Zero-result state */

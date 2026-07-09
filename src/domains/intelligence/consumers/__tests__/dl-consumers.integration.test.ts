@@ -91,6 +91,10 @@ describe("AC-87: account_closed enrichment suspension", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [listing.id],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     // Verify deferred actions cancelled
@@ -118,6 +122,10 @@ describe("AC-87: account_closed enrichment suspension", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: ["list-001"],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
   })
 })

@@ -76,6 +76,10 @@ describe("account_closed enrichment suspension", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [listing1.id, listing2.id],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     const decayChecks = mock
@@ -103,6 +107,10 @@ describe("account_closed enrichment suspension", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [listing1.id, listing2.id],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     const fullCycles = mock
@@ -130,6 +138,10 @@ describe("account_closed enrichment suspension", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [listing.id],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     const remaining = await db
@@ -147,6 +159,10 @@ describe("account_closed enrichment suspension", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: ACCOUNT_ID,
       listingsArchived: [],
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
     })
 
     expect(mock.getCancelled()).toHaveLength(0)

@@ -383,7 +383,11 @@ describe("account closed", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: USER_ID,
       listingsArchived: [listing.id],
-    } as AccountClosedEvent)
+      buyerDataDeleted: false,
+      complianceHoldActive: false,
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
+    })
 
     const [ticket] = await db.select().from(supportTickets).where(eq(supportTickets.accountId, USER_ID))
     expect(ticket.status).toBe("closed")
@@ -408,8 +412,11 @@ describe("account closed", () => {
       _brand: "AccountClosedEvent" as const,
       accountId: USER_ID,
       listingsArchived: [],
+      buyerDataDeleted: false,
       complianceHoldActive: true,
-    } as AccountClosedEvent)
+      paddleCancellationsPending: false,
+      timestamp: new Date().toISOString(),
+    })
 
     // Compliance monitor note created
     const entries = await db.select().from(complianceRegister)

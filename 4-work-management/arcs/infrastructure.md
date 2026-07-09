@@ -1,7 +1,7 @@
 ---
 id: infrastructure
 epoch: CS-E1
-status: Active
+status: Complete
 depends: null
 chapters: [CH-CS-001, CH-CS-002, CH-CS-003, CH-CS-013]
 ---

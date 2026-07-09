@@ -4,8 +4,18 @@ import { SiteHeader } from "@/components/layout/header"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Callsheet",
-  description: "B2B discovery platform for UK broadcast/film/TV production services",
+  title: {
+    default: "Callsheet — UK Production Services Directory",
+    template: "%s | Callsheet",
+  },
+  description: "Find and connect with verified broadcast, film and TV production service providers across the UK.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://callsheet.co.uk"),
+  openGraph: {
+    type: "website",
+    siteName: "Callsheet",
+    title: "Callsheet — UK Production Services Directory",
+    description: "Find and connect with verified broadcast, film and TV production service providers across the UK.",
+  },
 }
 
 export default function RootLayout({

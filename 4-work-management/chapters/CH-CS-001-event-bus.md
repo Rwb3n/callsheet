@@ -3,7 +3,7 @@ id: CH-CS-001
 title: Event Bus & Core Infrastructure
 arc: infrastructure
 epoch: CS-E1
-status: Active
+status: Complete
 depends: null
 work_items: [CS-WORK-001, CS-WORK-002, CS-WORK-003, CS-WORK-004, CS-WORK-005, CS-WORK-006, CS-WORK-034]
 ---
